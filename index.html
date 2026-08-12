@@ -7,6 +7,7 @@
 <meta name="description" content="Estudio de arquitectura en Rosario y Funes. Proyecto y construcción de casas en Roldán e Ibarlucea, remodelación integral de cocinas y baños en Rosario. Cotizador de honorarios de arquitecto online, Ley 10653 / CAUPSF Santa Fe.">
 <meta name="keywords" content="arquitectos en Rosario, estudio de arquitectura Rosario y Funes, proyecto y construcción de casas en Roldán, arquitectos Ibarlucea, remodelación integral de cocinas y baños Rosario, cotizador de honorarios arquitecto Santa Fe Ley 10653, dirección de obra Gran Rosario, CAUPSF">
 <meta name="theme-color" content="#142129">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://kvqxffvaalxphmqrmjxw.supabase.co https://*.supabase.co; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
 <link rel="canonical" href="https://estudiomengibar.com.ar/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Arquitectos en Rosario · Estudio Mengibar">
@@ -634,6 +635,8 @@ button,.btn{border-radius:var(--r-pill)}
 @keyframes tickerMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media(prefers-reduced-motion: reduce){.ticker-track{animation:none}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
@@ -805,8 +808,10 @@ button,.btn{border-radius:var(--r-pill)}
     <p class="modal-sub">Registro histórico y métricas de las cotizaciones generadas en este navegador.</p>
     <div id="adminStats" class="admin-stats"></div>
     <div id="adminCharts" class="admin-charts"></div>
-    <div class="step-num tech" style="margin-top:8px">Histórico de cotizaciones</div>
+    <div class="step-num tech" style="margin-top:8px">Histórico de cotizaciones (este navegador)</div>
     <div id="adminHistorial" class="admin-historial"></div>
+    <div class="step-num tech" style="margin-top:18px">Cotizaciones en Supabase (tiempo real) · descarga de PDF</div>
+    <div id="adminSupabaseList" class="admin-historial"></div>
     <div class="navrow" style="margin-top:18px">
       <button class="ghost" onclick="borrarHistorialAdmin()">Borrar historial</button>
       <div class="spacer"></div>
@@ -1126,6 +1131,37 @@ button,.btn{border-radius:var(--r-pill)}
    CONFIGURACION
    ============================================================ */
 const CONFIG = { whatsapp:'543413632019', email:'hola@sasharuiz.com', adminPass:'mengibar2026' };
+
+/* ============================================================
+   SUPABASE — captura de leads y consulta desde /admin
+   ============================================================ */
+const SUPABASE_URL = 'https://kvqxffvaalxphmqrmjxw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2cXhmZnZhYWx4cGhtcXJtanh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MzM2NjYsImV4cCI6MjEwMjEwOTY2Nn0.xwfujk1JsO6GM89lIKyPOu0ixFX-dX1vgC9IqWmgvvQ';
+let supabaseClient = null;
+try{
+  if(window.supabase && typeof window.supabase.createClient==='function' &&
+     SUPABASE_ANON_KEY && SUPABASE_ANON_KEY.indexOf('PEGAR_AQUI')===-1){
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+}catch(e){ supabaseClient = null; }
+
+/* Sanitización básica anti-XSS para campos de texto libre (nombre/email) */
+function sanitizarTexto(str){
+  if(typeof str!=='string') return '';
+  return str.replace(/[<>"'`&]/g, c=>({'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','&':'&amp;'}[c])).trim().slice(0,180);
+}
+
+/* Inserta el lead en la tabla `cotizaciones` de Supabase sin bloquear la UI.
+   Si tarda más de 2s, no hay clave configurada, o falla, se ignora en silencio:
+   el resultado del cotizador ya se muestra en pantalla de todos modos. */
+async function registrarEnSupabase(reg){
+  if(!supabaseClient) return;
+  try{
+    const insertPromise = supabaseClient.from('cotizaciones').insert([reg]);
+    const timeoutPromise = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout_supabase')),2000));
+    await Promise.race([insertPromise, timeoutPromise]);
+  }catch(e){ /* nunca debe interrumpir el flujo del cotizador */ }
+}
 
 const ico = (n,c='') => `<svg class="ico ${c}"><use href="#i-${n}"/></svg>`;
 
@@ -2348,7 +2384,7 @@ function confirmarLead(){
   const err=document.getElementById('leadErr');
   if(!n){err.innerHTML=ico('alerta','ico--sm')+'Completá tu nombre.';return}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m)){err.innerHTML=ico('alerta','ico--sm')+'Ingresá un email válido.';return}
-  err.innerHTML=''; S.nombre=n; S.email=m;
+  err.innerHTML=''; S.nombre=sanitizarTexto(n); S.email=sanitizarTexto(m);
   cerrarModal('modalLead');
   calcularYRender();
   irA(stepSequence().length-1);
@@ -2725,16 +2761,34 @@ function guardarCotizacionAdmin(){
   try{
     const arr=leerHistorialAdmin();
     const id='c'+Date.now();
+    const nombreLimpio=sanitizarTexto(S.nombre||'');
+    const emailLimpio=sanitizarTexto(S.email||'');
+    const ubicacion=S.tipo==='obra_nueva'?(S.ciudadTexto||(R.zona?R.zona.n:'')):(R.zona?R.zona.n:'');
+    const superficieM2=Math.round(R.supComp*10)/10;
+    const presupuestoUsd=Math.round(R.total/TC_REFERENCIA);
     arr.push({
       id, fecha:new Date().toISOString(),
-      nombre:S.nombre||'', email:S.email||'',
+      nombre:nombreLimpio, email:emailLimpio,
       tipo:S.tipo, servicios:S.servicios.slice(),
       ciudad:S.tipo==='obra_nueva'?(S.ciudadTexto||''):'', zona:R.zona?R.zona.n:'',
-      m2:Math.round(R.supComp*10)/10, totalUsd:Math.round(R.total/TC_REFERENCIA),
+      m2:superficieM2, totalUsd:presupuestoUsd,
       tarea:R.tarea?R.tarea.n:'', enviada:false
     });
     escribirHistorialAdmin(arr);
     ultimaCotizacionId=id;
+
+    /* Registro en Supabase (tabla `cotizaciones`) — no bloqueante */
+    registrarEnSupabase({
+      nombre:nombreLimpio,
+      email:emailLimpio,
+      superficie_m2:superficieM2,
+      tipo_servicio:R.tarea?R.tarea.n:(S.servicios.map(k=>SERVICIOS[k]?SERVICIOS[k].n:k).join(', ')),
+      modalidad_obra:S.tipo==='obra_nueva'?'Obra nueva':'Remodelación',
+      ubicacion:ubicacion,
+      presupuesto_usd:presupuestoUsd,
+      fecha:new Date().toISOString(),
+      estado:'Pendiente de envío manual'
+    });
   }catch(e){ /* nunca debe interrumpir el flujo del cotizador */ }
 }
 function marcarCotizacionEnviada(){
@@ -2777,7 +2831,114 @@ function abrirAdminPanel(){
   try{ auth=sessionStorage.getItem('mengibarAdminAuth')==='1'; }catch(e){}
   if(!auth){ abrirAdminLogin(); return; }
   renderAdminPanel();
+  cargarCotizacionesSupabase();
   abrirModal('modalAdminPanel');
+}
+
+/* ============================================================
+   FASE 6 — CONSULTA EN TIEMPO REAL A SUPABASE + GENERACIÓN DE PDF
+   ============================================================ */
+let SUPABASE_RECORDS=[];
+async function cargarCotizacionesSupabase(){
+  const cont=document.getElementById('adminSupabaseList');
+  if(!cont) return;
+  if(!supabaseClient){
+    cont.innerHTML='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">Falta configurar la anon key de Supabase para ver las cotizaciones en tiempo real. El registro local sigue funcionando igual.</p>';
+    return;
+  }
+  cont.innerHTML='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">Cargando cotizaciones…</p>';
+  try{
+    const {data,error}=await supabaseClient.from('cotizaciones').select('*').order('fecha',{ascending:false}).limit(100);
+    if(error) throw error;
+    SUPABASE_RECORDS=data||[];
+    if(!SUPABASE_RECORDS.length){
+      cont.innerHTML='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">Todavía no hay cotizaciones registradas en Supabase.</p>';
+      return;
+    }
+    cont.innerHTML=SUPABASE_RECORDS.map((r,i)=>{
+      const f=r.fecha?new Date(r.fecha):null;
+      const fechaTxt=f&&!isNaN(f)?f.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'2-digit'}):'—';
+      const nombreTxt=sanitizarTexto(r.nombre||'Sin nombre');
+      const emailTxt=sanitizarTexto(r.email||'—');
+      const ubicTxt=sanitizarTexto(r.ubicacion||'');
+      const servTxt=sanitizarTexto(r.tipo_servicio||'');
+      const modTxt=sanitizarTexto(r.modalidad_obra||'');
+      return `<div class="admin-row" style="grid-template-columns:auto 1fr auto auto auto">
+        <span class="tech" style="color:var(--c-mut)">${fechaTxt}</span>
+        <span>
+          <b style="display:block">${nombreTxt}</b>
+          <span style="font-size:.72rem;color:var(--c-mut)">${emailTxt}</span><br>
+          <span style="font-size:.72rem;color:var(--c-mut)">${modTxt}${ubicTxt?' · '+ubicTxt:''} · ${servTxt}</span>
+        </span>
+        <span class="tech">${r.superficie_m2||'—'} m²</span>
+        <span class="tech">USD ${(r.presupuesto_usd||0).toLocaleString('es-AR')}</span>
+        <button class="ghost" style="font-size:.66rem;padding:8px 12px;white-space:nowrap" onclick="generarPDFCotizacion(${i})">Generar / Descargar PDF</button>
+      </div>`;
+    }).join('');
+  }catch(e){
+    cont.innerHTML='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">No se pudo conectar con Supabase. Verificá la anon key y la tabla `cotizaciones`.</p>';
+  }
+}
+function generarPDFCotizacion(i){
+  const r=SUPABASE_RECORDS[i];
+  if(!r) return;
+  generarPDFDesdeRegistro(r);
+}
+function generarPDFDesdeRegistro(r){
+  if(!window.jspdf || !window.jspdf.jsPDF){ alert('No se pudo cargar el generador de PDF. Revisá tu conexión.'); return; }
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  const navy=[20,33,41], nude=[215,186,170], azul=[110,133,149];
+  const nombre=sanitizarTexto(r.nombre||'Cliente');
+  const email=sanitizarTexto(r.email||'—');
+  const ubicacion=sanitizarTexto(r.ubicacion||'—');
+  const servicio=sanitizarTexto(r.tipo_servicio||'—');
+  const modalidad=sanitizarTexto(r.modalidad_obra||'—');
+  const m2=r.superficie_m2||'—';
+  const usdTotal=(r.presupuesto_usd||0).toLocaleString('es-AR');
+  const fechaTxt=r.fecha?new Date(r.fecha).toLocaleDateString('es-AR'):'—';
+
+  doc.setFillColor(navy[0],navy[1],navy[2]); doc.rect(0,0,210,32,'F');
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(18);
+  doc.text('Estudio Mengibar', 14, 16);
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.text('Resumen de cotización de honorarios · Arq. Sasha Ruiz', 14, 24);
+
+  let y=44;
+  doc.setTextColor(navy[0],navy[1],navy[2]);
+  doc.setFontSize(13); doc.setFont('helvetica','bold');
+  doc.text('Datos del cliente', 14, y); y+=8;
+  doc.setFontSize(10);
+  const linea=(label,val)=>{
+    doc.setFont('helvetica','bold'); doc.text(label+':',14,y);
+    doc.setFont('helvetica','normal'); doc.text(String(val||'—'),62,y);
+    y+=7;
+  };
+  linea('Nombre', nombre);
+  linea('Email', email);
+  linea('Fecha de cotización', fechaTxt);
+
+  y+=4;
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Detalle del proyecto', 14, y); y+=8;
+  doc.setFontSize(10);
+  linea('Modalidad', modalidad);
+  linea('Servicio', servicio);
+  linea('Ubicación', ubicacion);
+  linea('Superficie computable', m2+' m²');
+
+  y+=6;
+  doc.setDrawColor(nude[0],nude[1],nude[2]); doc.setLineWidth(0.6); doc.line(14,y,196,y); y+=10;
+  doc.setFillColor(nude[0],nude[1],nude[2]); doc.rect(14,y-7,182,17,'F');
+  doc.setTextColor(navy[0],navy[1],navy[2]); doc.setFont('helvetica','bold'); doc.setFontSize(14);
+  doc.text('HONORARIO ESTIMADO: USD '+usdTotal, 20, y+4);
+  y+=26;
+
+  doc.setTextColor(azul[0],azul[1],azul[2]); doc.setFont('helvetica','normal'); doc.setFontSize(8);
+  doc.text('Estimación válida por 7 a 15 días. El presupuesto final se valida en la visita técnica.', 14, y);
+  doc.text('Aportes Ley 10653 (23%) incluidos en el cálculo. CAUPSF / Ley Araya — Santa Fe.', 14, y+5);
+  doc.text('Estado del envío: '+sanitizarTexto(r.estado||'Pendiente de envío manual'), 14, y+10);
+
+  doc.save('cotizacion-'+nombre.replace(/\s+/g,'_').toLowerCase()+'.pdf');
 }
 function donutSVG(pctA,colA,pctB,colB){
   const r=42, c=2*Math.PI*r, offA=c*(1-pctA);
