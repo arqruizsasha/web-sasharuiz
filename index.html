@@ -48,7 +48,7 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{background:var(--papel);color:var(--navy);font-family:'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+body{background:var(--papel);color:var(--navy);font-family:'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 img,svg{display:block;max-width:100%}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 a{color:inherit}
@@ -93,8 +93,15 @@ h1.hero-title{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(2
 .hero-bio{font-size:1.03rem;font-weight:300;max-width:54ch;color:rgba(20,33,41,.84);margin-bottom:16px}
 .hero-bio strong{font-weight:600;color:var(--navy)}
 .hero-acts{display:flex;gap:14px;flex-wrap:wrap;margin:30px 0 46px}
-.foto-block{background:transparent;position:relative;align-self:stretch;min-height:400px;display:flex;align-items:flex-end;justify-content:center;padding-top:34px;overflow:hidden}
-.foto-block::before{content:none}
+.foto-block{background:transparent;position:relative;align-self:stretch;min-height:400px;display:flex;align-items:flex-end;justify-content:center;padding-top:34px;overflow:visible}
+.foto-block::before{content:'';position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);width:150%;aspect-ratio:1/1;max-width:680px;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(circle at 62% 32%,rgba(167,210,221,.65),transparent 52%),
+    radial-gradient(circle at 30% 68%,rgba(110,133,149,.4),transparent 55%),
+    radial-gradient(circle at 55% 55%,rgba(215,186,170,.22),transparent 60%);
+  filter:blur(8px);
+  -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 38%,transparent 70%);
+  mask-image:radial-gradient(circle at 50% 50%,#000 38%,transparent 70%)}
 .foto-block img{width:94%;max-width:420px;height:auto;position:relative;z-index:2;filter:drop-shadow(0 16px 34px rgba(20,33,41,.26))}
 .foto-tag{position:absolute;top:0;left:0;z-index:3;background:var(--navy);color:var(--papel);padding:9px 16px}
 .social-fabs{position:fixed;right:22px;bottom:88px;z-index:80;display:flex;flex-direction:column;gap:12px}
@@ -813,6 +820,7 @@ button,.btn{border-radius:var(--r-pill)}
     <button class="modal-x" onclick="cerrarModal('modalAdminPanel')" aria-label="Cerrar">×</button>
     <h4><svg class="ico"><use href="#i-doc"/></svg> Panel de administración</h4>
     <p class="modal-sub">Datos en tiempo real desde Supabase. Sin caché local: siempre lo último que dejaron los clientes.</p>
+    <div id="adminPendientesLocal" style="display:none;margin:10px 0;padding:10px 14px;border:1px solid var(--nude);background:rgba(215,186,170,.12);font-size:.78rem;color:var(--c-txt)"></div>
 
     <div class="admin-tabs" role="tablist">
       <button class="admin-tab sel" id="tabBtnMetricas" role="tab" onclick="cambiarTabAdmin('metricas')">Métricas y Analíticas</button>
@@ -1167,18 +1175,75 @@ function sanitizarTexto(str){
   return str.replace(/[<>"'`&]/g, c=>({'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','&':'&amp;'}[c])).trim().slice(0,180);
 }
 
+/* ============================================================
+   RESPALDO LOCAL — leads que no pudieron guardarse en Supabase
+   (RLS mal configurado, columna incompatible, timeout, sin red, etc.)
+   Se guardan en localStorage del dispositivo del VISITANTE y se
+   reintenta sincronizarlos automáticamente en cada carga de página
+   y cada vez que se abre el panel admin (desde ese mismo dispositivo).
+   Limitación real: si el visitante nunca vuelve a entrar al sitio
+   desde ese navegador, el respaldo queda ahí y no llega a Supabase
+   solo. No es un backend de reintento server-side, es una red de
+   contención para no perder el dato en el momento del fallo.
+   ============================================================ */
+const LOCAL_LEADS_KEY = 'mengibarLeadsPendientes';
+function leerLeadsPendientesLocal(){
+  try{
+    const raw = localStorage.getItem(LOCAL_LEADS_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){ return []; }
+}
+function guardarLeadPendienteLocal(reg){
+  try{
+    const arr = leerLeadsPendientesLocal();
+    arr.push(Object.assign({}, reg, {
+      _localId: Date.now()+'_'+Math.random().toString(36).slice(2,8),
+      _guardadoLocal: new Date().toISOString()
+    }));
+    while(arr.length>200) arr.shift(); // tope de seguridad, no crece indefinidamente
+    localStorage.setItem(LOCAL_LEADS_KEY, JSON.stringify(arr));
+  }catch(e){ /* si ni localStorage está disponible, no hay más nada que hacer del lado cliente */ }
+}
+function borrarLeadPendienteLocal(localId){
+  try{
+    const arr = leerLeadsPendientesLocal().filter(l=>l._localId!==localId);
+    localStorage.setItem(LOCAL_LEADS_KEY, JSON.stringify(arr));
+  }catch(e){}
+}
+/* Intenta reenviar a Supabase todo lo que haya quedado pendiente en este dispositivo.
+   Se llama sola al cargar la página y al abrir el panel admin. No bloquea nada si falla de nuevo. */
+async function sincronizarLeadsPendientes(){
+  if(!supabaseClient) return {intentados:0, exitosos:0};
+  const pendientes = leerLeadsPendientesLocal();
+  if(!pendientes.length) return {intentados:0, exitosos:0};
+  let exitosos=0;
+  for(const lead of pendientes){
+    try{
+      const reg = Object.assign({}, lead);
+      const localId = reg._localId;
+      delete reg._localId; delete reg._guardadoLocal;
+      const {error} = await supabaseClient.from('cotizaciones').insert([reg]);
+      if(!error){ borrarLeadPendienteLocal(localId); exitosos++; }
+    }catch(e){ /* sigue pendiente, se reintenta la próxima vez que se cargue la página */ }
+  }
+  return {intentados:pendientes.length, exitosos};
+}
+window.addEventListener('load', ()=>{ sincronizarLeadsPendientes(); });
+
 /* Inserta el lead en la tabla `cotizaciones` de Supabase sin bloquear la UI.
-   Si tarda más de 2s, no hay clave configurada, o falla, se ignora en silencio:
-   el resultado del cotizador ya se muestra en pantalla de todos modos.
+   Si tarda más de 2s, no hay clave configurada, o falla, se guarda como
+   respaldo local (ver arriba) para no perder el dato del cliente.
    Guarda el id devuelto en S.supabaseId para poder marcar pdf_generado luego. */
 async function registrarEnSupabase(reg){
-  if(!supabaseClient) return;
+  if(!supabaseClient){ guardarLeadPendienteLocal(reg); return; }
   try{
     const insertPromise = supabaseClient.from('cotizaciones').insert([reg]).select('id').single();
     const timeoutPromise = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout_supabase')),2000));
     const {data} = await Promise.race([insertPromise, timeoutPromise]);
     if(data && data.id) S.supabaseId = data.id;
-  }catch(e){ /* nunca debe interrumpir el flujo del cotizador */ }
+    else guardarLeadPendienteLocal(reg);
+  }catch(e){ guardarLeadPendienteLocal(reg); }
 }
 /* Marca en Supabase que el cliente descargó su PDF (para el badge del panel admin) */
 async function marcarPdfGeneradoSupabase(){
@@ -2771,7 +2836,6 @@ function guardarCotizacionAdmin(){
       modalidad_obra:S.tipo==='obra_nueva'?'Obra nueva':'Remodelación',
       ubicacion:ubicacion,
       presupuesto_usd:presupuestoUsd,
-      fecha:new Date().toISOString(),
       estado:'Pendiente de envío manual',
       telefono:'',
       pdf_generado:false
@@ -2818,6 +2882,22 @@ function cambiarTabAdmin(tab){
    FASE 6 — DASHBOARD 100% SUPABASE (SIN LOCALSTORAGE) + MOTOR DE PDF
    ============================================================ */
 let SUPABASE_RECORDS=[];
+function renderAdminPendientesLocal(){
+  const box=document.getElementById('adminPendientesLocal');
+  if(!box) return;
+  const pendientes=leerLeadsPendientesLocal();
+  if(!pendientes.length){ box.style.display='none'; box.innerHTML=''; return; }
+  box.style.display='block';
+  box.innerHTML = ico('alerta','ico--sm') + ' <strong>'+pendientes.length+' lead'+(pendientes.length!==1?'s':'')+'</strong> '
+    + (pendientes.length!==1?'quedaron':'quedó') + ' guardado'+(pendientes.length!==1?'s':'')+' solo en <em>este dispositivo</em> '
+    + '(no se pudieron sincronizar con Supabase). Se reintenta solo en cada carga de página desde este mismo navegador. '
+    + '<button class="ghost" style="margin-left:8px;padding:4px 10px;font-size:.68rem" onclick="reintentarSyncManual()">Reintentar ahora</button>';
+}
+async function reintentarSyncManual(){
+  await sincronizarLeadsPendientes();
+  renderAdminPendientesLocal();
+  cargarCotizacionesSupabase();
+}
 async function cargarCotizacionesSupabase(){
   const stats=document.getElementById('adminStats');
   const charts=document.getElementById('adminCharts');
@@ -2825,6 +2905,8 @@ async function cargarCotizacionesSupabase(){
   const tabla=document.getElementById('adminLeadsTable');
   const sync=document.getElementById('adminSyncStatus');
   if(!stats||!tabla) return;
+  await sincronizarLeadsPendientes();
+  renderAdminPendientesLocal();
   if(!supabaseClient){
     const msg='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">Falta configurar la anon key de Supabase para ver datos en tiempo real.</p>';
     stats.innerHTML=''; charts.innerHTML=''; if(ubic) ubic.innerHTML=''; tabla.innerHTML=msg;
@@ -2833,7 +2915,7 @@ async function cargarCotizacionesSupabase(){
   if(sync) sync.textContent='Sincronizando…';
   tabla.innerHTML='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">Cargando cotizaciones…</p>';
   try{
-    const {data,error}=await supabaseClient.from('cotizaciones').select('*').order('fecha',{ascending:false}).limit(300);
+    const {data,error}=await supabaseClient.from('cotizaciones').select('*').order('created_at',{ascending:false}).limit(300);
     if(error) throw error;
     SUPABASE_RECORDS=data||[];
     renderAdminStats(SUPABASE_RECORDS);
@@ -2948,7 +3030,7 @@ function renderAdminLeadsTable(arr){
     return;
   }
   tabla.innerHTML = arr.map((r,i)=>{
-    const f=r.fecha?new Date(r.fecha):null;
+    const f=r.created_at?new Date(r.created_at):null;
     const fechaTxt=f&&!isNaN(f)?f.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'2-digit'}):'—';
     const nombreTxt=sanitizarTexto(r.nombre||'Sin nombre');
     const emailTxt=sanitizarTexto(r.email||'—');
@@ -3178,7 +3260,7 @@ function generarPDFDesdeRegistro(r){
   const doc=construirPDFCotizacion({
     subtitle:'Resumen de cotización (panel administrativo)',
     nombre, email:sanitizarTexto(r.email||'—'),
-    fechaTxt:r.fecha?new Date(r.fecha).toLocaleDateString('es-AR'):'—',
+    fechaTxt:r.created_at?new Date(r.created_at).toLocaleDateString('es-AR'):'—',
     proyecto, filas,
     totalTxt:'USD '+(Number(r.presupuesto_usd)||0).toLocaleString('es-AR'),
     tcTxt:'Ver condiciones vigentes al momento de la consulta',
