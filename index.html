@@ -206,6 +206,9 @@ h1.hero-title{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(2
 /* WhatsApp: blanco por defecto, verde al pasar el cursor */
 .cta--wa{background:var(--blanco);color:var(--navy);border:1px solid var(--linea-2)}
 .cta--wa:hover{background:var(--wa);color:#fff;border-color:var(--wa-dark)}
+/* Email: mismo tratamiento neutro, acento celeste-grisáceo de marca al pasar el cursor */
+.cta--mail{background:var(--blanco);color:var(--navy);border:1px solid var(--linea-2)}
+.cta--mail:hover{background:var(--azul);color:#fff;border-color:var(--azul)}
 .wa-fab{position:fixed;right:22px;bottom:22px;z-index:80;display:flex;align-items:center;
   background:var(--blanco);color:var(--wa);border:1px solid var(--linea-2);border-radius:999px;
   padding:15px;box-shadow:0 8px 26px rgba(20,33,41,.22);text-decoration:none;transition:var(--t);overflow:hidden}
@@ -798,7 +801,7 @@ button,.btn{border-radius:var(--r-pill)}
         <input type="email" id="leadEmail" autocomplete="email" placeholder="nombre@correo.com" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarLead()}"></div>
     </div>
     <p class="err" id="leadErr" style="min-height:1.2em"></p>
-    <button class="cta cta--full" style="margin-top:6px" onclick="confirmarLead()">
+    <button class="cta cta--full" id="btnConfirmarLead" style="margin-top:6px" onclick="confirmarLead()">
       <svg class="ico"><use href="#i-calc"/></svg> Ver mi presupuesto estimado</button>
   </div>
 </div>
@@ -1076,8 +1079,7 @@ button,.btn{border-radius:var(--r-pill)}
         <div class="bloque-h"><svg class="ico ico--sm"><use href="#i-planta"/></svg><span>Esquema de tu distribución</span></div>
         <div class="bloque-b">
           <p style="font-size:.83rem;font-weight:300;color:var(--c-mut);margin-bottom:14px">
-            Planta esquemática generada a partir de los ambientes y el flujo circulatorio que armaste en el planificador.
-            Descargala para adjuntarla junto al resumen por WhatsApp o email.</p>
+            Planta esquemática generada a partir de los ambientes y el flujo circulatorio que armaste en el planificador.</p>
           <div class="esquema-box" style="max-width:420px">
             <div id="esquemaPlanta"></div>
             <div class="esquema-lbl" style="display:flex;justify-content:space-between;align-items:center">
@@ -1130,14 +1132,15 @@ button,.btn{border-radius:var(--r-pill)}
       </div>
 
       <div class="form" id="envioCard">
-        <h5><svg class="ico "><use href="#i-enviar"/></svg> ¿Te la mando?</h5>
-        <p class="fs" id="envioSub">Dejame tu WhatsApp y te la mando por ahí.</p>
+        <h5><svg class="ico "><use href="#i-enviar"/></svg> ¿Querés recibir tu presupuesto?</h5>
+        <p class="fs" id="envioSub">Elegí cómo preferís recibirlo: WhatsApp o email.</p>
         <div class="field full" style="margin-bottom:18px">
           <label class="tech" for="fWa">WhatsApp con código de área (opcional)</label>
           <input type="tel" id="fWa" autocomplete="tel" placeholder="341 555 5555">
         </div>
         <div class="envio">
-          <button class="cta cta--wa" onclick="enviarWA()"><svg class="glyph" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm0 18.13h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.36c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.21-8.24 8.21zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.23.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.29z"/></svg> Enviar por WhatsApp</button>
+          <button class="cta cta--wa" id="btnEnviarWA" onclick="enviarWA()"><svg class="glyph" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm0 18.13h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.36c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.21-8.24 8.21zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.23.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.29z"/></svg> <span id="btnEnviarWATxt">Enviar por WhatsApp</span></button>
+          <button class="cta cta--mail" id="btnEnviarMail" onclick="enviarPorEmail()"><svg class="ico ico--sm"><use href="#i-sobre"/></svg> <span id="btnEnviarMailTxt">Enviar por email</span></button>
         </div>
       </div>
 
@@ -1169,6 +1172,59 @@ try{
   }
 }catch(e){ supabaseClient = null; }
 
+/* ============================================================
+   ENVÍO "A PRUEBA DE BACKGROUNDING" — fetch con keepalive:true
+   ============================================================
+   El problema real en mobile: apenas el visitante toca "Enviar por
+   WhatsApp" o "Enviar por email", el navegador manda la pestaña a
+   segundo plano (se abre WhatsApp / la app de mail). Si en ese momento
+   el guardado en Supabase seguía viajando, el sistema puede cortar la
+   conexión a mitad de camino y el dato se pierde, sin aviso.
+
+   navigator.sendBeacon() existe justo para este caso, pero no permite
+   mandar headers propios — y Supabase necesita el header `apikey` para
+   aceptar el pedido. Por eso se usa en cambio `fetch(..., {keepalive:true})`:
+   es la forma moderna y recomendada de lograr la misma garantía
+   (el pedido sigue viajando aunque la pestaña se oculte o el usuario
+   navegue a otra app) pero SÍ permite mandar los headers de autenticación
+   que hacen falta. Se usa tanto para el insert inicial como para
+   cualquier update posterior (feedback, teléfono, pdf, pedido de email).
+   ============================================================ */
+const SUPABASE_REST_URL = SUPABASE_URL + '/rest/v1/cotizaciones';
+function supabaseHeaders(prefer){
+  return {
+    'Content-Type': 'application/json',
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+    'Prefer': prefer
+  };
+}
+/* Inserta una fila. keepalive:true garantiza que el pedido complete su
+   viaje aunque la pestaña se oculte apenas después de dispararlo — el
+   navegador lo sostiene en segundo plano de forma independiente del
+   código JS que lo esperaba. Devuelve el id creado, o null si no llegó
+   a confirmarse a tiempo (igual puede haber quedado guardado del otro
+   lado; por eso el guardado sigue viajando aunque acá se dé por perdido). */
+async function supabaseInsertKeepalive(reg){
+  const resp = await fetch(SUPABASE_REST_URL, {
+    method:'POST', keepalive:true,
+    headers: supabaseHeaders('return=representation'),
+    body: JSON.stringify(reg)
+  });
+  if(!resp.ok) throw new Error('insert_failed_'+resp.status);
+  const data = await resp.json();
+  return (data && data[0] && data[0].id) ? data[0].id : null;
+}
+/* Actualiza una fila por id, misma garantía de keepalive. */
+async function supabaseUpdateKeepalive(id, patch){
+  const resp = await fetch(SUPABASE_REST_URL+'?id=eq.'+encodeURIComponent(id), {
+    method:'PATCH', keepalive:true,
+    headers: supabaseHeaders('return=minimal'),
+    body: JSON.stringify(patch)
+  });
+  if(!resp.ok) throw new Error('update_failed_'+resp.status);
+}
+
 /* Sanitización básica anti-XSS para campos de texto libre (nombre/email) */
 function sanitizarTexto(str){
   if(typeof str!=='string') return '';
@@ -1187,6 +1243,11 @@ function sanitizarTexto(str){
    contención para no perder el dato en el momento del fallo.
    ============================================================ */
 const LOCAL_LEADS_KEY = 'mengibarLeadsPendientes';
+/* Cola separada de ACTUALIZACIONES (voto de feedback, pedido de email, teléfono,
+   pdf generado) que llegaron a fallar contra Supabase para un registro que SÍ
+   quedó guardado remotamente (tiene supabaseId). Sin esto, cualquier clic
+   posterior al guardado inicial que falle por red se perdía en silencio. */
+const LOCAL_UPDATES_KEY = 'mengibarActualizacionesPendientes';
 function leerLeadsPendientesLocal(){
   try{
     const raw = localStorage.getItem(LOCAL_LEADS_KEY);
@@ -1195,15 +1256,14 @@ function leerLeadsPendientesLocal(){
   }catch(e){ return []; }
 }
 function guardarLeadPendienteLocal(reg){
+  const localId = Date.now()+'_'+Math.random().toString(36).slice(2,8);
   try{
     const arr = leerLeadsPendientesLocal();
-    arr.push(Object.assign({}, reg, {
-      _localId: Date.now()+'_'+Math.random().toString(36).slice(2,8),
-      _guardadoLocal: new Date().toISOString()
-    }));
+    arr.push(Object.assign({}, reg, { _localId: localId, _guardadoLocal: new Date().toISOString() }));
     while(arr.length>200) arr.shift(); // tope de seguridad, no crece indefinidamente
     localStorage.setItem(LOCAL_LEADS_KEY, JSON.stringify(arr));
   }catch(e){ /* si ni localStorage está disponible, no hay más nada que hacer del lado cliente */ }
+  return localId;
 }
 function borrarLeadPendienteLocal(localId){
   try{
@@ -1211,13 +1271,47 @@ function borrarLeadPendienteLocal(localId){
     localStorage.setItem(LOCAL_LEADS_KEY, JSON.stringify(arr));
   }catch(e){}
 }
-/* Intenta reenviar a Supabase todo lo que haya quedado pendiente en este dispositivo.
-   Se llama sola al cargar la página y al abrir el panel admin. No bloquea nada si falla de nuevo. */
+/* Actualiza campos de un lead que todavía está solo en el respaldo local
+   (ej. llega el voto de feedback antes de que el insert original haya
+   podido sincronizarse). Así, cuando sincronice, ya viaja completo. */
+function actualizarLeadPendienteLocal(localId, patch){
+  try{
+    const arr = leerLeadsPendientesLocal();
+    const i = arr.findIndex(l=>l._localId===localId);
+    if(i>-1){ Object.assign(arr[i], patch); localStorage.setItem(LOCAL_LEADS_KEY, JSON.stringify(arr)); }
+  }catch(e){}
+}
+function leerActualizacionesPendientesLocal(){
+  try{
+    const raw = localStorage.getItem(LOCAL_UPDATES_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){ return []; }
+}
+function guardarActualizacionPendienteLocal(supabaseId, patch){
+  try{
+    const arr = leerActualizacionesPendientesLocal();
+    arr.push({ _localId: Date.now()+'_'+Math.random().toString(36).slice(2,8), supabaseId, patch, _guardadoLocal: new Date().toISOString() });
+    while(arr.length>200) arr.shift();
+    localStorage.setItem(LOCAL_UPDATES_KEY, JSON.stringify(arr));
+  }catch(e){}
+}
+function borrarActualizacionPendienteLocal(localId){
+  try{
+    const arr = leerActualizacionesPendientesLocal().filter(l=>l._localId!==localId);
+    localStorage.setItem(LOCAL_UPDATES_KEY, JSON.stringify(arr));
+  }catch(e){}
+}
+/* Intenta reenviar a Supabase todo lo que haya quedado pendiente en este dispositivo:
+   tanto leads completos sin insertar como actualizaciones sueltas (feedback, email
+   solicitado, teléfono, pdf) sobre leads que sí llegaron a insertarse.
+   Se llama sola al cargar la página, al abrir el panel admin y a pedido manual.
+   No bloquea nada si falla de nuevo. */
 async function sincronizarLeadsPendientes(){
   if(!supabaseClient) return {intentados:0, exitosos:0};
+  let intentados=0, exitosos=0;
   const pendientes = leerLeadsPendientesLocal();
-  if(!pendientes.length) return {intentados:0, exitosos:0};
-  let exitosos=0;
+  intentados += pendientes.length;
   for(const lead of pendientes){
     try{
       const reg = Object.assign({}, lead);
@@ -1227,39 +1321,84 @@ async function sincronizarLeadsPendientes(){
       if(!error){ borrarLeadPendienteLocal(localId); exitosos++; }
     }catch(e){ /* sigue pendiente, se reintenta la próxima vez que se cargue la página */ }
   }
-  return {intentados:pendientes.length, exitosos};
+  const actualizaciones = leerActualizacionesPendientesLocal();
+  intentados += actualizaciones.length;
+  for(const upd of actualizaciones){
+    try{
+      const {error} = await supabaseClient.from('cotizaciones').update(upd.patch).eq('id', upd.supabaseId);
+      if(!error){ borrarActualizacionPendienteLocal(upd._localId); exitosos++; }
+    }catch(e){ /* sigue pendiente */ }
+  }
+  return {intentados, exitosos};
 }
 window.addEventListener('load', ()=>{ sincronizarLeadsPendientes(); });
 
-/* Inserta el lead en la tabla `cotizaciones` de Supabase sin bloquear la UI.
-   Si tarda más de 2s, no hay clave configurada, o falla, se guarda como
-   respaldo local (ver arriba) para no perder el dato del cliente.
-   Guarda el id devuelto en S.supabaseId para poder marcar pdf_generado luego. */
+/* Inserta el lead en la tabla `cotizaciones` de Supabase sin bloquear el
+   RENDER de la pantalla de resultado (se ve al instante igual).
+   Si tarda, no hay clave configurada, o falla, se guarda como respaldo
+   local (ver arriba) para no perder el dato del cliente.
+   Devuelve la promesa del intento (no solo dispara y olvida): así, acciones
+   que sacan al usuario de la pestaña —como "Enviar por WhatsApp", que en
+   celular manda la app a segundo plano casi al instante— pueden ESPERAR a
+   que el intento termine (éxito o respaldo local) antes de disparar esa
+   salida. Si no se espera, en redes móviles más lentas el pedido puede
+   quedar a mitad de camino y el navegador lo corta al perder foco antes de
+   que el bloque catch llegue a guardar el respaldo local: la cotización se
+   pierde en silencio. Como la mayoría entra por celular, esto importa mucho.
+   Guarda el id devuelto en S.supabaseId (o el id local en S.localLeadId si no
+   hubo forma de llegar a Supabase) para que cualquier clic posterior —voto de
+   feedback, pedido de email, teléfono, pdf generado— sepa dónde escribir. */
 async function registrarEnSupabase(reg){
-  if(!supabaseClient){ guardarLeadPendienteLocal(reg); return; }
+  if(S.supabaseId || S.localLeadId) return; /* ya existe un registro para esta cotización: no duplicar */
+  if(!supabaseClient){ S.localLeadId = guardarLeadPendienteLocal(reg); return; }
   try{
-    const insertPromise = supabaseClient.from('cotizaciones').insert([reg]).select('id').single();
-    const timeoutPromise = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout_supabase')),2000));
-    const {data} = await Promise.race([insertPromise, timeoutPromise]);
-    if(data && data.id) S.supabaseId = data.id;
-    else guardarLeadPendienteLocal(reg);
-  }catch(e){ guardarLeadPendienteLocal(reg); }
+    const insertPromise = supabaseInsertKeepalive(reg);
+    const timeoutPromise = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout_supabase')),4000));
+    const id = await Promise.race([insertPromise, timeoutPromise]);
+    if(id) S.supabaseId = id;
+    else S.localLeadId = guardarLeadPendienteLocal(reg);
+  }catch(e){ S.localLeadId = guardarLeadPendienteLocal(reg); }
+}
+/* Punto único para guardar CUALQUIER dato que se genere después del insert
+   inicial: voto de feedback, pedido de "enviar por email", teléfono, pdf
+   generado. Espera primero a que termine el guardado inicial (si seguía en
+   viaje), y después escribe el campo donde corresponda:
+   - si el registro ya está en Supabase, hace el UPDATE (con su propio
+     respaldo local si ese UPDATE puntual falla);
+   - si el registro solo llegó al respaldo local, actualiza esa copia local
+     para que viaje completa la próxima vez que sincronice.
+   Así, absolutamente todo lo que el visitante toca en el cotizador queda
+   guardado en algún lado, nunca solo en la memoria de la pestaña. */
+async function guardarCampos(patch){
+  try{ if(S.guardadoPromise) await S.guardadoPromise; }catch(e){}
+  if(S.supabaseId){
+    if(!supabaseClient){ guardarActualizacionPendienteLocal(S.supabaseId, patch); return; }
+    try{
+      const updPromise = supabaseUpdateKeepalive(S.supabaseId, patch);
+      const timeoutPromise = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout_supabase')),4000));
+      await Promise.race([updPromise, timeoutPromise]);
+    }catch(e){ guardarActualizacionPendienteLocal(S.supabaseId, patch); }
+  } else if(S.localLeadId){
+    actualizarLeadPendienteLocal(S.localLeadId, patch);
+  }
+  /* si no hay ni supabaseId ni localLeadId todavía (guardado inicial no
+     terminó de resolverse), no hay dónde escribir: se pierde ese campo
+     puntual, pero es un caso extremo (falló también localStorage). */
+}
+/* Atajo para actualizar un único campo (feedback, quiere_email, teléfono, pdf). */
+async function guardarCampo(campo, valor){
+  const patch = {}; patch[campo] = valor;
+  return guardarCampos(patch);
 }
 /* Marca en Supabase que el cliente descargó su PDF (para el badge del panel admin) */
 async function marcarPdfGeneradoSupabase(){
-  if(!supabaseClient || !S.supabaseId) return;
-  try{
-    await supabaseClient.from('cotizaciones').update({pdf_generado:true}).eq('id', S.supabaseId);
-  }catch(e){ /* no bloquea la descarga del PDF */ }
+  return guardarCampo('pdf_generado', true);
 }
 /* Guarda el WhatsApp opcional que el cliente deja en la pantalla final (si ya existe el registro) */
 async function actualizarTelefonoSupabase(tel){
-  if(!supabaseClient || !S.supabaseId || !tel) return;
-  try{
-    await supabaseClient.from('cotizaciones').update({telefono:tel}).eq('id', S.supabaseId);
-  }catch(e){ /* no bloquea el envío */ }
+  if(!tel) return;
+  return guardarCampo('telefono', tel);
 }
-
 const ico = (n,c='') => `<svg class="ico ${c}"><use href="#i-${n}"/></svg>`;
 
 /* ---------- Esquemas de terminación (ilustrativos) ---------- */
@@ -1551,7 +1690,7 @@ const S = {servicios:[],tipo:null,pais:null,provincia:null,zona:null,ciudadTexto
   ambienteRemod:null,ambientes:[],alcance:null,alcanceBloqueado:false,calidad:null,
   m2:120,m2semi:0,tareaProyecto:null,tareaDireccion:null,extras:[],m2Piscina:24,layout:[],conexiones:[],
   tieneCAD:null,bimEtapas:[],bimLod:300,bimRenders:[],
-  feedback:null,nombre:'',apellido:'',email:'',supabaseId:null};
+  feedback:null,nombre:'',apellido:'',email:'',supabaseId:null,localLeadId:null,guardadoPromise:null};
 let paso = 0;
 const TOTAL = 7;
 
@@ -2472,15 +2611,26 @@ function usarEstimacion(){
    ============================================================ */
 function abrirModalLead(){
   document.getElementById('leadErr').innerHTML='';
+  /* Reabrir el modal (típicamente tras "← Modificar datos" y volver a avanzar)
+     es una intención legítima de recalcular: hay que soltar el freno anti
+     doble-tap de la vez anterior, si no, el botón queda muerto para siempre. */
+  envioLeadEnCurso = false;
+  const btnConfirmar=document.getElementById('btnConfirmarLead');
+  if(btnConfirmar) btnConfirmar.disabled = false;
   abrirModal('modalLead');
   setTimeout(()=>document.getElementById('leadNombre').focus(),80);
 }
+let envioLeadEnCurso = false;
 function confirmarLead(){
+  if(envioLeadEnCurso) return; /* freno anti doble-tap: evita 2 inserts de la misma cotización */
   const n=document.getElementById('leadNombre').value.trim();
   const m=document.getElementById('leadEmail').value.trim();
   const err=document.getElementById('leadErr');
   if(!n){err.innerHTML=ico('alerta','ico--sm')+'Completá tu nombre.';return}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m)){err.innerHTML=ico('alerta','ico--sm')+'Ingresá un email válido.';return}
+  envioLeadEnCurso = true;
+  const btnConfirmar=document.getElementById('btnConfirmarLead');
+  if(btnConfirmar) btnConfirmar.disabled = true;
   err.innerHTML=''; S.nombre=sanitizarTexto(n); S.email=sanitizarTexto(m);
   cerrarModal('modalLead');
   calcularYRender();
@@ -2638,7 +2788,7 @@ function calcularYRender(){
   guardarCotizacionAdmin();
   const envioCard=document.getElementById('envioCard');
   const obraBloque=document.getElementById('obraBloque');
-  document.getElementById('envioSub').textContent='Dejame tu WhatsApp y te la mando por ahí.';
+  document.getElementById('envioSub').textContent='Elegí cómo preferís recibirlo: WhatsApp o email.';
   if(envioCard) envioCard.classList.toggle('envio-pulse', !S.feedback);
 
   /* ---- esquema visual dinamico ---- */
@@ -2725,6 +2875,7 @@ function setFb(el){
   document.querySelectorAll('.fb-btn[data-fb]').forEach(b=>b.classList.remove('sel'));
   el.classList.add('sel'); S.feedback=el.dataset.fb;
   document.getElementById('fbThanks').classList.remove('hidden');
+  guardarCampo('feedback', S.feedback); /* dato propio en la base, no solo texto dentro del mensaje */
   const envioCard=document.getElementById('envioCard');
   if(envioCard){
     envioCard.classList.remove('envio-pulse');
@@ -2790,18 +2941,61 @@ function textoCotizacion(){
   L.push(''); L.push('Quedo a la espera para coordinar la visita técnica.');
   return L.join('\n');
 }
-function enviarWA(){
+let envioWaEnCurso = false;
+/* Espera a que el guardado de la cotización (Supabase o su respaldo local)
+   haya terminado ANTES de mandar al usuario a WhatsApp. En celular, abrir
+   WhatsApp manda la pestaña a segundo plano casi al instante, y si el
+   guardado todavía está en viaje, el navegador puede cortarlo a mitad de
+   camino: la cotización se pierde sin aviso. Esperar acá cierra ese hueco. */
+async function enviarWA(){
+  if(envioWaEnCurso) return;
   const w=document.getElementById('fWa').value.trim();
   if(w && w.replace(/\D/g,'').length<8){alerta('Revisá el número de WhatsApp o dejalo vacío.');return}
-  if(w) actualizarTelefonoSupabase(w);
+  envioWaEnCurso = true;
+  const btn=document.getElementById('btnEnviarWA');
+  const txt=document.getElementById('btnEnviarWATxt');
+  const txtOriginal = txt ? txt.textContent : '';
+  if(btn) btn.disabled = true;
+  if(txt) txt.textContent = 'Guardando...';
+  try{
+    if(S.guardadoPromise) await S.guardadoPromise;
+  }catch(e){ /* el respaldo local ya se encarga si algo falló */ }
+  if(w) { try{ await actualizarTelefonoSupabase(w); }catch(e){} }
+  if(txt) txt.textContent = txtOriginal;
+  if(btn) btn.disabled = false;
+  envioWaEnCurso = false;
   window.open('https://wa.me/'+CONFIG.whatsapp+'?text='+encodeURIComponent(textoCotizacion()),'_blank');
+}
+let envioMailEnCurso = false;
+/* No manda ningún email de verdad: solo deja guardado en la base que esta
+   persona pidió recibir su presupuesto por mail, para que Sasha se lo
+   envíe a mano desde el panel de administración. */
+async function enviarPorEmail(){
+  if(envioMailEnCurso) return;
+  envioMailEnCurso = true;
+  const btn=document.getElementById('btnEnviarMail');
+  const txt=document.getElementById('btnEnviarMailTxt');
+  if(btn) btn.disabled = true;
+  if(txt) txt.textContent = 'Guardando...';
+  try{
+    await guardarCampo('quiere_email', true);
+  }catch(e){ /* el respaldo local ya se encarga si algo falló */ }
+  if(txt) txt.textContent = '¡Listo! Te lo enviamos por mail';
+  envioMailEnCurso = false;
 }
 function reiniciar(){
   Object.assign(S,{servicios:[],tipo:null,pais:null,provincia:null,zona:null,ciudadTexto:'',barrio:null,espacio:null,profundidad:null,
     ambienteRemod:null,ambientes:[],alcance:null,alcanceBloqueado:false,calidad:null,
     m2:120,m2semi:0,tareaProyecto:null,tareaDireccion:null,extras:[],m2Piscina:24,layout:[],conexiones:[],
     tieneCAD:null,bimEtapas:[],bimLod:300,bimRenders:[],
-    feedback:null,nombre:'',apellido:'',email:'',supabaseId:null});
+    feedback:null,nombre:'',apellido:'',email:'',supabaseId:null,localLeadId:null,guardadoPromise:null});
+  envioLeadEnCurso = false;
+  envioWaEnCurso = false;
+  envioMailEnCurso = false;
+  const btnConfirmar=document.getElementById('btnConfirmarLead');
+  if(btnConfirmar) btnConfirmar.disabled = false;
+  const btnMail=document.getElementById('btnEnviarMail'); if(btnMail) btnMail.disabled=false;
+  const txtMail=document.getElementById('btnEnviarMailTxt'); if(txtMail) txtMail.textContent='Enviar por email';
   document.querySelectorAll('.opt,.chk,.qcard,.fb-btn[data-fb]').forEach(o=>o.classList.remove('sel'));
   document.getElementById('infoProc').classList.remove('on');
   document.getElementById('btnStart').disabled=true;
@@ -2817,7 +3011,7 @@ document.getElementById('notaTC').textContent='USD 1 = $'+TC_REFERENCIA.toLocale
 renderCota();
 
 /* ============================================================
-   FASE 5 — REGISTRO DE COTIZACIONES (100% SUPABASE, SIN LOCALSTORAGE)
+   FASE 5 — REGISTRO DE COTIZACIONES (Supabase + respaldo local)
    ============================================================ */
 function guardarCotizacionAdmin(){
   try{
@@ -2826,20 +3020,37 @@ function guardarCotizacionAdmin(){
     const ubicacion=S.tipo==='obra_nueva'?(S.ciudadTexto||(R.zona?R.zona.n:'')):(R.zona?R.zona.n:'');
     const superficieM2=Math.round(R.supComp*10)/10;
     const presupuestoUsd=Math.round(R.total/TC_REFERENCIA);
-
-    /* Registro en Supabase (tabla `cotizaciones`) — no bloqueante, fuente única de verdad */
-    registrarEnSupabase({
+    const camposBase={
       nombre:nombreLimpio,
       email:emailLimpio,
       superficie_m2:superficieM2,
       tipo_servicio:R.tarea?R.tarea.n:(S.servicios.map(k=>SERVICIOS[k]?SERVICIOS[k].n:k).join(', ')),
       modalidad_obra:S.tipo==='obra_nueva'?'Obra nueva':'Remodelación',
       ubicacion:ubicacion,
-      presupuesto_usd:presupuestoUsd,
-      estado:'Pendiente de envío manual',
-      telefono:'',
-      pdf_generado:false
-    });
+      presupuesto_usd:presupuestoUsd
+    };
+
+    if(S.supabaseId || S.localLeadId){
+      /* El visitante volvió con "← Modificar datos", cambió algo y llegó de
+         nuevo a esta pantalla: ya existe una fila para esta visita. Hay que
+         ACTUALIZARLA con los números nuevos, no insertar una fila duplicada
+         (registrarEnSupabase ya bloquea el reinsert por diseño). Sin esto,
+         Supabase se quedaba con la superficie/presupuesto de la primera
+         vuelta aunque el cliente haya seguido ajustando el cotizador. */
+      S.guardadoPromise = guardarCampos(camposBase);
+    } else {
+      /* Primera vez que esta visita llega al resultado: inserta la fila
+         completa, con respaldo local si Supabase falla. Guardamos la
+         promesa en S.guardadoPromise para que enviarWA()/enviarPorEmail()
+         puedan esperar la confirmación antes de actuar. */
+      S.guardadoPromise = registrarEnSupabase(Object.assign({}, camposBase, {
+        estado:'Pendiente de envío manual',
+        telefono:'',
+        pdf_generado:false,
+        feedback:null,
+        quiere_email:false
+      }));
+    }
   }catch(e){ /* nunca debe interrumpir el flujo del cotizador */ }
 }
 
@@ -2886,10 +3097,15 @@ function renderAdminPendientesLocal(){
   const box=document.getElementById('adminPendientesLocal');
   if(!box) return;
   const pendientes=leerLeadsPendientesLocal();
-  if(!pendientes.length){ box.style.display='none'; box.innerHTML=''; return; }
+  const actualizaciones=leerActualizacionesPendientesLocal();
+  const total=pendientes.length+actualizaciones.length;
+  if(!total){ box.style.display='none'; box.innerHTML=''; return; }
   box.style.display='block';
-  box.innerHTML = ico('alerta','ico--sm') + ' <strong>'+pendientes.length+' lead'+(pendientes.length!==1?'s':'')+'</strong> '
-    + (pendientes.length!==1?'quedaron':'quedó') + ' guardado'+(pendientes.length!==1?'s':'')+' solo en <em>este dispositivo</em> '
+  const partes=[];
+  if(pendientes.length) partes.push(pendientes.length+' lead'+(pendientes.length!==1?'s':'')+' completo'+(pendientes.length!==1?'s':''));
+  if(actualizaciones.length) partes.push(actualizaciones.length+' actualización'+(actualizaciones.length!==1?'es':'')+' suelta'+(actualizaciones.length!==1?'s':'')+' (voto, pedido de mail, teléfono o pdf)');
+  box.innerHTML = ico('alerta','ico--sm') + ' <strong>'+partes.join(' y ')+'</strong> '
+    + (total!==1?'quedaron':'quedó') + ' guardado'+(total!==1?'s':'')+' solo en <em>este dispositivo</em> '
     + '(no se pudieron sincronizar con Supabase). Se reintenta solo en cada carga de página desde este mismo navegador. '
     + '<button class="ghost" style="margin-left:8px;padding:4px 10px;font-size:.68rem" onclick="reintentarSyncManual()">Reintentar ahora</button>';
 }
@@ -3039,12 +3255,17 @@ function renderAdminLeadsTable(arr){
     const servTxt=sanitizarTexto(r.tipo_servicio||'');
     const modTxt=sanitizarTexto(r.modalidad_obra||'');
     const pidioPdf=!!r.pdf_generado;
+    const pidioMail=!!r.quiere_email;
+    const fbMap={economico:'Le pareció económico',razonable:'Le pareció razonable',elevado:'Le pareció elevado'};
+    const fbTxt=r.feedback?fbMap[r.feedback]||sanitizarTexto(r.feedback):'';
     return `<div class="admin-row">
       <span class="tech" style="color:var(--c-mut)">${fechaTxt}</span>
       <span>
         <b style="display:block">${nombreTxt}</b>
         <span style="font-size:.72rem;color:var(--c-mut)">${emailTxt}${telTxt?' · '+telTxt:''}</span><br>
-        <span style="font-size:.72rem;color:var(--c-mut)">${modTxt}${ubicTxt?' · '+ubicTxt:''} · ${servTxt}</span>
+        <span style="font-size:.72rem;color:var(--c-mut)">${modTxt}${ubicTxt?' · '+ubicTxt:''} · ${servTxt}</span><br>
+        ${pidioMail?'<span class="badge on" style="margin-top:4px;display:inline-block">Pidió que se lo mandes por mail</span>':''}
+        ${fbTxt?'<span class="badge off" style="margin-top:4px;margin-left:4px;display:inline-block">'+fbTxt+'</span>':''}
       </span>
       <span class="tech">${r.superficie_m2||'—'} m²</span>
       <span class="tech">USD ${(Number(r.presupuesto_usd)||0).toLocaleString('es-AR')}</span>
@@ -3082,102 +3303,163 @@ function svgToPngDataUrl(svgEl, scale){
     }catch(e){ reject(e); }
   });
 }
+/* ---------- Motor de PDF "Layout Mengibar" — tema oscuro tipo card
+   Replica visualmente la pantalla de resultado del cotizador web:
+   fondo navy, hero nude con el total, grilla de fichas, bloques dark surf
+   y barra de total honorarios en nude, en vez del reporte clásico blanco. */
+const PDF_C = {
+  navy:[20,33,41], surf:[27,44,54], surf2:[36,55,67],
+  nude:[215,186,170], azul:[110,133,149], papel:[247,245,242],
+  linea:[46,64,75]
+};
+function pdfBgNavy(doc){
+  doc.setFillColor(PDF_C.navy[0],PDF_C.navy[1],PDF_C.navy[2]);
+  doc.rect(0,0,210,297,'F');
+}
 function pdfHeaderMengibar(doc, subtitle){
-  doc.setFillColor(20,33,41); doc.rect(0,0,210,30,'F');
-  doc.setDrawColor(215,186,170); doc.setLineWidth(1.1); doc.line(0,30,210,30);
-  doc.setTextColor(247,245,242); doc.setFont('helvetica','bold'); doc.setFontSize(17);
+  doc.setDrawColor(PDF_C.nude[0],PDF_C.nude[1],PDF_C.nude[2]); doc.setLineWidth(.6); doc.line(14,24,196,24);
+  doc.setTextColor(PDF_C.papel[0],PDF_C.papel[1],PDF_C.papel[2]); doc.setFont('helvetica','bold'); doc.setFontSize(15);
   doc.text('ESTUDIO MENGIBAR', 14, 14);
-  doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(215,186,170);
-  doc.text('Arq. Sasha Ruiz · '+(subtitle||'Cotización de honorarios profesionales'), 14, 22);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.8); doc.setTextColor(PDF_C.nude[0],PDF_C.nude[1],PDF_C.nude[2]);
+  doc.text('Arq. Sasha Ruiz · '+(subtitle||'Cotización de honorarios profesionales'), 14, 20.5);
 }
 function pdfFooterMengibar(doc, pageNum){
-  doc.setDrawColor(226,220,212); doc.setLineWidth(.3); doc.line(14,283,196,283);
-  doc.setTextColor(110,133,149); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+  doc.setDrawColor(PDF_C.linea[0],PDF_C.linea[1],PDF_C.linea[2]); doc.setLineWidth(.3); doc.line(14,283,196,283);
+  doc.setTextColor(PDF_C.azul[0],PDF_C.azul[1],PDF_C.azul[2]); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
   doc.text('Estudio Mengibar · Arq. Sasha Ruiz · CAUPSF / Ley 10653 · Santa Fe, Argentina', 14, 289);
   doc.text('Pág. '+pageNum, 196, 289, {align:'right'});
+}
+function pdfBloqueHeader(doc,y,titulo){
+  doc.setFont('helvetica','bold'); doc.setFontSize(8.6); doc.setTextColor(PDF_C.nude[0],PDF_C.nude[1],PDF_C.nude[2]);
+  doc.text(titulo.toUpperCase(),18,y);
+  doc.setDrawColor(PDF_C.linea[0],PDF_C.linea[1],PDF_C.linea[2]); doc.setLineWidth(.3); doc.line(14,y+3.5,196,y+3.5);
+  return y+10;
 }
 function construirPDFCotizacion(data){
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({unit:'mm',format:'a4'});
-  const navy=[20,33,41], nude=[215,186,170], azul=[110,133,149], papel=[247,245,242];
+  const C=PDF_C;
   let page=1;
-  pdfHeaderMengibar(doc,data.subtitle); pdfFooterMengibar(doc,page);
-  let y=42;
+  pdfBgNavy(doc); pdfHeaderMengibar(doc,data.subtitle); pdfFooterMengibar(doc,page);
+  let y=34;
   const ensureSpace=(need)=>{
-    if(y+need>278){ doc.addPage(); page++; pdfHeaderMengibar(doc,data.subtitle); pdfFooterMengibar(doc,page); y=42; }
-  };
-  const kv=(label,val)=>{
-    doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(navy[0],navy[1],navy[2]);
-    doc.text(label,14,y);
-    doc.setFont('helvetica','normal'); doc.setTextColor(70,70,70);
-    const lines=doc.splitTextToSize(String(val||'—'),118);
-    doc.text(lines,62,y);
-    y+=6*lines.length;
+    if(y+need>278){ doc.addPage(); page++; pdfBgNavy(doc); pdfHeaderMengibar(doc,data.subtitle); pdfFooterMengibar(doc,page); y=34; }
   };
 
-  doc.setFont('helvetica','bold'); doc.setFontSize(11.5); doc.setTextColor(navy[0],navy[1],navy[2]);
-  doc.text('DATOS DEL CLIENTE',14,y); y+=2;
-  doc.setDrawColor(nude[0],nude[1],nude[2]); doc.setLineWidth(.5); doc.line(14,y,60,y); y+=7;
-  kv('Nombre', data.nombre);
-  kv('Email', data.email);
-  kv('Fecha', data.fechaTxt);
-  y+=4;
+  /* ---- HERO: total honorarios profesionales, fondo nude ---- */
+  ensureSpace(26);
+  doc.setFillColor(C.nude[0],C.nude[1],C.nude[2]); doc.roundedRect(14,y,182,22,2,2,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.6); doc.setTextColor(C.navy[0],C.navy[1],C.navy[2]);
+  doc.text('TOTAL HONORARIOS PROFESIONALES',19,y+8);
+  doc.setFontSize(19);
+  doc.text(data.totalTxt,19,y+17.5);
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+  doc.text(data.fechaTxt||'',191,y+8,{align:'right'});
+  y+=30;
 
+  /* ---- FICHA: grilla de 3 columnas con los datos del proyecto ---- */
+  const ficha=data.ficha||[];
+  if(ficha.length){
+    const colW=182/3, colX=[14,14+colW,14+colW*2];
+    for(let i=0;i<ficha.length;i+=3){
+      const grupo=ficha.slice(i,i+3);
+      const alturas=grupo.map(it=>{
+        doc.setFont('helvetica','normal'); doc.setFontSize(6.6);
+        const subL=it.sub?doc.splitTextToSize(it.sub,colW-8):[];
+        doc.setFont('helvetica','bold'); doc.setFontSize(8.2);
+        const valL=doc.splitTextToSize(String(it.value||''),colW-8);
+        return 9+valL.length*4+(subL.length?subL.length*3.4+2:0)+5;
+      });
+      const rowH=Math.max(...alturas,20);
+      ensureSpace(rowH+2);
+      grupo.forEach((it,ci)=>{
+        const cx=colX[ci];
+        doc.setFillColor(C.surf[0],C.surf[1],C.surf[2]); doc.rect(cx,y,colW-(ci<2?1:0),rowH,'F');
+        doc.setFillColor(C.nude[0],C.nude[1],C.nude[2]); doc.circle(cx+7,y+8,1.6,'F');
+        doc.setFont('helvetica','bold'); doc.setFontSize(6.3); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+        doc.text((it.label||'').toUpperCase(),cx+12,y+6.5);
+        doc.setFont('helvetica','bold'); doc.setFontSize(8.2); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
+        const valL=doc.splitTextToSize(String(it.value||''),colW-16);
+        doc.text(valL,cx+12,y+11.5);
+        if(it.sub){
+          doc.setFont('helvetica','normal'); doc.setFontSize(6.6); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+          const subL=doc.splitTextToSize(it.sub,colW-16);
+          doc.text(subL,cx+12,y+11.5+valL.length*4+2.5);
+        }
+      });
+      y+=rowH+1;
+    }
+    y+=6;
+  }
+
+  /* ---- ESQUEMA DE DISTRIBUCIÓN (si existe) ---- */
+  if(data.esquemaImg){
+    ensureSpace(20);
+    y=pdfBloqueHeader(doc,y,'Esquema de tu distribución');
+    const maxW=178, maxH=150;
+    let w=data.esquemaImg.w, h=data.esquemaImg.h;
+    const scale=Math.min(maxW/w,maxH/h);
+    w*=scale; h*=scale;
+    ensureSpace(h+10);
+    doc.setFillColor(C.surf[0],C.surf[1],C.surf[2]); doc.rect(14,y,182,h+4,'F');
+    doc.addImage(data.esquemaImg.dataUrl,'PNG',14+(182-w)/2,y+2,w,h);
+    y+=h+12;
+  }
+
+  /* ---- COSTO DE CONSTRUCCIÓN ESTIMADO (si aplica) ---- */
+  if(data.obra){
+    ensureSpace(28);
+    y=pdfBloqueHeader(doc,y,'Costo de construcción estimado');
+    doc.setFillColor(C.surf2[0],C.surf2[1],C.surf2[2]); doc.rect(14,y-4,182,11,'F');
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.8); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
+    doc.text(data.obra.det||'',18,y+2);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+    doc.text(data.obra.val||'',192,y+2,{align:'right'});
+    y+=11;
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+    const notaL=doc.splitTextToSize('Lo presupuesta y ejecuta la empresa constructora. No forma parte de mis honorarios: lo muestro porque es la base sobre la que se calculan.',176);
+    doc.text(notaL,18,y+3); y+=notaL.length*3.4+8;
+  }
+
+  /* ---- DESGLOSE DE HONORARIOS ---- */
   ensureSpace(20);
-  doc.setFont('helvetica','bold'); doc.setFontSize(11.5); doc.setTextColor(navy[0],navy[1],navy[2]);
-  doc.text('DETALLE DEL PROYECTO',14,y); y+=2;
-  doc.setDrawColor(nude[0],nude[1],nude[2]); doc.line(14,y,60,y); y+=7;
-  (data.proyecto||[]).forEach(([label,val])=>{ ensureSpace(8); kv(label,val); });
-  y+=4;
-
-  ensureSpace(20);
-  doc.setFont('helvetica','bold'); doc.setFontSize(11.5); doc.setTextColor(navy[0],navy[1],navy[2]);
-  doc.text('DESGLOSE DE HONORARIOS',14,y); y+=2;
-  doc.setDrawColor(nude[0],nude[1],nude[2]); doc.line(14,y,60,y); y+=8;
-
-  (data.filas||[]).forEach((f,i)=>{
-    ensureSpace(14);
-    if(i%2===0){ doc.setFillColor(papel[0],papel[1],papel[2]); doc.rect(12,y-5,184,12,'F'); }
-    doc.setFont('helvetica','bold'); doc.setFontSize(9.3); doc.setTextColor(navy[0],navy[1],navy[2]);
-    doc.text(f.label,14,y);
-    doc.setFont('helvetica','normal'); doc.setFontSize(7.6); doc.setTextColor(azul[0],azul[1],azul[2]);
-    const sublines=doc.splitTextToSize(f.sub||'',120);
-    doc.text(sublines,14,y+4.5);
-    doc.setFont('helvetica','bold'); doc.setFontSize(9.6); doc.setTextColor(navy[0],navy[1],navy[2]);
-    doc.text(f.valor,196,y,{align:'right'});
-    y+=Math.max(12, 4.5+sublines.length*3.4);
+  y=pdfBloqueHeader(doc,y,'Desglose de honorarios');
+  (data.filas||[]).forEach(f=>{
+    doc.setFont('helvetica','normal'); doc.setFontSize(6.8);
+    const sublines=f.sub?doc.splitTextToSize(f.sub,140):[];
+    const alto=Math.max(11, 4.5+sublines.length*3.2+3);
+    ensureSpace(alto+3);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.6); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
+    doc.text(f.label,18,y);
+    if(sublines.length){
+      doc.setFont('helvetica','normal'); doc.setFontSize(6.8); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+      doc.text(sublines,18,y+4.3);
+    }
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
+    doc.text(f.valor,192,y,{align:'right'});
+    y+=alto;
+    doc.setDrawColor(C.linea[0],C.linea[1],C.linea[2]); doc.setLineWidth(.25); doc.line(14,y-2,196,y-2);
   });
+  y+=4;
 
-  y+=4; ensureSpace(22);
-  doc.setFillColor(nude[0],nude[1],nude[2]); doc.rect(12,y-7,184,16,'F');
-  doc.setTextColor(navy[0],navy[1],navy[2]); doc.setFont('helvetica','bold'); doc.setFontSize(13.5);
-  doc.text('TOTAL ESTIMADO',16,y+2.5);
-  doc.text(data.totalTxt,194,y+2.5,{align:'right'});
-  y+=22;
+  /* ---- TOTAL HONORARIOS: barra nude ---- */
+  ensureSpace(18);
+  doc.setFillColor(C.nude[0],C.nude[1],C.nude[2]); doc.roundedRect(14,y-6,182,15,2,2,'F');
+  doc.setTextColor(C.navy[0],C.navy[1],C.navy[2]); doc.setFont('helvetica','bold'); doc.setFontSize(9.5);
+  doc.text('Total honorarios',19,y+2.5);
+  doc.setFontSize(14);
+  doc.text(data.totalTxt,191,y+2.8,{align:'right'});
+  y+=17;
 
+  /* ---- Notas legales / vigencia ---- */
   ensureSpace(20);
-  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(azul[0],azul[1],azul[2]);
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.4); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
   [
     'Aportes obligatorios incluidos: Ley 10653 — 5% Colegio + 13% Caja Jubilatoria + 5% Asistencial (23% s/honorario).',
     'Estimación orientativa, válida por 7 a 15 días corridos. El presupuesto final se determina tras la visita técnica.',
     'TC de referencia: '+(data.tcTxt||'')
-  ].forEach(n=>{ ensureSpace(10); const l=doc.splitTextToSize(n,182); doc.text(l,14,y); y+=4*l.length+1; });
+  ].forEach(n=>{ ensureSpace(10); const l=doc.splitTextToSize(n,178); doc.text(l,14,y); y+=3.8*l.length+1.5; });
 
-  if(data.esquemaImg){
-    doc.addPage(); page++; pdfHeaderMengibar(doc,data.subtitle); pdfFooterMengibar(doc,page); y=42;
-    doc.setFont('helvetica','bold'); doc.setFontSize(11.5); doc.setTextColor(navy[0],navy[1],navy[2]);
-    doc.text('ESQUEMA DE DISTRIBUCIÓN',14,y); y+=2;
-    doc.setDrawColor(nude[0],nude[1],nude[2]); doc.line(14,y,60,y); y+=8;
-    const maxW=182, maxH=200;
-    let w=data.esquemaImg.w, h=data.esquemaImg.h;
-    const scale=Math.min(maxW/w, maxH/h);
-    w*=scale; h*=scale;
-    doc.setFillColor(14,26,33); doc.rect(14,y,w,h,'F');
-    doc.addImage(data.esquemaImg.dataUrl,'PNG',14,y,w,h);
-    y+=h+8;
-    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(azul[0],azul[1],azul[2]);
-    doc.text('Planta esquemática generada a partir de los ambientes y la circulación configurados por el cliente.',14,y);
-  }
   return doc;
 }
 /* Descarga desde la pantalla de presupuesto (cliente): usa el estado vivo S/R, con desglose
@@ -3205,33 +3487,42 @@ async function descargarPDFCliente(){
     if(R.extraInter>0) filas.push({label:'Interiorismo y mobiliario a medida', sub:'Extra opcional', valor:usd(R.extraInter)});
   }
 
-  const proyecto=[];
+  /* ---- Ficha: replica exacta de los mismos datos que se ven en pantalla ---- */
+  const ficha=[];
   if(R.esBimCalc){
-    proyecto.push(['Servicio','Documentación BIM']);
-    proyecto.push(['Superficie', S.m2+' m²']);
-    proyecto.push(['Nivel de detalle', R.lod.n+' — '+R.lod.sub]);
-    proyecto.push(['Punto de partida', S.tieneCAD==='si'?'Legajo en CAD existente':'Sin digitalizar (incluye relevamiento)']);
-    proyecto.push(['Etapas contratadas', S.bimEtapas.map(k=>BIM_PRECIOS[k].n).join(', ')]);
-    if(S.bimRenders.length) proyecto.push(['Renders', S.bimRenders.map(k=>BIM_RENDERS[k].n).join(', ')]);
+    ficha.push({label:'Superficie',value:S.m2+' m²',sub:'Base del cálculo de modelado'});
+    ficha.push({label:'Nivel de detalle',value:R.lod.n,sub:R.lod.sub});
+    ficha.push({label:'Punto de partida',value:S.tieneCAD==='si'?'Legajo en CAD existente':'Sin digitalizar',sub:'Desde cero, incluye relevamiento'});
+    ficha.push({label:'Etapas contratadas',value:S.bimEtapas.length+' de 6',sub:S.bimEtapas.map(k=>BIM_PRECIOS[k].n).join(', ')});
+    if(S.bimRenders.length) ficha.push({label:'Renders',value:S.bimRenders.map(k=>BIM_RENDERS[k].n).join(' + '),sub:'Generados desde el mismo modelo'});
   } else {
-    proyecto.push(['Modalidad', S.tipo==='obra_nueva'?'Obra nueva':'Remodelación']);
+    ficha.push({label:'Superficie cubierta',value:S.m2+' m²',sub:R.semicub?('+ '+R.semicub+' m² semicubiertos'):''});
+    ficha.push({label:'Superficie computable',value:R.supComp.toLocaleString('es-AR',{maximumFractionDigits:1})+' m²',sub:'Cubierta + semicubierta × 0,5'});
+    ficha.push({label:'Fuente del costo m²',value:R.modelo,sub:R.origenCosto});
+    ficha.push({label:'Escala de honorarios',value:Math.round(R.esc.p*10000)/100+'%',sub:R.esc.n+' · alícuota CAUPSF'});
+    ficha.push({label:'Tarea contratada',value:R.tarea.n,sub:Math.round(R.tarea.p*100)+'% del Honorario Base'});
+    ficha.push({label:'Ubicación',value:S.tipo==='obra_nueva'?(S.ciudadTexto||R.zona.n):R.zona.n,
+      sub:S.tipo==='obra_nueva'?(S.barrio?S.barrio+' · '+R.zona.n:R.zona.n):'Sobre espacio existente'});
     if(S.tipo==='remodelacion'){
-      proyecto.push(['Ambiente', AMBIENTE_REMOD[S.ambienteRemod]?AMBIENTE_REMOD[S.ambienteRemod].n:'—']);
-      proyecto.push(['Profundidad de intervención', R.prof?R.prof.n:'—']);
+      ficha.push({label:'Ambiente',value:AMBIENTE_REMOD[S.ambienteRemod].n,sub:'Reforma '+(R.prof?R.prof.n.toLowerCase():'')});
+    } else {
+      ficha.push({label:'Tipo de obra',value:'Obra nueva',sub:'Desde cero sobre lote propio'});
     }
-    proyecto.push(['Ubicación', S.tipo==='obra_nueva'?(S.ciudadTexto||R.zona.n)+(S.barrio?' — '+S.barrio:''):R.zona.n]);
-    proyecto.push(['Superficie cubierta', S.m2+' m²'+(R.semicub?(' + '+R.semicub+' m² semicubiertos'):'')]);
-    proyecto.push(['Superficie computable', R.supComp.toLocaleString('es-AR',{maximumFractionDigits:1})+' m²']);
-    proyecto.push(['Tarea contratada', R.tarea.n]);
-    if(S.servicios.length) proyecto.push(['Servicios de interés', S.servicios.map(k=>SERVICIOS[k].n).join(', ')]);
-    if(S.extras.length) proyecto.push(['Extras incluidos', S.extras.map(k=>EXTRAS[k].n).join(', ')]);
+    if(S.servicios.length) ficha.push({label:'Servicios de interés',value:S.servicios.map(k=>SERVICIOS[k].n).join(' + '),
+      sub:S.servicios.length+' servicio'+(S.servicios.length>1?'s':'')+' seleccionado'+(S.servicios.length>1?'s':'')});
+    if(S.extras.length) ficha.push({label:'Extras incluidos',value:S.extras.map(k=>EXTRAS[k].n.split(' y ')[0]).join(' + '),
+      sub:S.extras.length+' servicio'+(S.extras.length>1?'s':'')+' adicional'+(S.extras.length>1?'es':'')});
   }
+
+  const obra=(!R.esBimCalc)?{
+    det:R.supComp.toLocaleString('es-AR',{maximumFractionDigits:1})+' m² computables × '+usd(R.costoM2)+' por m²',
+    val:usd(R.montoObra)
+  }:null;
 
   const doc=construirPDFCotizacion({
     subtitle:'Cotización de honorarios profesionales',
-    nombre:S.nombre, email:S.email,
     fechaTxt:new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'}),
-    proyecto, filas,
+    ficha, obra, filas,
     totalTxt:usd(R.total),
     tcTxt:'USD 1 = $'+TC_REFERENCIA.toLocaleString('es-AR')+' ARS · vigencia del estimado: 10 días',
     esquemaImg
@@ -3241,7 +3532,8 @@ async function descargarPDFCliente(){
   if(wTel && wTel.value.trim()) actualizarTelefonoSupabase(wTel.value.trim());
   marcarPdfGeneradoSupabase();
 }
-/* Descarga desde el panel admin: reconstruye el mismo layout a partir del registro guardado en Supabase */
+/* Descarga desde el panel admin: reconstruye una versión simplificada del mismo layout,
+   a partir de los campos guardados en Supabase (sin el detalle vivo de R/S de esa visita). */
 function generarPDFCotizacion(i){
   const r=SUPABASE_RECORDS[i];
   if(!r) return;
@@ -3250,18 +3542,17 @@ function generarPDFCotizacion(i){
 function generarPDFDesdeRegistro(r){
   if(!window.jspdf || !window.jspdf.jsPDF){ alert('No se pudo cargar el generador de PDF. Revisá tu conexión.'); return; }
   const nombre=sanitizarTexto(r.nombre||'Cliente');
-  const proyecto=[
-    ['Modalidad', sanitizarTexto(r.modalidad_obra||'—')],
-    ['Servicio', sanitizarTexto(r.tipo_servicio||'—')],
-    ['Ubicación', sanitizarTexto(r.ubicacion||'—')],
-    ['Superficie computable', (r.superficie_m2||'—')+' m²']
+  const ficha=[
+    {label:'Modalidad',value:sanitizarTexto(r.modalidad_obra||'—')},
+    {label:'Servicio',value:sanitizarTexto(r.tipo_servicio||'—')},
+    {label:'Ubicación',value:sanitizarTexto(r.ubicacion||'—')},
+    {label:'Superficie computable',value:(r.superficie_m2||'—')+' m²'}
   ];
   const filas=[{label:'Honorario estimado', sub:'Total informado al cliente en el cotizador web', valor:'USD '+(Number(r.presupuesto_usd)||0).toLocaleString('es-AR')}];
   const doc=construirPDFCotizacion({
-    subtitle:'Resumen de cotización (panel administrativo)',
-    nombre, email:sanitizarTexto(r.email||'—'),
+    subtitle:'Resumen de cotización (panel administrativo) · '+nombre,
     fechaTxt:r.created_at?new Date(r.created_at).toLocaleDateString('es-AR'):'—',
-    proyecto, filas,
+    ficha, obra:null, filas,
     totalTxt:'USD '+(Number(r.presupuesto_usd)||0).toLocaleString('es-AR'),
     tcTxt:'Ver condiciones vigentes al momento de la consulta',
     esquemaImg:null
