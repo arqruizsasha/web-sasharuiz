@@ -814,7 +814,7 @@ button,.btn{border-radius:var(--r-pill)}
     <input type="password" id="adminPassInput" placeholder="Contraseña" class="sel-input"
       style="margin-top:6px" onkeydown="if(event.key==='Enter'){event.preventDefault();verificarAdminPass()}">
     <p id="adminLoginErr" style="color:#E08585;font-size:.8rem;margin-top:8px;min-height:1em"></p>
-    <button class="cta cta--full" style="margin-top:10px" onclick="verificarAdminPass()">Entrar</button>
+    <button class="cta cta--full" id="btnVerificarAdminPass" style="margin-top:10px" onclick="verificarAdminPass()">Entrar</button>
   </div>
 </div>
 
@@ -1157,7 +1157,7 @@ button,.btn{border-radius:var(--r-pill)}
 /* ============================================================
    CONFIGURACION
    ============================================================ */
-const CONFIG = { whatsapp:'543413632019', email:'hola@sasharuiz.com', adminPass:'mengibar2026' };
+const CONFIG = { whatsapp:'543413632019', email:'hola@sasharuiz.com' };
 
 /* ============================================================
    SUPABASE — captura de leads y consulta desde /admin
@@ -3060,24 +3060,44 @@ function abrirAdminLogin(){
   abrirModal('modalAdminLogin');
   setTimeout(()=>document.getElementById('adminPassInput').focus(),80);
 }
-function verificarAdminPass(){
+async function verificarAdminPass(){
   const v=document.getElementById('adminPassInput').value;
-  if(v===CONFIG.adminPass){
-    try{ sessionStorage.setItem('mengibarAdminAuth','1'); }catch(e){}
+  const errEl=document.getElementById('adminLoginErr');
+  const btn=document.getElementById('btnVerificarAdminPass');
+  if(!supabaseClient){ errEl.textContent='No se pudo conectar a Supabase.'; return; }
+  if(btn) btn.disabled=true;
+  errEl.textContent='Verificando…';
+  try{
+    /* La contraseña se valida en el servidor (función admin_listar_cotizaciones):
+       nunca queda escrita en el código de la página, así que no se puede leer
+       abriendo "ver código fuente" como pasaba antes. */
+    const {data,error}=await supabaseClient.rpc('admin_listar_cotizaciones',{clave:v});
+    if(error) throw error;
+    try{ sessionStorage.setItem('mengibarAdminClave', v); }catch(e){}
+    SUPABASE_RECORDS=data||[];
+    errEl.textContent='';
     cerrarModal('modalAdminLogin');
-    abrirAdminPanel();
-  } else {
-    document.getElementById('adminLoginErr').textContent='Contraseña incorrecta.';
+    cambiarTabAdmin('metricas');
+    renderAdminStats(SUPABASE_RECORDS);
+    renderAdminCharts(SUPABASE_RECORDS);
+    renderAdminUbicaciones(SUPABASE_RECORDS);
+    renderAdminLeadsTable(SUPABASE_RECORDS);
+    renderAdminPendientesLocal();
+    abrirModal('modalAdminPanel');
+  }catch(e){
+    errEl.textContent='Contraseña incorrecta.';
+  } finally {
+    if(btn) btn.disabled=false;
   }
 }
 function cerrarSesionAdmin(){
-  try{ sessionStorage.removeItem('mengibarAdminAuth'); }catch(e){}
+  try{ sessionStorage.removeItem('mengibarAdminClave'); }catch(e){}
   cerrarModal('modalAdminPanel');
 }
 function abrirAdminPanel(){
-  let auth=false;
-  try{ auth=sessionStorage.getItem('mengibarAdminAuth')==='1'; }catch(e){}
-  if(!auth){ abrirAdminLogin(); return; }
+  let clave=null;
+  try{ clave=sessionStorage.getItem('mengibarAdminClave'); }catch(e){}
+  if(!clave){ abrirAdminLogin(); return; }
   cambiarTabAdmin('metricas');
   cargarCotizacionesSupabase();
   abrirModal('modalAdminPanel');
@@ -3130,8 +3150,11 @@ async function cargarCotizacionesSupabase(){
   }
   if(sync) sync.textContent='Sincronizando…';
   tabla.innerHTML='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">Cargando cotizaciones…</p>';
+  let clave=null;
+  try{ clave=sessionStorage.getItem('mengibarAdminClave'); }catch(e){}
+  if(!clave){ abrirAdminLogin(); return; }
   try{
-    const {data,error}=await supabaseClient.from('cotizaciones').select('*').order('created_at',{ascending:false}).limit(300);
+    const {data,error}=await supabaseClient.rpc('admin_listar_cotizaciones',{clave});
     if(error) throw error;
     SUPABASE_RECORDS=data||[];
     renderAdminStats(SUPABASE_RECORDS);
