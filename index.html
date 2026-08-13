@@ -7,7 +7,7 @@
 <meta name="description" content="Estudio de arquitectura en Rosario y Funes. Proyecto y construcción de casas en Roldán e Ibarlucea, remodelación integral de cocinas y baños en Rosario. Cotizador de honorarios de arquitecto online, Ley 10653 / CAUPSF Santa Fe.">
 <meta name="keywords" content="arquitectos en Rosario, estudio de arquitectura Rosario y Funes, proyecto y construcción de casas en Roldán, arquitectos Ibarlucea, remodelación integral de cocinas y baños Rosario, cotizador de honorarios arquitecto Santa Fe Ley 10653, dirección de obra Gran Rosario, CAUPSF">
 <meta name="theme-color" content="#142129">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://kvqxffvaalxphmqrmjxw.supabase.co https://*.supabase.co; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://kvqxffvaalxphmqrmjxw.supabase.co https://*.supabase.co https://cdn.jsdelivr.net; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
 <link rel="canonical" href="https://estudiomengibar.com.ar/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Arquitectos en Rosario · Estudio Mengibar">
@@ -3256,16 +3256,22 @@ function renderAdminLeadsTable(arr){
     const modTxt=sanitizarTexto(r.modalidad_obra||'');
     const pidioPdf=!!r.pdf_generado;
     const pidioMail=!!r.quiere_email;
-    const fbMap={economico:'Le pareció económico',razonable:'Le pareció razonable',elevado:'Le pareció elevado'};
-    const fbTxt=r.feedback?fbMap[r.feedback]||sanitizarTexto(r.feedback):'';
+    const fbEstilo={economico:{t:'Le pareció económico',c:'#8FD19E'},razonable:{t:'Le pareció razonable',c:'var(--nude)'},elevado:{t:'Le pareció elevado',c:'#E3907A'}};
+    const fb=r.feedback?(fbEstilo[r.feedback]||{t:sanitizarTexto(r.feedback),c:'var(--c-mut)'}):null;
+    /* Fila de badges bien visibles: teléfono, voto de feedback y pedido de mail.
+       Antes vivían como texto chico enterrado en la línea de datos — ahora son
+       pastillas propias, con color, imposibles de pasar por alto. */
+    let badges='';
+    if(telTxt) badges+=`<span class="badge on" style="margin-right:4px;margin-bottom:4px">WhatsApp: ${telTxt}</span>`;
+    if(fb) badges+=`<span class="badge" style="margin-right:4px;margin-bottom:4px;background:${fb.c}22;color:${fb.c};border:1px solid ${fb.c}55">${fb.t}</span>`;
+    if(pidioMail) badges+=`<span class="badge" style="margin-right:4px;margin-bottom:4px;background:rgba(110,133,149,.22);color:var(--azul);border:1px solid rgba(110,133,149,.4)">Pidió envío por mail</span>`;
     return `<div class="admin-row">
       <span class="tech" style="color:var(--c-mut)">${fechaTxt}</span>
       <span>
         <b style="display:block">${nombreTxt}</b>
-        <span style="font-size:.72rem;color:var(--c-mut)">${emailTxt}${telTxt?' · '+telTxt:''}</span><br>
-        <span style="font-size:.72rem;color:var(--c-mut)">${modTxt}${ubicTxt?' · '+ubicTxt:''} · ${servTxt}</span><br>
-        ${pidioMail?'<span class="badge on" style="margin-top:4px;display:inline-block">Pidió que se lo mandes por mail</span>':''}
-        ${fbTxt?'<span class="badge off" style="margin-top:4px;margin-left:4px;display:inline-block">'+fbTxt+'</span>':''}
+        <span style="font-size:.72rem;color:var(--c-mut)">${emailTxt}</span><br>
+        <span style="font-size:.72rem;color:var(--c-mut)">${modTxt}${ubicTxt?' · '+ubicTxt:''} · ${servTxt}</span>
+        ${badges?'<div style="margin-top:6px">'+badges+'</div>':''}
       </span>
       <span class="tech">${r.superficie_m2||'—'} m²</span>
       <span class="tech">USD ${(Number(r.presupuesto_usd)||0).toLocaleString('es-AR')}</span>
@@ -3303,10 +3309,68 @@ function svgToPngDataUrl(svgEl, scale){
     }catch(e){ reject(e); }
   });
 }
+/* ---------- Tipografías reales del PDF (Poppins + Montserrat) ----------
+   jsPDF no puede usar las fuentes que ya están cargadas en la página (son
+   webfonts del navegador, no algo que jsPDF sepa leer): hay que "inyectarle"
+   el archivo de la fuente directamente. Como esos archivos no se pueden
+   empaquetar de antemano en este proyecto, se bajan en el momento — desde
+   el propio navegador de quien genera el PDF (vos o el cliente), usando el
+   mismo CDN que ya sirve Poppins/Montserrat en la web (jsDelivr/Fontsource).
+   Si la red falla o tarda, el PDF NUNCA se rompe por esto: sigue con
+   Helvetica (la fuente de sistema de jsPDF) sin que nadie lo note demasiado,
+   y la próxima vez que alguien genere un PDF con internet estable, se
+   vuelve a intentar. Una vez que se bajan, quedan en caché de la pestaña:
+   generar un segundo PDF en la misma visita no vuelve a pedir red. */
+const PDF_FONT_URLS = {
+  poppinsBold:   'https://cdn.jsdelivr.net/fontsource/fonts/poppins@latest/latin-700-normal.ttf',
+  montserratReg: 'https://cdn.jsdelivr.net/fontsource/fonts/montserrat@latest/latin-400-normal.ttf'
+};
+const _pdfFontCache = {};
+function _arrayBufferToBase64(buf){
+  const bytes = new Uint8Array(buf);
+  let binary = '';
+  const chunk = 0x8000; // de a bloques, para no reventar el límite de argumentos del navegador
+  for(let i=0;i<bytes.length;i+=chunk){
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+  }
+  return btoa(binary);
+}
+async function _cargarFuenteBase64(url){
+  if(_pdfFontCache[url]) return _pdfFontCache[url];
+  const resp = await fetch(url);
+  if(!resp.ok) throw new Error('font_fetch_failed_'+resp.status);
+  const buf = await resp.arrayBuffer();
+  const b64 = _arrayBufferToBase64(buf);
+  _pdfFontCache[url] = b64;
+  return b64;
+}
+/* Intenta registrar Poppins Bold y Montserrat Regular en esta instancia de
+   jsPDF. Devuelve qué familias quedaron listas para usar (o 'helvetica' si
+   no se pudo). Nunca lanza error hacia afuera: siempre hay una fuente
+   utilizable al final, aunque sea la de respaldo. */
+async function prepararFuentesPDF(doc){
+  const timeout = (ms)=>new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout_fuente')),ms));
+  const out = {head:'helvetica', body:'helvetica'};
+  try{
+    const b64 = await Promise.race([_cargarFuenteBase64(PDF_FONT_URLS.poppinsBold), timeout(5000)]);
+    doc.addFileToVFS('Poppins-Bold.ttf', b64);
+    doc.addFont('Poppins-Bold.ttf', 'Poppins', 'bold');
+    out.head='Poppins';
+  }catch(e){ /* se queda con helvetica para los títulos */ }
+  try{
+    const b64 = await Promise.race([_cargarFuenteBase64(PDF_FONT_URLS.montserratReg), timeout(5000)]);
+    doc.addFileToVFS('Montserrat-Regular.ttf', b64);
+    doc.addFont('Montserrat-Regular.ttf', 'Montserrat', 'normal');
+    out.body='Montserrat';
+  }catch(e){ /* se queda con helvetica para el texto de cuerpo */ }
+  return out;
+}
 /* ---------- Motor de PDF "Layout Mengibar" — tema oscuro tipo card
    Replica visualmente la pantalla de resultado del cotizador web:
    fondo navy, hero nude con el total, grilla de fichas, bloques dark surf
-   y barra de total honorarios en nude, en vez del reporte clásico blanco. */
+   y barra de total honorarios en nude, en vez del reporte clásico blanco.
+   Tipografías: Poppins Bold para títulos/énfasis, Montserrat Regular para
+   texto de cuerpo — con Helvetica como red de contención si no hay red. */
 const PDF_C = {
   navy:[20,33,41], surf:[27,44,54], surf2:[36,55,67],
   nude:[215,186,170], azul:[110,133,149], papel:[247,245,242],
@@ -3316,44 +3380,45 @@ function pdfBgNavy(doc){
   doc.setFillColor(PDF_C.navy[0],PDF_C.navy[1],PDF_C.navy[2]);
   doc.rect(0,0,210,297,'F');
 }
-function pdfHeaderMengibar(doc, subtitle){
+function pdfHeaderMengibar(doc, subtitle, F){
   doc.setDrawColor(PDF_C.nude[0],PDF_C.nude[1],PDF_C.nude[2]); doc.setLineWidth(.6); doc.line(14,24,196,24);
-  doc.setTextColor(PDF_C.papel[0],PDF_C.papel[1],PDF_C.papel[2]); doc.setFont('helvetica','bold'); doc.setFontSize(15);
+  doc.setTextColor(PDF_C.papel[0],PDF_C.papel[1],PDF_C.papel[2]); doc.setFont(F.head,'bold'); doc.setFontSize(15);
   doc.text('ESTUDIO MENGIBAR', 14, 14);
-  doc.setFont('helvetica','normal'); doc.setFontSize(8.8); doc.setTextColor(PDF_C.nude[0],PDF_C.nude[1],PDF_C.nude[2]);
+  doc.setFont(F.body,'normal'); doc.setFontSize(8.8); doc.setTextColor(PDF_C.nude[0],PDF_C.nude[1],PDF_C.nude[2]);
   doc.text('Arq. Sasha Ruiz · '+(subtitle||'Cotización de honorarios profesionales'), 14, 20.5);
 }
-function pdfFooterMengibar(doc, pageNum){
+function pdfFooterMengibar(doc, pageNum, F){
   doc.setDrawColor(PDF_C.linea[0],PDF_C.linea[1],PDF_C.linea[2]); doc.setLineWidth(.3); doc.line(14,283,196,283);
-  doc.setTextColor(PDF_C.azul[0],PDF_C.azul[1],PDF_C.azul[2]); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+  doc.setTextColor(PDF_C.azul[0],PDF_C.azul[1],PDF_C.azul[2]); doc.setFont(F.body,'normal'); doc.setFontSize(7.5);
   doc.text('Estudio Mengibar · Arq. Sasha Ruiz · CAUPSF / Ley 10653 · Santa Fe, Argentina', 14, 289);
   doc.text('Pág. '+pageNum, 196, 289, {align:'right'});
 }
-function pdfBloqueHeader(doc,y,titulo){
-  doc.setFont('helvetica','bold'); doc.setFontSize(8.6); doc.setTextColor(PDF_C.nude[0],PDF_C.nude[1],PDF_C.nude[2]);
+function pdfBloqueHeader(doc,y,titulo,F){
+  doc.setFont(F.head,'bold'); doc.setFontSize(8.6); doc.setTextColor(PDF_C.nude[0],PDF_C.nude[1],PDF_C.nude[2]);
   doc.text(titulo.toUpperCase(),18,y);
   doc.setDrawColor(PDF_C.linea[0],PDF_C.linea[1],PDF_C.linea[2]); doc.setLineWidth(.3); doc.line(14,y+3.5,196,y+3.5);
   return y+10;
 }
-function construirPDFCotizacion(data){
+async function construirPDFCotizacion(data){
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({unit:'mm',format:'a4'});
   const C=PDF_C;
+  const F=await prepararFuentesPDF(doc); /* {head:'Poppins'|'helvetica', body:'Montserrat'|'helvetica'} */
   let page=1;
-  pdfBgNavy(doc); pdfHeaderMengibar(doc,data.subtitle); pdfFooterMengibar(doc,page);
+  pdfBgNavy(doc); pdfHeaderMengibar(doc,data.subtitle,F); pdfFooterMengibar(doc,page,F);
   let y=34;
   const ensureSpace=(need)=>{
-    if(y+need>278){ doc.addPage(); page++; pdfBgNavy(doc); pdfHeaderMengibar(doc,data.subtitle); pdfFooterMengibar(doc,page); y=34; }
+    if(y+need>278){ doc.addPage(); page++; pdfBgNavy(doc); pdfHeaderMengibar(doc,data.subtitle,F); pdfFooterMengibar(doc,page,F); y=34; }
   };
 
   /* ---- HERO: total honorarios profesionales, fondo nude ---- */
   ensureSpace(26);
   doc.setFillColor(C.nude[0],C.nude[1],C.nude[2]); doc.roundedRect(14,y,182,22,2,2,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(7.6); doc.setTextColor(C.navy[0],C.navy[1],C.navy[2]);
+  doc.setFont(F.head,'bold'); doc.setFontSize(7.6); doc.setTextColor(C.navy[0],C.navy[1],C.navy[2]);
   doc.text('TOTAL HONORARIOS PROFESIONALES',19,y+8);
   doc.setFontSize(19);
   doc.text(data.totalTxt,19,y+17.5);
-  doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+  doc.setFont(F.body,'normal'); doc.setFontSize(7.5);
   doc.text(data.fechaTxt||'',191,y+8,{align:'right'});
   y+=30;
 
@@ -3364,9 +3429,9 @@ function construirPDFCotizacion(data){
     for(let i=0;i<ficha.length;i+=3){
       const grupo=ficha.slice(i,i+3);
       const alturas=grupo.map(it=>{
-        doc.setFont('helvetica','normal'); doc.setFontSize(6.6);
+        doc.setFont(F.body,'normal'); doc.setFontSize(6.6);
         const subL=it.sub?doc.splitTextToSize(it.sub,colW-8):[];
-        doc.setFont('helvetica','bold'); doc.setFontSize(8.2);
+        doc.setFont(F.head,'bold'); doc.setFontSize(8.2);
         const valL=doc.splitTextToSize(String(it.value||''),colW-8);
         return 9+valL.length*4+(subL.length?subL.length*3.4+2:0)+5;
       });
@@ -3376,13 +3441,13 @@ function construirPDFCotizacion(data){
         const cx=colX[ci];
         doc.setFillColor(C.surf[0],C.surf[1],C.surf[2]); doc.rect(cx,y,colW-(ci<2?1:0),rowH,'F');
         doc.setFillColor(C.nude[0],C.nude[1],C.nude[2]); doc.circle(cx+7,y+8,1.6,'F');
-        doc.setFont('helvetica','bold'); doc.setFontSize(6.3); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+        doc.setFont(F.head,'bold'); doc.setFontSize(6.3); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
         doc.text((it.label||'').toUpperCase(),cx+12,y+6.5);
-        doc.setFont('helvetica','bold'); doc.setFontSize(8.2); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
+        doc.setFont(F.head,'bold'); doc.setFontSize(8.2); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
         const valL=doc.splitTextToSize(String(it.value||''),colW-16);
         doc.text(valL,cx+12,y+11.5);
         if(it.sub){
-          doc.setFont('helvetica','normal'); doc.setFontSize(6.6); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+          doc.setFont(F.body,'normal'); doc.setFontSize(6.6); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
           const subL=doc.splitTextToSize(it.sub,colW-16);
           doc.text(subL,cx+12,y+11.5+valL.length*4+2.5);
         }
@@ -3395,7 +3460,7 @@ function construirPDFCotizacion(data){
   /* ---- ESQUEMA DE DISTRIBUCIÓN (si existe) ---- */
   if(data.esquemaImg){
     ensureSpace(20);
-    y=pdfBloqueHeader(doc,y,'Esquema de tu distribución');
+    y=pdfBloqueHeader(doc,y,'Esquema de tu distribución',F);
     const maxW=178, maxH=150;
     let w=data.esquemaImg.w, h=data.esquemaImg.h;
     const scale=Math.min(maxW/w,maxH/h);
@@ -3409,33 +3474,33 @@ function construirPDFCotizacion(data){
   /* ---- COSTO DE CONSTRUCCIÓN ESTIMADO (si aplica) ---- */
   if(data.obra){
     ensureSpace(28);
-    y=pdfBloqueHeader(doc,y,'Costo de construcción estimado');
+    y=pdfBloqueHeader(doc,y,'Costo de construcción estimado',F);
     doc.setFillColor(C.surf2[0],C.surf2[1],C.surf2[2]); doc.rect(14,y-4,182,11,'F');
-    doc.setFont('helvetica','normal'); doc.setFontSize(7.8); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
+    doc.setFont(F.body,'normal'); doc.setFontSize(7.8); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
     doc.text(data.obra.det||'',18,y+2);
-    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+    doc.setFont(F.body,'normal'); doc.setFontSize(9); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
     doc.text(data.obra.val||'',192,y+2,{align:'right'});
     y+=11;
-    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+    doc.setFont(F.body,'normal'); doc.setFontSize(7); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
     const notaL=doc.splitTextToSize('Lo presupuesta y ejecuta la empresa constructora. No forma parte de mis honorarios: lo muestro porque es la base sobre la que se calculan.',176);
     doc.text(notaL,18,y+3); y+=notaL.length*3.4+8;
   }
 
   /* ---- DESGLOSE DE HONORARIOS ---- */
   ensureSpace(20);
-  y=pdfBloqueHeader(doc,y,'Desglose de honorarios');
+  y=pdfBloqueHeader(doc,y,'Desglose de honorarios',F);
   (data.filas||[]).forEach(f=>{
-    doc.setFont('helvetica','normal'); doc.setFontSize(6.8);
+    doc.setFont(F.body,'normal'); doc.setFontSize(6.8);
     const sublines=f.sub?doc.splitTextToSize(f.sub,140):[];
     const alto=Math.max(11, 4.5+sublines.length*3.2+3);
     ensureSpace(alto+3);
-    doc.setFont('helvetica','bold'); doc.setFontSize(8.6); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
+    doc.setFont(F.head,'bold'); doc.setFontSize(8.6); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
     doc.text(f.label,18,y);
     if(sublines.length){
-      doc.setFont('helvetica','normal'); doc.setFontSize(6.8); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+      doc.setFont(F.body,'normal'); doc.setFontSize(6.8); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
       doc.text(sublines,18,y+4.3);
     }
-    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
+    doc.setFont(F.head,'bold'); doc.setFontSize(9); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
     doc.text(f.valor,192,y,{align:'right'});
     y+=alto;
     doc.setDrawColor(C.linea[0],C.linea[1],C.linea[2]); doc.setLineWidth(.25); doc.line(14,y-2,196,y-2);
@@ -3445,7 +3510,7 @@ function construirPDFCotizacion(data){
   /* ---- TOTAL HONORARIOS: barra nude ---- */
   ensureSpace(18);
   doc.setFillColor(C.nude[0],C.nude[1],C.nude[2]); doc.roundedRect(14,y-6,182,15,2,2,'F');
-  doc.setTextColor(C.navy[0],C.navy[1],C.navy[2]); doc.setFont('helvetica','bold'); doc.setFontSize(9.5);
+  doc.setTextColor(C.navy[0],C.navy[1],C.navy[2]); doc.setFont(F.head,'bold'); doc.setFontSize(9.5);
   doc.text('Total honorarios',19,y+2.5);
   doc.setFontSize(14);
   doc.text(data.totalTxt,191,y+2.8,{align:'right'});
@@ -3453,7 +3518,7 @@ function construirPDFCotizacion(data){
 
   /* ---- Notas legales / vigencia ---- */
   ensureSpace(20);
-  doc.setFont('helvetica','normal'); doc.setFontSize(7.4); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+  doc.setFont(F.body,'normal'); doc.setFontSize(7.4); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
   [
     'Aportes obligatorios incluidos: Ley 10653 — 5% Colegio + 13% Caja Jubilatoria + 5% Asistencial (23% s/honorario).',
     'Estimación orientativa, válida por 7 a 15 días corridos. El presupuesto final se determina tras la visita técnica.',
@@ -3519,7 +3584,7 @@ async function descargarPDFCliente(){
     val:usd(R.montoObra)
   }:null;
 
-  const doc=construirPDFCotizacion({
+  const doc=await construirPDFCotizacion({
     subtitle:'Cotización de honorarios profesionales',
     fechaTxt:new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'}),
     ficha, obra, filas,
@@ -3534,22 +3599,27 @@ async function descargarPDFCliente(){
 }
 /* Descarga desde el panel admin: reconstruye una versión simplificada del mismo layout,
    a partir de los campos guardados en Supabase (sin el detalle vivo de R/S de esa visita). */
-function generarPDFCotizacion(i){
+async function generarPDFCotizacion(i){
   const r=SUPABASE_RECORDS[i];
   if(!r) return;
-  generarPDFDesdeRegistro(r);
+  await generarPDFDesdeRegistro(r);
 }
-function generarPDFDesdeRegistro(r){
+async function generarPDFDesdeRegistro(r){
   if(!window.jspdf || !window.jspdf.jsPDF){ alert('No se pudo cargar el generador de PDF. Revisá tu conexión.'); return; }
   const nombre=sanitizarTexto(r.nombre||'Cliente');
+  const fbMap={economico:'Le pareció económico',razonable:'Le pareció razonable',elevado:'Le pareció elevado'};
   const ficha=[
+    {label:'Cliente',value:nombre,sub:sanitizarTexto(r.email||'')},
     {label:'Modalidad',value:sanitizarTexto(r.modalidad_obra||'—')},
     {label:'Servicio',value:sanitizarTexto(r.tipo_servicio||'—')},
     {label:'Ubicación',value:sanitizarTexto(r.ubicacion||'—')},
-    {label:'Superficie computable',value:(r.superficie_m2||'—')+' m²'}
+    {label:'Superficie computable',value:(r.superficie_m2||'—')+' m²'},
+    {label:'Contacto',value:sanitizarTexto(r.telefono||'Sin WhatsApp cargado')},
+    {label:'Opinión del cliente',value:r.feedback?(fbMap[r.feedback]||sanitizarTexto(r.feedback)):'Sin votar todavía'},
+    {label:'Pidió envío por mail',value:r.quiere_email?'Sí':'No'}
   ];
   const filas=[{label:'Honorario estimado', sub:'Total informado al cliente en el cotizador web', valor:'USD '+(Number(r.presupuesto_usd)||0).toLocaleString('es-AR')}];
-  const doc=construirPDFCotizacion({
+  const doc=await construirPDFCotizacion({
     subtitle:'Resumen de cotización (panel administrativo) · '+nombre,
     fechaTxt:r.created_at?new Date(r.created_at).toLocaleDateString('es-AR'):'—',
     ficha, obra:null, filas,
