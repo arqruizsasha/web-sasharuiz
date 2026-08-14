@@ -803,6 +803,37 @@ button,.btn{border-radius:var(--r-pill)}
     <p class="err" id="leadErr" style="min-height:1.2em"></p>
     <button class="cta cta--full" id="btnConfirmarLead" style="margin-top:6px" onclick="confirmarLead()">
       <svg class="ico"><use href="#i-calc"/></svg> Ver mi presupuesto estimado</button>
+    <p style="font-size:.7rem;color:var(--c-mut);text-align:center;margin-top:10px;line-height:1.5">
+      Al continuar aceptás nuestra <a href="#" onclick="event.preventDefault();abrirModal('modalPrivacidad')" style="color:var(--nude);text-decoration:underline">Política de Privacidad</a>.</p>
+  </div>
+</div>
+
+<div class="overlay" id="modalPrivacidad" onclick="cerrarSiFondo(event,'modalPrivacidad')">
+  <div class="modal modal--dark" role="dialog" aria-modal="true" style="max-width:640px;max-height:85vh;overflow-y:auto">
+    <button class="modal-x" onclick="cerrarModal('modalPrivacidad')" aria-label="Cerrar">×</button>
+    <h4><svg class="ico"><use href="#i-alerta"/></svg> Política de Privacidad</h4>
+    <p class="modal-sub" style="font-family:'Space Mono',monospace;font-size:.72rem">Última actualización: agosto de 2026</p>
+    <div style="font-size:.85rem;line-height:1.7;color:var(--c-txt)">
+      <p style="margin-bottom:14px"><strong>1. Responsable del tratamiento.</strong> Estudio Mengibar (Arq. Sasha Ruiz), con domicilio en Rosario, provincia de Santa Fe, Argentina, es responsable del tratamiento de los datos personales que se recaban a través de este sitio. Contacto: <a href="https://wa.me/543413632019" target="_blank" rel="noopener" style="color:var(--nude)">WhatsApp de Estudio Mengibar</a>.</p>
+
+      <p style="margin-bottom:14px"><strong>2. Qué datos recolectamos.</strong> Cuando usás el cotizador, guardamos: nombre, email y (si lo dejás) tu número de WhatsApp; los datos de tu proyecto (superficie, ubicación, tipo de obra, servicios elegidos); el presupuesto estimado que te mostramos; y, si nos lo indicás, tu opinión sobre el presupuesto y si pediste que te lo enviemos por mail. No pedimos datos sensibles (salud, ideología, etc.) ni datos de menores de edad.</p>
+
+      <p style="margin-bottom:14px"><strong>3. Para qué los usamos.</strong> Exclusivamente para: (a) mostrarte una estimación de honorarios profesionales; (b) contactarte para coordinar una propuesta formal si vos lo solicitás (por WhatsApp o email); (c) llevar un registro interno de consultas para mejorar el servicio. No usamos tus datos para enviarte publicidad no solicitada, no los vendemos ni los cedemos a terceros con fines comerciales.</p>
+
+      <p style="margin-bottom:14px"><strong>4. Base legal.</strong> El tratamiento se basa en tu consentimiento, otorgado al completar y enviar el formulario del cotizador (Ley 25.326 de Protección de Datos Personales, Argentina).</p>
+
+      <p style="margin-bottom:14px"><strong>5. Dónde se almacenan.</strong> Los datos se guardan en una base de datos administrada por Supabase Inc., un proveedor de infraestructura cloud. Esto puede implicar que los datos se alojen en servidores fuera de Argentina. El acceso a esa base está restringido y protegido con contraseña; solo Estudio Mengibar puede consultarla.</p>
+
+      <p style="margin-bottom:14px"><strong>6. Cuánto tiempo los conservamos.</strong> Conservamos tus datos mientras sean necesarios para los fines descriptos en el punto 3, o hasta que solicites su eliminación.</p>
+
+      <p style="margin-bottom:14px"><strong>7. Tus derechos.</strong> Como titular de los datos, tenés derecho a acceder, rectificar, actualizar o solicitar la supresión de tus datos personales (derechos ARCO), de forma gratuita, en cualquier momento. Para ejercerlos, escribinos por <a href="https://wa.me/543413632019" target="_blank" rel="noopener" style="color:var(--nude)">WhatsApp</a> indicando tu nombre y email utilizados en el cotizador.</p>
+
+      <p style="margin-bottom:14px"><strong>8. Autoridad de control.</strong> La Agencia de Acceso a la Información Pública (AAIP), órgano de control de la Ley 25.326, tiene la atribución de atender las denuncias y reclamos que se interpongan con relación al incumplimiento de las normas sobre protección de datos personales (www.argentina.gob.ar/aaip).</p>
+
+      <p style="margin-bottom:14px"><strong>9. Cookies y almacenamiento local.</strong> Este sitio utiliza almacenamiento local del navegador (localStorage/sessionStorage) únicamente con fines técnicos: evitar perder tu cotización si falla la conexión, y mantener tu sesión iniciada en el panel administrativo. No utilizamos cookies de seguimiento ni de publicidad de terceros.</p>
+
+      <p style="margin-bottom:0"><strong>10. Cambios a esta política.</strong> Podemos actualizar esta política ocasionalmente. La fecha de la última actualización figura al principio de este documento.</p>
+    </div>
   </div>
 </div>
 
@@ -1157,7 +1188,7 @@ button,.btn{border-radius:var(--r-pill)}
 /* ============================================================
    CONFIGURACION
    ============================================================ */
-const CONFIG = { whatsapp:'543413632019', email:'hola@sasharuiz.com' };
+const CONFIG = { whatsapp:'543413632019' };
 
 /* ============================================================
    SUPABASE — captura de leads y consulta desde /admin
