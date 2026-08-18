@@ -94,15 +94,21 @@ h1.hero-title{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(2
 .hero-bio strong{font-weight:600;color:var(--navy)}
 .hero-acts{display:flex;gap:14px;flex-wrap:wrap;margin:30px 0 46px}
 .foto-block{background:transparent;position:relative;align-self:stretch;min-height:400px;display:flex;align-items:flex-end;justify-content:center;padding-top:34px;overflow:visible}
-.foto-block::before{content:'';position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);width:150%;aspect-ratio:1/1;max-width:680px;z-index:1;pointer-events:none;
+.foto-block::before{content:'';position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);width:178%;aspect-ratio:1/1;max-width:760px;z-index:1;pointer-events:none;
   background:
-    radial-gradient(circle at 62% 32%,rgba(167,210,221,.65),transparent 52%),
-    radial-gradient(circle at 30% 68%,rgba(110,133,149,.4),transparent 55%),
-    radial-gradient(circle at 55% 55%,rgba(215,186,170,.22),transparent 60%);
-  filter:blur(8px);
-  -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 38%,transparent 70%);
-  mask-image:radial-gradient(circle at 50% 50%,#000 38%,transparent 70%)}
-.foto-block img{width:94%;max-width:420px;height:auto;position:relative;z-index:2;filter:drop-shadow(0 16px 34px rgba(20,33,41,.26))}
+    radial-gradient(circle at 60% 30%,rgba(167,210,221,.5),transparent 55%),
+    radial-gradient(circle at 28% 66%,rgba(110,133,149,.36),transparent 58%),
+    radial-gradient(circle at 55% 56%,rgba(215,186,170,.32),transparent 62%),
+    radial-gradient(circle at 50% 50%,var(--papel),transparent 70%);
+  filter:blur(26px);
+  -webkit-mask-image:radial-gradient(circle at 50% 46%,#000 26%,transparent 76%);
+  mask-image:radial-gradient(circle at 50% 46%,#000 26%,transparent 76%)}
+.foto-block::after{content:'';position:absolute;left:50%;bottom:2%;transform:translateX(-50%);width:66%;height:30px;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(20,33,41,.16),transparent 72%);
+  filter:blur(5px)}
+.foto-block img{width:94%;max-width:420px;height:auto;position:relative;z-index:2;filter:drop-shadow(0 8px 14px rgba(20,33,41,.10));
+  -webkit-mask-image:radial-gradient(ellipse 72% 68% at 50% 44%,#000 0%,#000 90%,transparent 100%);
+  mask-image:radial-gradient(ellipse 72% 68% at 50% 44%,#000 0%,#000 90%,transparent 100%)}
 .foto-tag{position:absolute;top:0;left:0;z-index:3;background:var(--navy);color:var(--papel);padding:9px 16px}
 .social-fabs{position:fixed;right:22px;bottom:88px;z-index:80;display:flex;flex-direction:column;gap:12px}
 .social-fabs a{width:48px;height:48px;border-radius:50%;background:var(--blanco);color:var(--navy);
@@ -386,7 +392,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;background:var(--nude
 .m2-row.compact .m2-read{margin-bottom:6px;flex-wrap:wrap}
 .m2-row.compact .m2-read input{font-size:1.7rem;width:100%;max-width:110px}
 .m2-row.compact .m2-read span{font-size:.74rem}
-.m2-row.compact .range-track-wrap,.m2-row.compact .range-ticks{display:none}
+.m2-row.compact .range-ticks{font-size:.6rem}
 @media (max-width:400px){
   .m2-row.compact{grid-template-columns:1fr}
 }
@@ -1023,14 +1029,15 @@ button,.btn{border-radius:var(--r-pill)}
 
     <section class="step" id="s1a"></section>
     <section class="step" id="s1b"></section>
-    <section class="step" id="s1c"></section>
 
     <section class="step" id="s2">
       <div class="step-num tech"><span id="numS2">02</span> · Superficie</div>
       <h2 id="s4title">Superficie</h2>
       <p class="lead" id="s4lead"></p>
 
-      <div class="opts opts--2" id="s2metodoOpts" style="margin-bottom:18px">
+      <div id="s2ambienteBox" class="hidden" style="margin-bottom:18px"></div>
+
+      <div class="opts opts--2 hidden" id="s2metodoOpts" style="margin-bottom:18px">
         <button class="opt" data-metodo="m2" onclick="elegirMetodoSuperficie('m2',this)">
           <span class="opt-mark">01</span><span class="oi"><svg class="ico ico--lg"><use href="#i-calc"/></svg></span>
           <span class="ot">¿Sabés los m² de tu espacio?</span>
@@ -1742,7 +1749,7 @@ function renderProcesoAdaptivo(tipo){
    cotiza aparte, vía CAUPSF.
    ============================================================ */
 const BIM_MERCADOS = {
-  local:{n:'Local / LatAm', d:'Tarifa de mercado regional.', microFloor:100, peq:3.50, med:1.80, gde:0.90},
+  local:{n:'Local', d:'Tarifa de mercado regional.', microFloor:100, peq:3.50, med:1.80, gde:0.90},
   intl: {n:'Internacional', d:'EE.UU. / Europa / Oceanía · valor hora USD 20–25.', microFloor:100, peq:8.00, med:4.50, gde:2.50}
 };
 const BIM_DISCIPLINAS = {
@@ -1825,7 +1832,7 @@ document.addEventListener('keydown',e=>{
 
 function stepSequence(){
   const seq=['s0','s1'];
-  if(S.tipo==='remodelacion') seq.push('s1a','s1b','s1c');
+  if(S.tipo==='remodelacion') seq.push('s1a','s1b');
   seq.push('s2','s3','s4');
   if(!esBim()) seq.push('s5');
   seq.push('s6');
@@ -1857,9 +1864,12 @@ function next(){
     construirPasoSuperficie(); irA(paso+1); return
   }
   if(id==='s1a'){ if(!S.espacio){alerta('Indicá el tipo de espacio.');return} construirPasoProfundidad(); irA(paso+1); return }
-  if(id==='s1b'){ if(!S.profundidad){alerta('Elegí la profundidad de la intervención.');return} construirPasoAmbiente(); irA(paso+1); return }
-  if(id==='s1c'){ if(!S.ambienteRemod){alerta('Indicá qué vas a remodelar.');return} construirPasoSuperficie(); irA(paso+1); return }
-  if(id==='s2'){ if(!S.m2||S.m2<5){alerta('Ingresá una superficie válida.');return} construirPaso3(); irA(paso+1); return }
+  if(id==='s1b'){ if(!S.profundidad){alerta('Elegí la profundidad de la intervención.');return} construirPasoSuperficie(); irA(paso+1); return }
+  if(id==='s2'){
+    if(S.tipo==='remodelacion' && !S.ambienteRemod){alerta('Indicá qué vas a remodelar.');return}
+    if(!S.m2||S.m2<5){alerta('Ingresá una superficie válida.');return}
+    construirPaso3(); irA(paso+1); return
+  }
   if(id==='s3'){
     if(esBim()){
       if(!S.tieneCAD){alerta('Indicá si ya tenés un legajo en CAD.');return}
@@ -1926,10 +1936,10 @@ function construirPaso1(){
     <div class="opts opts--2" id="bimMercadoTop">
       <button class="opt" data-mk="local" onclick="elegirUbicacionMercado('local',this)">
         <span class="opt-mark">01</span><span class="oi">${ico('pin','ico--lg')}</span>
-        <span class="ot">Local / LatAm</span><span class="od">Rosario, Argentina o la región.</span></button>
+        <span class="ot">Local</span><span class="od">Rosario, Argentina o la región.</span></button>
       <button class="opt" data-mk="intl" onclick="elegirUbicacionMercado('intl',this)">
         <span class="opt-mark">02</span><span class="oi">${ico('globo','ico--lg')}</span>
-        <span class="ot">Exterior</span><span class="od">EE.UU., Europa, Oceanía — trabajo remoto.</span></button>
+        <span class="ot">Exterior</span><span class="od">Europa, Oceanía, LatAm fuera de Argentina, EE.UU. — trabajo remoto.</span></button>
     </div>
     <div id="bimUbicacionSubBox" style="margin-top:16px"></div>
     <div class="aviso" id="geoZonaInfo" style="margin-top:14px">Elegí una opción arriba.</div>
@@ -2024,28 +2034,6 @@ function construirPasoProfundidad(){
         <span class="ot">${p.n} · ${k==='cosmetica'?'menor complejidad':k==='parcial'?'complejidad media':'mayor complejidad'}</span>
         <span class="od">${p.d}</span></button>`).join('')}
     </div>
-    <div class="navrow"><button class="ghost" onclick="prev()">← Atras</button><div class="spacer"></div>
-      <button class="cta" onclick="next()">Continuar</button></div>`;
-  onPick=null;
-}
-function construirPasoAmbiente(){
-  const c=document.getElementById('s1c');
-  c.innerHTML=`
-    <div class="step-num tech">04 · Qué vas a remodelar</div>
-    <h2>Elegí tu espacio o diseñá la planta</h2>
-    <p class="lead">Baño y cocina usan las incidencias exactas de las planillas GESTO. Para cualquier otro espacio
-      —incluidos locales y oficinas— armá la planta ambiente por ambiente para una estimación más precisa.</p>
-    <div class="opts opts--2">
-      ${Object.entries(AMBIENTE_REMOD).map(([k,a],i)=>`
-      <button class="opt ${S.ambienteRemod===k?'sel':''}" data-k="ambienteRemod" data-v="${k}" onclick="pick(this)">
-        <span class="opt-mark">0${i+1}</span><span class="oi">${ico(a.ico,'ico--lg')}</span>
-        <span class="ot">${a.n}</span><span class="od">${a.d}</span></button>`).join('')}
-    </div>
-    <button class="plan-cta" onclick="abrirCalc()">
-      <svg class="ico ico--xl"><use href="#i-planta"/></svg>
-      <span><span class="pt">¿Preferís diseñar el espacio ambiente por ambiente?</span>
-      <span class="pd">Armá la planta —incluye locales, oficinas y depósitos— y calculá el m² en 1 minuto →</span></span>
-    </button>
     <div class="navrow"><button class="ghost" onclick="prev()">← Atras</button><div class="spacer"></div>
       <button class="cta" onclick="next()">Continuar</button></div>`;
   onPick=null;
@@ -2166,7 +2154,7 @@ function elegirCiudadAR(v){
   }
 }
 function validarPaso1(){
-  if(!S.bimMercado){alerta('Elegí Local/LatAm o Exterior.');return false}
+  if(!S.bimMercado){alerta('Elegí Local o Exterior.');return false}
   if(!S.zona){alerta('Elegí tu zona.');return false}
   return true;
 }
@@ -2502,11 +2490,45 @@ function construirPasoSuperficie(){
   document.getElementById('s4lead').textContent = esBim()
     ? 'Mínimo 5 m² — un baño, una cocina o un ambiente puntual también se cotizan. Elegí cómo definir la superficie.'
     : (rem
-        ? 'Indicá los m² del sector que se va a reformar, no la superficie total de la propiedad. Elegí cómo definir la superficie.'
+        ? 'Indicá qué vas a remodelar y los m² del sector que se va a reformar, no la superficie total de la propiedad.'
         : 'Indicá los m² cubiertos totales. Elegí cómo definir la superficie.');
+  renderAmbienteRemodBox();
   restaurarSuperficie();
   sincroM2(S.m2);
   sincroM2Semi(S.m2semi);
+}
+/* Reforma: selector de ambiente (baño/cocina/otro) unificado dentro del
+   paso de Superficie — evita el paso 04 separado que duplicaba la misma
+   decisión. Las opciones de "cómo definir la superficie" quedan ocultas
+   hasta que se elige el ambiente a remodelar. */
+function renderAmbienteRemodBox(){
+  const box=document.getElementById('s2ambienteBox');
+  const metodo=document.getElementById('s2metodoOpts');
+  if(!box)return;
+  const rem=S.tipo==='remodelacion';
+  if(!rem){
+    box.classList.add('hidden'); box.innerHTML='';
+    if(metodo) metodo.classList.remove('hidden');
+    return;
+  }
+  box.classList.remove('hidden');
+  box.innerHTML=`<div class="opts opts--2">
+      ${Object.entries(AMBIENTE_REMOD).map(([k,a],i)=>`
+      <button class="opt ${S.ambienteRemod===k?'sel':''}" data-amb="${k}" onclick="elegirAmbienteRemod('${k}')">
+        <span class="opt-mark">0${i+1}</span><span class="oi">${ico(a.ico,'ico--lg')}</span>
+        <span class="ot">${a.n}</span><span class="od">${a.d}</span></button>`).join('')}
+    </div>`;
+  if(metodo) metodo.classList.toggle('hidden', !S.ambienteRemod);
+  if(!S.ambienteRemod){
+    const panel=document.getElementById('s2panel');
+    if(panel) panel.classList.add('hidden');
+  }
+}
+function elegirAmbienteRemod(k){
+  S.ambienteRemod=k;
+  document.querySelectorAll('#s2ambienteBox [data-amb]').forEach(b=>b.classList.toggle('sel', b.dataset.amb===k));
+  const metodo=document.getElementById('s2metodoOpts');
+  if(metodo) metodo.classList.remove('hidden');
 }
 function elegirMetodoSuperficie(k,el){
   if(k==='planta'){ abrirCalc(); return; }
@@ -2526,7 +2548,11 @@ function restaurarSuperficie(){
     panel.classList.add('hidden');
   }
   const interiorChk=document.getElementById('bimInteriorChk');
-  if(interiorChk) interiorChk.classList.toggle('sel',!!S.bimInterior);
+  if(interiorChk){
+    interiorChk.style.display = esBim() ? '' : 'none';
+    if(!esBim() && S.bimInterior) S.bimInterior=false;
+    interiorChk.classList.toggle('sel',!!S.bimInterior);
+  }
 }
 function construirPaso6(){
   document.getElementById('s6opts').innerHTML=Object.entries(EXTRAS).map(([k,x])=>{
