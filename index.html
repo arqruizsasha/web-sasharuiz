@@ -379,6 +379,28 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;background:var(--nude
   background:var(--nude);width:var(--fill,50%);pointer-events:none;z-index:1;box-shadow:0 0 6px rgba(215,186,170,.5)}
 .range-track-wrap input[type=range]{position:relative;z-index:2}
 .range-ticks{display:flex;justify-content:space-between;margin-top:9px;font-size:.66rem;color:var(--c-mut);font-variant-numeric:tabular-nums}
+/* fila compacta de superficie (m2 cubiertos + semicubiertos lado a lado, modo BIM) */
+.m2-row{display:block}
+.m2-row.compact{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.m2-row.compact .m2-box{padding:16px 14px;margin-bottom:0}
+.m2-row.compact .m2-read{margin-bottom:6px;flex-wrap:wrap}
+.m2-row.compact .m2-read input{font-size:1.7rem;width:100%;max-width:110px}
+.m2-row.compact .m2-read span{font-size:.74rem}
+.m2-row.compact .range-track-wrap,.m2-row.compact .range-ticks{display:none}
+@media (max-width:400px){
+  .m2-row.compact{grid-template-columns:1fr}
+}
+/* planificador rapido inline (modo BIM, sin modal) */
+.bim-planner{background:var(--c-surf);border:1px solid var(--aca-celeste);border-radius:var(--r-lg);padding:18px;margin-bottom:20px;box-shadow:0 0 0 0 rgba(167,210,221,.35);animation:bimPlannerPulse 2.4s ease-in-out infinite}
+@keyframes bimPlannerPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(167,210,221,.35)}
+  50%{box-shadow:0 0 0 7px rgba(167,210,221,0)}
+}
+.bim-planner-h{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-family:'Poppins',sans-serif;font-weight:600;font-size:.9rem}
+.bim-planner-h .ico{color:var(--aca-celeste)}
+.badge-pulse{margin-left:auto;font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--aca-celeste);color:var(--navy);padding:3px 9px;border-radius:999px;font-weight:700}
+.plan-list--inline{max-height:none}
 /* boton destacado del planificador */
 .plan-cta{width:100%;display:flex;align-items:center;gap:18px;padding:20px 22px;margin-bottom:26px;
   background:linear-gradient(90deg,rgba(215,186,170,.16),rgba(110,133,149,.10));
@@ -1007,26 +1029,47 @@ button,.btn{border-radius:var(--r-pill)}
       <div class="step-num tech"><span id="numS2">02</span> · Superficie</div>
       <h2 id="s4title">Superficie cubierta</h2>
       <p class="lead" id="s4lead"></p>
-      <button class="plan-cta" onclick="abrirCalc()">
+
+      <div id="s2bimTop" class="hidden">
+        <button type="button" class="chk" id="bimInteriorChk" onclick="toggleBimInterior(this)" style="margin-bottom:16px">
+          <span class="box"></span>Es un ambiente 100% interior (baño, cocina, habitación) — sin fachada</button>
+
+        <div class="bim-planner" id="bimPlannerBox">
+          <div class="bim-planner-h">
+            <svg class="ico ico--sm"><use href="#i-planta"/></svg>
+            <span>¿No sabés cuántos m² necesitás? Sumá ambientes acá abajo</span>
+            <span class="badge-pulse">en vivo</span>
+          </div>
+          <div class="plan-list plan-list--inline" id="bimAmbList"></div>
+          <div class="amb-total">
+            <div><span class="lbl tech">m² sugeridos por ambientes</span><span class="tot" id="bimAmbTotal">0</span></div>
+            <button type="button" class="cta" onclick="usarBimAmbEstimacion()"><svg class="ico "><use href="#i-check"/></svg> Usar esta suma</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="plan-cta" id="btnAbrirCalcNoBim" onclick="abrirCalc()">
         <svg class="ico ico--xl"><use href="#i-planta"/></svg>
         <span><span class="pt">¿No sabés cuántos m² necesitás?</span>
         <span class="pd">Armá la planta ambiente por ambiente y calculala en 1 minuto →</span></span>
       </button>
-      <div class="m2-box">
-        <div class="m2-read">
-          <input type="number" id="m2Input" value="120" min="10" max="20000" step="1" aria-label="Metros cuadrados">
-          <span>m² cubiertos</span>
+      <div class="m2-row" id="m2RowBox">
+        <div class="m2-box">
+          <div class="m2-read">
+            <input type="number" id="m2Input" value="120" min="5" max="20000" step="1" aria-label="Metros cuadrados">
+            <span>m² cubiertos</span>
+          </div>
+          <div class="range-track-wrap"><input type="range" id="m2Range" min="15" max="1000" step="5" value="120" aria-label="Deslizador de superficie"></div>
+          <div class="range-ticks"><span>15 m²</span><span>250</span><span>500</span><span>750</span><span>1000 m²</span></div>
         </div>
-        <div class="range-track-wrap"><input type="range" id="m2Range" min="15" max="1000" step="5" value="120" aria-label="Deslizador de superficie"></div>
-        <div class="range-ticks"><span>15 m²</span><span>250</span><span>500</span><span>750</span><span>1000 m²</span></div>
-      </div>
-      <div class="m2-box">
-        <div class="m2-read">
-          <input type="number" id="m2SemiInput" value="0" min="0" max="600" step="1" aria-label="Metros cuadrados semicubiertos">
-          <span>m² semicubiertos <span class="tech" style="opacity:.6">(galerías, porches — cuentan 50%)</span></span>
+        <div class="m2-box">
+          <div class="m2-read">
+            <input type="number" id="m2SemiInput" value="0" min="0" max="600" step="1" aria-label="Metros cuadrados semicubiertos">
+            <span>m² semicubiertos <span class="tech" style="opacity:.6">(galerías, porches — cuentan 50%)</span></span>
+          </div>
+          <div class="range-track-wrap"><input type="range" id="m2SemiRange" min="0" max="200" step="5" value="0" aria-label="Deslizador de superficie semicubierta"></div>
+          <div class="range-ticks"><span>0 m²</span><span>50</span><span>100</span><span>150</span><span>200 m²</span></div>
         </div>
-        <div class="range-track-wrap"><input type="range" id="m2SemiRange" min="0" max="200" step="5" value="0" aria-label="Deslizador de superficie semicubierta"></div>
-        <div class="range-ticks"><span>0 m²</span><span>50</span><span>100</span><span>150</span><span>200 m²</span></div>
       </div>
       <p style="font-size:.85rem;color:var(--c-mut);margin-bottom:14px">Superficie computable: <strong id="s4comp" style="color:var(--nude)">120 m²</strong></p>
       <button type="button" class="infotip" onclick="toggleInfotip(this)">
@@ -1049,13 +1092,8 @@ button,.btn{border-radius:var(--r-pill)}
         <div class="opts opts--2" id="s3opts"></div>
       </div>
       <div id="s3bim" class="hidden">
-        <div class="step-num tech"><span id="numS3bim">03</span> · Mercado del cliente</div>
-        <h2>¿Dónde está tu cliente?</h2>
-        <p class="lead">Define la tabla de tarifas aplicable al servicio BIM.</p>
-        <div class="opts opts--2" id="s3bimMercado"></div>
-
-        <div class="step-num tech" style="margin-top:26px">Punto de partida</div>
-        <h2 style="font-size:1.15rem">¿Ya tenés un legajo en CAD?</h2>
+        <div class="step-num tech"><span id="numS3bim">03</span> · Documentación y disciplinas</div>
+        <h2>¿Ya tenés un legajo en CAD?</h2>
         <p class="lead">Define si partimos de cero o de una base digital existente para modelar en BIM.</p>
         <div class="opts opts--2" id="s3bimCad"></div>
 
@@ -1064,8 +1102,6 @@ button,.btn{border-radius:var(--r-pill)}
           <label for="bimNombreInput">Nombre de referencia (aparece en tu PDF)</label>
           <input type="text" id="bimNombreInput" maxlength="60" placeholder="Ej: Casa Familia Pérez, Comedor, Edificio Rosario…" oninput="S.bimNombreProyecto=sanitizarTexto(this.value)">
         </div>
-        <button type="button" class="chk" id="bimInteriorChk" onclick="toggleBimInterior(this)">
-          <span class="box"></span>Es un ambiente 100% interior (baño, cocina, habitación) — sin fachada</button>
 
         <div class="step-num tech" style="margin-top:26px">Disciplinas a modelar</div>
         <p class="lead" style="margin-bottom:14px">Elegí una, varias o todas. El precio se arma como % del costo base según lo seleccionado.</p>
@@ -1098,7 +1134,7 @@ button,.btn{border-radius:var(--r-pill)}
         <p class="lead" id="s4bimBepNota" style="margin-bottom:10px"></p>
 
         <div class="step-num tech" style="margin-top:26px">Imágenes y renders</div>
-        <p class="lead" style="margin-bottom:14px">Opcional: vistas fotorrealistas generadas a partir del mismo modelo BIM. Elegí cantidad; 5 o más renders en total tienen 15% OFF.</p>
+        <p class="lead" style="margin-bottom:14px">Opcional: vistas fotorrealistas generadas a partir del mismo modelo BIM. Elegí cantidad; 4 o más renders en total tienen 15% OFF.</p>
         <div id="s4bimRenders"></div>
       </div>
       <div class="navrow"><button class="ghost" onclick="prev()">← Atras</button><div class="spacer"></div>
@@ -1713,13 +1749,14 @@ function renderProcesoAdaptivo(tipo){
    cotiza aparte, vía CAUPSF.
    ============================================================ */
 const BIM_MERCADOS = {
-  local:{n:'Local / LatAm', d:'Tarifa de mercado regional.', microFloor:150, peq:3.50, med:1.80, gde:0.90},
-  intl: {n:'Internacional', d:'EE.UU. / Europa / Oceanía · valor hora USD 20–25.', microFloor:300, peq:8.00, med:4.50, gde:2.50}
+  local:{n:'Local / LatAm', d:'Tarifa de mercado regional.', microFloor:100, peq:3.50, med:1.80, gde:0.90},
+  intl: {n:'Internacional', d:'EE.UU. / Europa / Oceanía · valor hora USD 20–25.', microFloor:100, peq:8.00, med:4.50, gde:2.50}
 };
 const BIM_DISCIPLINAS = {
   arquitectura:{n:'Arquitectura', d:'Muros, aberturas, cubiertas y terminaciones en 3D paramétrico.', pct:0.35, ico:'plano'},
   estructura:  {n:'Estructura', d:'Fundaciones, columnas, vigas y losas, coordinado con el calculista.', pct:0.25, ico:'balanza'},
-  mep:         {n:'Instalaciones (MEP)', d:'Sanitario, eléctrico, climatización y contra incendio, mayor complejidad de ruteo.', pct:0.40, ico:'cubo'}
+  mep:         {n:'Instalaciones (MEP)', d:'Sanitario, eléctrico, climatización y contra incendio, mayor complejidad de ruteo.', pct:0.40, ico:'cubo'},
+  coordinacion_laminas:{n:'Coordinación y Láminas', d:'Cruce de modelos (clash detection) y armado de láminas de documentación para entrega.', pct:0.15, ico:'doc'}
 };
 const BIM_LOD = {
   200:{n:'LOD 200', sub:'Geometría aproximada', d:'Volúmenes y elementos genéricos, sin detalle constructivo. Sirve para anteproyecto.'},
@@ -1734,7 +1771,7 @@ const BIM_RENDER_PRECIOS = {
 const BIM_BEP_UMBRAL_M2 = 200;   // desde acá se cobra BEP/Coordinación
 const BIM_BEP_PCT = 0.10;        // 10% sobre subtotal de modelado
 const BIM_LOD500_MIN_M2 = 100;   // LOD 500 solo disponible por encima de esto
-const BIM_RENDER_DESCUENTO_QTY = 5;   // cantidad total de renders que dispara el descuento
+const BIM_RENDER_DESCUENTO_QTY = 4;   // cantidad total de renders que dispara el descuento
 const BIM_RENDER_DESCUENTO_PCT = 0.15; // 15% OFF
 const BIM_DOC_COEF = {si:1.0, no:1.35}; // digitalizado vs. sin digitalizar
 
@@ -1744,7 +1781,7 @@ const BIM_DOC_COEF = {si:1.0, no:1.35}; // digitalizado vs. sin digitalizar
 const S = {servicios:[],tipo:null,pais:null,provincia:null,zona:null,ciudadTexto:'',barrio:null,espacio:null,profundidad:null,
   ambienteRemod:null,ambientes:[],alcance:null,alcanceBloqueado:false,calidad:null,
   m2:120,m2semi:0,tareaProyecto:null,tareaDireccion:null,extras:[],m2Piscina:24,layout:[],conexiones:[],
-  tieneCAD:null,bimMercado:null,bimNombreProyecto:'',bimInterior:false,bimDisciplinas:[],bimLod:300,bimRenderInt:0,bimRenderExt:0,
+  tieneCAD:null,bimMercado:null,bimNombreProyecto:'',bimInterior:false,bimDisciplinas:[],bimLod:300,bimRenderInt:0,bimRenderExt:0,bimAmbQty:{},
   feedback:null,nombre:'',apellido:'',email:'',supabaseId:null,localLeadId:null,guardadoPromise:null};
 let paso = 0;
 const TOTAL = 7;
@@ -1829,10 +1866,9 @@ function next(){
   if(id==='s1a'){ if(!S.espacio){alerta('Indicá el tipo de espacio.');return} construirPasoProfundidad(); irA(paso+1); return }
   if(id==='s1b'){ if(!S.profundidad){alerta('Elegí la profundidad de la intervención.');return} construirPasoAmbiente(); irA(paso+1); return }
   if(id==='s1c'){ if(!S.ambienteRemod){alerta('Indicá qué vas a remodelar.');return} construirPaso4(); irA(paso+1); return }
-  if(id==='s2'){ if(!S.m2||S.m2<10){alerta('Ingresá una superficie válida.');return} construirPaso3(); irA(paso+1); return }
+  if(id==='s2'){ if(!S.m2||S.m2<5){alerta('Ingresá una superficie válida.');return} construirPaso3(); irA(paso+1); return }
   if(id==='s3'){
     if(esBim()){
-      if(!S.bimMercado){alerta('Elegí el mercado del cliente (Local o Internacional).');return}
       if(!S.tieneCAD){alerta('Indicá si ya tenés un legajo en CAD.');return}
       if(!S.bimDisciplinas.length){alerta('Elegí al menos una disciplina a modelar.');return}
     } else if(!S.calidad){alerta('Elegí un nivel de terminaciones.');return}
@@ -1890,6 +1926,27 @@ function elegirServicioInicial(k,el){
    ============================================================ */
 function construirPaso1(){
   const c=document.getElementById('s1'); S.alcanceBloqueado=false;
+  if(esBim()){
+    c.innerHTML=`
+      <div class="step-num tech">01 · Mercado y ubicación</div>
+      <h2>¿Dónde está tu cliente?</h2>
+      <p class="lead">Define la tabla de tarifas BIM aplicable y, si corresponde, tu zona de cobertura presencial.</p>
+      <div class="opts opts--2" id="bimMercadoTop">
+        <button class="opt" data-mk="local" onclick="elegirBimUbicacionTop('local',this)">
+          <span class="opt-mark">01</span><span class="oi">${ico('pin','ico--lg')}</span>
+          <span class="ot">Local / LatAm</span><span class="od">Rosario, Argentina o la región.</span></button>
+        <button class="opt" data-mk="intl" onclick="elegirBimUbicacionTop('intl',this)">
+          <span class="opt-mark">02</span><span class="oi">${ico('globo','ico--lg')}</span>
+          <span class="ot">Exterior</span><span class="od">EE.UU., Europa, Oceanía — trabajo remoto.</span></button>
+      </div>
+      <div id="bimUbicacionSubBox" style="margin-top:16px"></div>
+      <div class="aviso" id="geoZonaInfo" style="margin-top:14px">Elegí una opción arriba.</div>
+      <div class="navrow"><button class="ghost" onclick="prev()">← Atras</button><div class="spacer"></div>
+        <button class="cta" onclick="next()">Continuar</button></div>`;
+    onPick=null;
+    setTimeout(restaurarZonaBim,20);
+    return;
+  }
   c.innerHTML=`
     <div class="step-num tech">01 · Ubicación</div>
     <h2>¿Dónde está el terreno o la propiedad?</h2>
@@ -1912,6 +1969,57 @@ function construirPaso1(){
       <button class="cta" onclick="next()">Continuar</button></div>`;
   onPick=null;
   setTimeout(restaurarZonaPaso1,20);
+}
+function elegirBimUbicacionTop(mk,el){
+  S.bimMercado=mk;
+  document.querySelectorAll('#bimMercadoTop [data-mk]').forEach(b=>b.classList.remove('sel'));
+  if(el) el.classList.add('sel');
+  const box=document.getElementById('bimUbicacionSubBox');
+  const info=document.getElementById('geoZonaInfo');
+  S.zona=null; S.ciudadTexto=''; S.barrio=null; S.provincia=null;
+  if(mk==='local'){
+    box.innerHTML=`<div class="opts opts--2">
+        <button class="opt" data-modo="rosario" onclick="elegirModoZona('rosario',this)">
+          <span class="opt-mark">01</span><span class="oi">${ico('pin','ico--lg')}</span>
+          <span class="ot">Rosario y alrededores</span><span class="od">Barrios de Rosario y pueblos satélite del Gran Rosario.</span></button>
+        <button class="opt" data-modo="argentina" onclick="elegirModoZona('argentina',this)">
+          <span class="opt-mark">02</span><span class="oi">${ico('mapa','ico--lg')}</span>
+          <span class="ot">Argentina</span><span class="od">Resto del país, por provincia y ciudad.</span></button>
+      </div>
+      <div id="zonaSubBox" style="margin-top:12px"></div>`;
+    info.textContent='Elegí tu zona de cobertura.';
+  } else {
+    S.pais='ext'; S.zona='exterior'; S.alcanceBloqueado=true; S.alcance='proyecto'; S.ciudadTexto='';
+    box.innerHTML=`<select id="paisSelect" class="sel-input" onchange="elegirPaisExterior(this.value)">
+        <option value="">Elegí el país...</option>
+        ${PAISES_EXTERIOR.map(p=>`<option value="${p}">${p}</option>`).join('')}
+      </select>`;
+    info.innerHTML=`<b>${ico('globo','ico--sm')}Mercado internacional</b>
+      Tarifas en USD acorde a valor hora profesional (EE.UU. / Europa / Oceanía). Trabajo 100% remoto.`;
+  }
+}
+function restaurarZonaBim(){
+  if(!S.bimMercado)return;
+  const el=document.querySelector('#bimMercadoTop [data-mk="'+S.bimMercado+'"]');
+  elegirBimUbicacionTop(S.bimMercado,el);
+  if(S.bimMercado==='local'){
+    if(S.zona==='rosario'||S.zona==='gran'){
+      elegirModoZona('rosario',document.querySelector('#s1 [data-modo="rosario"]'));
+      const sel=document.getElementById('rosarioSelect');
+      if(sel&&S.barrio){ sel.value=S.barrio; elegirRosario(S.barrio); }
+    } else if(S.zona==='restosf'||S.zona==='otras_prov'){
+      elegirModoZona('argentina',document.querySelector('#s1 [data-modo="argentina"]'));
+      const provSel=document.getElementById('provinciaSelect');
+      if(provSel&&S.provincia){
+        provSel.value=S.provincia; elegirProvincia(S.provincia);
+        const ciudadSel=document.getElementById('ciudadSelect');
+        if(ciudadSel&&S.ciudadTexto){ ciudadSel.value=S.ciudadTexto; elegirCiudadAR(S.ciudadTexto); }
+      }
+    }
+  } else {
+    const paisSel=document.getElementById('paisSelect');
+    if(paisSel&&S.ciudadTexto){ paisSel.value=S.ciudadTexto; elegirPaisExterior(S.ciudadTexto); }
+  }
 }
 function construirPasoEspacio(){
   const c=document.getElementById('s1a');
@@ -2116,6 +2224,7 @@ function restaurarZonaPaso1(){
 }
 
 function validarPaso1(){
+  if(esBim() && !S.bimMercado){alerta('Elegí Local/LatAm o Exterior.');return false}
   if(!S.zona){alerta('Elegí tu zona.');return false}
   return true;
 }
@@ -2249,18 +2358,13 @@ function renderBimRenders(){
     html+=`<p class="lead" style="font-size:.82rem;opacity:.7;margin-top:6px">Ambiente 100% interior: los renders exteriores quedan ocultos.</p>`;
   }
   html+=`<p class="lead" style="font-size:.82rem;margin-top:10px;${descuento?'color:var(--nude)':'opacity:.7'}">
-      ${descuento?'✓ 15% OFF aplicado por elegir 5 o más renders en total.':'Elegí 5 o más renders en total para acceder a 15% OFF.'}</p>`;
+      ${descuento?'✓ 15% OFF aplicado por elegir 4 o más renders en total.':'Elegí 4 o más renders en total para acceder a 15% OFF.'}</p>`;
   cont.innerHTML=html;
 }
 function bimRenderQty(tipo,d){
   if(tipo==='int'){ S.bimRenderInt=Math.max(0,S.bimRenderInt+d); }
   else { if(S.bimInterior)return; S.bimRenderExt=Math.max(0,S.bimRenderExt+d); }
   renderBimRenders();
-}
-function elegirBimMercado(v,el){
-  S.bimMercado=v;
-  document.querySelectorAll('#s3bimMercado .opt').forEach(b=>b.classList.remove('sel'));
-  el.classList.add('sel');
 }
 function toggleBimDisciplina(el,k){
   el.classList.toggle('sel');
@@ -2385,10 +2489,6 @@ function construirPaso3(){
   const normal=document.getElementById('s3normal'), bim=document.getElementById('s3bim');
   if(esBim()){
     normal.classList.add('hidden'); bim.classList.remove('hidden');
-    document.getElementById('s3bimMercado').innerHTML=Object.entries(BIM_MERCADOS).map(([k,mk],i)=>`
-      <button class="opt ${S.bimMercado===k?'sel':''}" onclick="elegirBimMercado('${k}',this)">
-        <span class="opt-mark">0${i+1}</span><span class="oi">${ico(k==='local'?'pin':'globo','ico--lg')}</span>
-        <span class="ot">${mk.n}</span><span class="od">${mk.d}</span></button>`).join('');
     document.getElementById('s3bimCad').innerHTML=['si','no'].map((v,i)=>{
       const t=v==='si'?{n:'Sí, ya tengo un legajo en CAD',d:'Partimos de tu documentación existente: el modelado es más rápido y el presupuesto baja.'}
                        :{n:'No, no tengo nada digitalizado',d:'Partimos de cero: relevamiento y armado de la base de modelado incluidos (+35%).'};
@@ -2398,8 +2498,6 @@ function construirPaso3(){
     }).join('');
     const nombreInput=document.getElementById('bimNombreInput');
     if(nombreInput) nombreInput.value=S.bimNombreProyecto||'';
-    const interiorChk=document.getElementById('bimInteriorChk');
-    if(interiorChk) interiorChk.classList.toggle('sel',!!S.bimInterior);
     document.getElementById('s3bimEtapas').innerHTML=Object.entries(BIM_DISCIPLINAS).map(([k,e])=>`
       <button class="chk ${S.bimDisciplinas.includes(k)?'sel':''}" onclick="toggleBimDisciplina(this,'${k}')">
         <span class="box"></span>${e.n} <span class="tech" style="opacity:.6">· ${Math.round(e.pct*100)}%</span></button>`).join('');
@@ -2456,12 +2554,63 @@ function toggleRefItem(el){
 }
 function construirPaso4(){
   const rem=S.tipo==='remodelacion';
-  document.getElementById('s4title').textContent=rem?'Superficie a intervenir':'Superficie cubierta';
-  document.getElementById('s4lead').textContent=rem
-    ?'Indicá los m² del sector que se va a reformar, no la superficie total de la propiedad.'
-    :'Indicá los m² cubiertos totales. Si todavía no lo tenés definido, armá la planta ambiente por ambiente.';
+  const bimTop=document.getElementById('s2bimTop');
+  const btnNoBim=document.getElementById('btnAbrirCalcNoBim');
+  const m2Row=document.getElementById('m2RowBox');
+  if(esBim()){
+    document.getElementById('s4title').textContent='Superficie del proyecto o ambiente';
+    document.getElementById('s4lead').textContent='Mínimo 5 m² — un baño, una cocina o un ambiente puntual también se cotizan. Indicá los m² o sumalos abajo.';
+    if(bimTop) bimTop.classList.remove('hidden');
+    if(btnNoBim) btnNoBim.classList.add('hidden');
+    if(m2Row) m2Row.classList.add('compact');
+    const interiorChk=document.getElementById('bimInteriorChk');
+    if(interiorChk) interiorChk.classList.toggle('sel',!!S.bimInterior);
+    renderBimAmbList();
+  } else {
+    document.getElementById('s4title').textContent=rem?'Superficie a intervenir':'Superficie cubierta';
+    document.getElementById('s4lead').textContent=rem
+      ?'Indicá los m² del sector que se va a reformar, no la superficie total de la propiedad.'
+      :'Indicá los m² cubiertos totales. Si todavía no lo tenés definido, armá la planta ambiente por ambiente.';
+    if(bimTop) bimTop.classList.add('hidden');
+    if(btnNoBim) btnNoBim.classList.remove('hidden');
+    if(m2Row) m2Row.classList.remove('compact');
+  }
   sincroM2(S.m2);
   sincroM2Semi(S.m2semi);
+}
+function renderBimAmbList(){
+  const cont=document.getElementById('bimAmbList');
+  if(!cont)return;
+  cont.innerHTML=AMB.map(a=>`
+    <div class="amb-row">
+      <div><span class="anm">${ico(a.ico,'ico--sm')}${a.n}</span><span class="am">${String(a.m).replace('.',',')} m² c/u</span></div>
+      <div class="stepper">
+        <button type="button" onclick="bimAmbQtyChange('${a.id}',-1)" aria-label="Quitar ${a.n}">−</button>
+        <span class="val" id="v_bimAmb_${a.id}">${S.bimAmbQty[a.id]||0}</span>
+        <button type="button" onclick="bimAmbQtyChange('${a.id}',1)" aria-label="Sumar ${a.n}">+</button>
+      </div>
+    </div>`).join('');
+  pintarBimAmbTotal();
+}
+function bimAmbQtyChange(id,d){
+  const prev=S.bimAmbQty[id]||0;
+  const nuevo=Math.max(0,prev+d);
+  S.bimAmbQty[id]=nuevo;
+  const el=document.getElementById('v_bimAmb_'+id);
+  if(el) el.textContent=nuevo;
+  pintarBimAmbTotal();
+}
+function totalBimAmbM2(){
+  return AMB.reduce((s,a)=>s+(S.bimAmbQty[a.id]||0)*a.m,0);
+}
+function pintarBimAmbTotal(){
+  const el=document.getElementById('bimAmbTotal');
+  if(el) el.textContent=Math.round(totalBimAmbM2()*10)/10;
+}
+function usarBimAmbEstimacion(){
+  const total=totalBimAmbM2();
+  if(total<5){ alerta('Sumá al menos 5 m² de ambientes.'); return; }
+  sincroM2(total);
 }
 function construirPaso6(){
   document.getElementById('s6opts').innerHTML=Object.entries(EXTRAS).map(([k,x])=>{
@@ -2511,7 +2660,7 @@ function pintarComputable(){
   if(el) el.textContent=(S.m2+S.m2semi*0.5).toLocaleString('es-AR',{maximumFractionDigits:1})+' m²';
 }
 function sincroM2(v){
-  v=Math.max(10,Math.min(1500,Math.round(v||0)));
+  v=Math.max(5,Math.min(20000,Math.round(v||0)));
   S.m2=v; mIn.value=v; mRg.value=Math.min(1000,v);
   actualizarFillRange(mRg);
   pintarComputable();
@@ -2972,7 +3121,7 @@ function calcularYRender(){
     f+=fichaItem('cinta','Superficie',S.m2+' m²','Tramo: '+R.tramo);
     f+=fichaItem('lapiz','Documentación base',S.tieneCAD==='si'?'DWG Digitalizado':'Sin digitalizar — desde cero',S.tieneCAD==='si'?'Coeficiente x1,00':'Coeficiente x1,35 (+35%)');
     f+=fichaItem('cubo','Nivel de detalle',R.lod.n,R.lod.sub);
-    f+=fichaItem('balanza','Disciplinas',R.disciplinas.map(d=>d.n).join(', ')||'—',R.disciplinas.length+' de 3 seleccionadas');
+    f+=fichaItem('balanza','Disciplinas',R.disciplinas.map(d=>d.n).join(', ')||'—',R.disciplinas.length+' de '+Object.keys(BIM_DISCIPLINAS).length+' seleccionadas');
     f+=fichaItem('calc','BEP / Coordinación',R.aplicaBEP?usd(R.bepUsd*TC_REFERENCIA):'No aplica',R.aplicaBEP?'10% del subtotal de modelado':'Superficie < '+BIM_BEP_UMBRAL_M2+' m²');
     if(R.qtyRenders>0) f+=fichaItem('cuadro','Renders',(S.bimRenderInt?S.bimRenderInt+' interiores':'')+(S.bimRenderInt&&S.bimRenderExt?' + ':'')+(S.bimRenderExt?S.bimRenderExt+' exteriores':''),R.aplicaDescuentoRender?'15% OFF aplicado':'Generados desde el mismo modelo');
     document.getElementById('resFicha').innerHTML=f;
@@ -3066,7 +3215,7 @@ function textoCotizacion(){
     if(R.qtyRenders>0){
       if(S.bimRenderInt) L.push('· Renders interiores: '+S.bimRenderInt+' × '+usd(R.preciosRender?R.preciosRender.interior*TC_REFERENCIA:0));
       if(S.bimRenderExt) L.push('· Renders exteriores: '+S.bimRenderExt+' × '+usd(R.preciosRender?R.preciosRender.exterior*TC_REFERENCIA:0));
-      if(R.aplicaDescuentoRender) L.push('· Descuento renders (≥5, 15% OFF): -'+usd(R.descuentoRender*TC_REFERENCIA));
+      if(R.aplicaDescuentoRender) L.push('· Descuento renders (≥4, 15% OFF): -'+usd(R.descuentoRender*TC_REFERENCIA));
     }
     L.push(''); L.push('*LOS NUMEROS — valores en USD, referencia de mercado*');
     R.detalle.forEach(d=>L.push('· '+d.n+': '+usd(d.costoUsd*TC_REFERENCIA)));
@@ -3155,7 +3304,7 @@ function reiniciar(){
   Object.assign(S,{servicios:[],tipo:null,pais:null,provincia:null,zona:null,ciudadTexto:'',barrio:null,espacio:null,profundidad:null,
     ambienteRemod:null,ambientes:[],alcance:null,alcanceBloqueado:false,calidad:null,
     m2:120,m2semi:0,tareaProyecto:null,tareaDireccion:null,extras:[],m2Piscina:24,layout:[],conexiones:[],
-    tieneCAD:null,bimMercado:null,bimNombreProyecto:'',bimInterior:false,bimDisciplinas:[],bimLod:300,bimRenderInt:0,bimRenderExt:0,
+    tieneCAD:null,bimMercado:null,bimNombreProyecto:'',bimInterior:false,bimDisciplinas:[],bimLod:300,bimRenderInt:0,bimRenderExt:0,bimAmbQty:{},
     feedback:null,nombre:'',apellido:'',email:'',supabaseId:null,localLeadId:null,guardadoPromise:null});
   envioLeadEnCurso = false;
   envioWaEnCurso = false;
@@ -3172,6 +3321,9 @@ function reiniciar(){
   ['leadNombre','leadEmail','fWa','bimNombreInput'].forEach(id=>{const e=document.getElementById(id); if(e) e.value=''});
   burbujas=[]; burbujaSel=null; conexiones=[]; modoFlechas=false; origenFlecha=null; modoZona=null;
   AMB.forEach(a=>{conteo[a.id]=0;const e=document.getElementById('v_'+a.id);if(e)e.textContent='0'});
+  const m2Row=document.getElementById('m2RowBox'); if(m2Row) m2Row.classList.remove('compact');
+  const s2bimTop=document.getElementById('s2bimTop'); if(s2bimTop) s2bimTop.classList.add('hidden');
+  const btnNoBim=document.getElementById('btnAbrirCalcNoBim'); if(btnNoBim) btnNoBim.classList.remove('hidden');
   sincroM2(120); sincroM2Semi(0); irA(0);
 }
 if(document.getElementById('anio')) document.getElementById('anio').textContent=new Date().getFullYear();
