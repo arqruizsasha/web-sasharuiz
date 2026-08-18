@@ -1027,59 +1027,52 @@ button,.btn{border-radius:var(--r-pill)}
 
     <section class="step" id="s2">
       <div class="step-num tech"><span id="numS2">02</span> · Superficie</div>
-      <h2 id="s4title">Superficie cubierta</h2>
+      <h2 id="s4title">Superficie</h2>
       <p class="lead" id="s4lead"></p>
 
-      <div id="s2bimTop" class="hidden">
+      <div class="opts opts--2" id="s2metodoOpts" style="margin-bottom:18px">
+        <button class="opt" data-metodo="m2" onclick="elegirMetodoSuperficie('m2',this)">
+          <span class="opt-mark">01</span><span class="oi"><svg class="ico ico--lg"><use href="#i-calc"/></svg></span>
+          <span class="ot">¿Sabés los m² de tu espacio?</span>
+          <span class="od">Ingresá la superficie cubierta y semicubierta directamente.</span></button>
+        <button class="opt" data-metodo="planta" onclick="elegirMetodoSuperficie('planta',this)">
+          <span class="opt-mark">02</span><span class="oi"><svg class="ico ico--lg"><use href="#i-planta"/></svg></span>
+          <span class="ot">Prefiero diseñar mi espacio</span>
+          <span class="od">Armá la planta ambiente por ambiente y calculala en 1 minuto.</span></button>
+      </div>
+
+      <div id="s2panel" class="hidden">
         <button type="button" class="chk" id="bimInteriorChk" onclick="toggleBimInterior(this)" style="margin-bottom:16px">
           <span class="box"></span>Es un ambiente 100% interior (baño, cocina, habitación) — sin fachada</button>
 
-        <div class="bim-planner" id="bimPlannerBox">
-          <div class="bim-planner-h">
-            <svg class="ico ico--sm"><use href="#i-planta"/></svg>
-            <span>¿No sabés cuántos m² necesitás? Sumá ambientes acá abajo</span>
-            <span class="badge-pulse">en vivo</span>
+        <div class="m2-row compact" id="m2RowBox">
+          <div class="m2-box">
+            <div class="m2-read">
+              <input type="number" id="m2Input" value="120" min="5" max="20000" step="1" aria-label="Metros cuadrados">
+              <span>m² cubiertos</span>
+            </div>
+            <div class="range-track-wrap"><input type="range" id="m2Range" min="15" max="1000" step="5" value="120" aria-label="Deslizador de superficie"></div>
+            <div class="range-ticks"><span>15 m²</span><span>250</span><span>500</span><span>750</span><span>1000 m²</span></div>
           </div>
-          <div class="plan-list plan-list--inline" id="bimAmbList"></div>
-          <div class="amb-total">
-            <div><span class="lbl tech">m² sugeridos por ambientes</span><span class="tot" id="bimAmbTotal">0</span></div>
-            <button type="button" class="cta" onclick="usarBimAmbEstimacion()"><svg class="ico "><use href="#i-check"/></svg> Usar esta suma</button>
+          <div class="m2-box">
+            <div class="m2-read">
+              <input type="number" id="m2SemiInput" value="0" min="0" max="600" step="1" aria-label="Metros cuadrados semicubiertos">
+              <span>m² semicubiertos <span class="tech" style="opacity:.6">(galerías, porches — cuentan 50%)</span></span>
+            </div>
+            <div class="range-track-wrap"><input type="range" id="m2SemiRange" min="0" max="200" step="5" value="0" aria-label="Deslizador de superficie semicubierta"></div>
+            <div class="range-ticks"><span>0 m²</span><span>50</span><span>100</span><span>150</span><span>200 m²</span></div>
           </div>
         </div>
+        <p style="font-size:.85rem;color:var(--c-mut);margin-bottom:14px">Superficie computable: <strong id="s4comp" style="color:var(--nude)">120 m²</strong></p>
+        <button type="button" class="infotip" onclick="toggleInfotip(this)">
+          <span class="infotip-dot"></span>
+          <svg class="ico ico--sm"><use href="#i-calc"/></svg> ¿Qué es la superficie computable?
+          <span class="infotip-pop">
+            <b>Superficie Computable CAUPSF</b>
+            Es la base del cálculo: Sup. Cubierta + (Sup. Semicubierta × 0,5).
+          </span>
+        </button>
       </div>
-
-      <button class="plan-cta" id="btnAbrirCalcNoBim" onclick="abrirCalc()">
-        <svg class="ico ico--xl"><use href="#i-planta"/></svg>
-        <span><span class="pt">¿No sabés cuántos m² necesitás?</span>
-        <span class="pd">Armá la planta ambiente por ambiente y calculala en 1 minuto →</span></span>
-      </button>
-      <div class="m2-row" id="m2RowBox">
-        <div class="m2-box">
-          <div class="m2-read">
-            <input type="number" id="m2Input" value="120" min="5" max="20000" step="1" aria-label="Metros cuadrados">
-            <span>m² cubiertos</span>
-          </div>
-          <div class="range-track-wrap"><input type="range" id="m2Range" min="15" max="1000" step="5" value="120" aria-label="Deslizador de superficie"></div>
-          <div class="range-ticks"><span>15 m²</span><span>250</span><span>500</span><span>750</span><span>1000 m²</span></div>
-        </div>
-        <div class="m2-box">
-          <div class="m2-read">
-            <input type="number" id="m2SemiInput" value="0" min="0" max="600" step="1" aria-label="Metros cuadrados semicubiertos">
-            <span>m² semicubiertos <span class="tech" style="opacity:.6">(galerías, porches — cuentan 50%)</span></span>
-          </div>
-          <div class="range-track-wrap"><input type="range" id="m2SemiRange" min="0" max="200" step="5" value="0" aria-label="Deslizador de superficie semicubierta"></div>
-          <div class="range-ticks"><span>0 m²</span><span>50</span><span>100</span><span>150</span><span>200 m²</span></div>
-        </div>
-      </div>
-      <p style="font-size:.85rem;color:var(--c-mut);margin-bottom:14px">Superficie computable: <strong id="s4comp" style="color:var(--nude)">120 m²</strong></p>
-      <button type="button" class="infotip" onclick="toggleInfotip(this)">
-        <span class="infotip-dot"></span>
-        <svg class="ico ico--sm"><use href="#i-calc"/></svg> ¿Qué es la superficie computable?
-        <span class="infotip-pop">
-          <b>Superficie Computable CAUPSF</b>
-          Es la base del cálculo: Sup. Cubierta + (Sup. Semicubierta × 0,5).
-        </span>
-      </button>
       <div class="navrow"><button class="ghost" onclick="prev()">← Atras</button><div class="spacer"></div>
         <button class="cta" onclick="next()">Continuar</button></div>
     </section>
@@ -1779,9 +1772,9 @@ const BIM_DOC_COEF = {si:1.0, no:1.35}; // digitalizado vs. sin digitalizar
    ESTADO
    ============================================================ */
 const S = {servicios:[],tipo:null,pais:null,provincia:null,zona:null,ciudadTexto:'',barrio:null,espacio:null,profundidad:null,
-  ambienteRemod:null,ambientes:[],alcance:null,alcanceBloqueado:false,calidad:null,
+  ambienteRemod:null,ambientes:[],alcance:null,alcanceBloqueado:false,calidad:null,metodoSup:null,
   m2:120,m2semi:0,tareaProyecto:null,tareaDireccion:null,extras:[],m2Piscina:24,layout:[],conexiones:[],
-  tieneCAD:null,bimMercado:null,bimNombreProyecto:'',bimInterior:false,bimDisciplinas:[],bimLod:300,bimRenderInt:0,bimRenderExt:0,bimAmbQty:{},
+  tieneCAD:null,bimMercado:null,bimNombreProyecto:'',bimInterior:false,bimDisciplinas:[],bimLod:300,bimRenderInt:0,bimRenderExt:0,
   feedback:null,nombre:'',apellido:'',email:'',supabaseId:null,localLeadId:null,guardadoPromise:null};
 let paso = 0;
 const TOTAL = 7;
@@ -1861,11 +1854,11 @@ function next(){
   if(id==='s1'){
     if(!validarPaso1())return;
     if(S.tipo==='remodelacion'){ construirPasoEspacio(); irA(paso+1); return }
-    construirPaso4(); irA(paso+1); return
+    construirPasoSuperficie(); irA(paso+1); return
   }
   if(id==='s1a'){ if(!S.espacio){alerta('Indicá el tipo de espacio.');return} construirPasoProfundidad(); irA(paso+1); return }
   if(id==='s1b'){ if(!S.profundidad){alerta('Elegí la profundidad de la intervención.');return} construirPasoAmbiente(); irA(paso+1); return }
-  if(id==='s1c'){ if(!S.ambienteRemod){alerta('Indicá qué vas a remodelar.');return} construirPaso4(); irA(paso+1); return }
+  if(id==='s1c'){ if(!S.ambienteRemod){alerta('Indicá qué vas a remodelar.');return} construirPasoSuperficie(); irA(paso+1); return }
   if(id==='s2'){ if(!S.m2||S.m2<5){alerta('Ingresá una superficie válida.');return} construirPaso3(); irA(paso+1); return }
   if(id==='s3'){
     if(esBim()){
@@ -1926,51 +1919,26 @@ function elegirServicioInicial(k,el){
    ============================================================ */
 function construirPaso1(){
   const c=document.getElementById('s1'); S.alcanceBloqueado=false;
-  if(esBim()){
-    c.innerHTML=`
-      <div class="step-num tech">01 · Mercado y ubicación</div>
-      <h2>¿Dónde está tu cliente?</h2>
-      <p class="lead">Define la tabla de tarifas BIM aplicable y, si corresponde, tu zona de cobertura presencial.</p>
-      <div class="opts opts--2" id="bimMercadoTop">
-        <button class="opt" data-mk="local" onclick="elegirBimUbicacionTop('local',this)">
-          <span class="opt-mark">01</span><span class="oi">${ico('pin','ico--lg')}</span>
-          <span class="ot">Local / LatAm</span><span class="od">Rosario, Argentina o la región.</span></button>
-        <button class="opt" data-mk="intl" onclick="elegirBimUbicacionTop('intl',this)">
-          <span class="opt-mark">02</span><span class="oi">${ico('globo','ico--lg')}</span>
-          <span class="ot">Exterior</span><span class="od">EE.UU., Europa, Oceanía — trabajo remoto.</span></button>
-      </div>
-      <div id="bimUbicacionSubBox" style="margin-top:16px"></div>
-      <div class="aviso" id="geoZonaInfo" style="margin-top:14px">Elegí una opción arriba.</div>
-      <div class="navrow"><button class="ghost" onclick="prev()">← Atras</button><div class="spacer"></div>
-        <button class="cta" onclick="next()">Continuar</button></div>`;
-    onPick=null;
-    setTimeout(restaurarZonaBim,20);
-    return;
-  }
   c.innerHTML=`
     <div class="step-num tech">01 · Ubicación</div>
-    <h2>¿Dónde está el terreno o la propiedad?</h2>
-    <p class="lead">Elegí tu zona. Define si podemos tomar la dirección de obra
-      presencial o si trabajamos solo la etapa de proyecto.</p>
-    <div class="opts">
-      <button class="opt" data-modo="rosario" onclick="elegirModoZona('rosario',this)">
+    <h2>¿Dónde está tu proyecto?</h2>
+    <p class="lead">Define la tabla de tarifas aplicable y, si corresponde, tu zona de cobertura presencial.</p>
+    <div class="opts opts--2" id="bimMercadoTop">
+      <button class="opt" data-mk="local" onclick="elegirUbicacionMercado('local',this)">
         <span class="opt-mark">01</span><span class="oi">${ico('pin','ico--lg')}</span>
-        <span class="ot">Rosario y alrededores</span><span class="od">Barrios de Rosario y pueblos satélite del Gran Rosario.</span></button>
-      <button class="opt" data-modo="argentina" onclick="elegirModoZona('argentina',this)">
-        <span class="opt-mark">02</span><span class="oi">${ico('mapa','ico--lg')}</span>
-        <span class="ot">Argentina</span><span class="od">Resto del país, por provincia y ciudad.</span></button>
-      <button class="opt" data-modo="exterior" onclick="elegirModoZona('exterior',this)">
-        <span class="opt-mark">03</span><span class="oi">${ico('globo','ico--lg')}</span>
-        <span class="ot">Exterior</span><span class="od">Proyecto fuera de Argentina, trabajo remoto.</span></button>
+        <span class="ot">Local / LatAm</span><span class="od">Rosario, Argentina o la región.</span></button>
+      <button class="opt" data-mk="intl" onclick="elegirUbicacionMercado('intl',this)">
+        <span class="opt-mark">02</span><span class="oi">${ico('globo','ico--lg')}</span>
+        <span class="ot">Exterior</span><span class="od">EE.UU., Europa, Oceanía — trabajo remoto.</span></button>
     </div>
-    <div id="zonaSubBox" style="margin-top:4px"></div>
+    <div id="bimUbicacionSubBox" style="margin-top:16px"></div>
     <div class="aviso" id="geoZonaInfo" style="margin-top:14px">Elegí una opción arriba.</div>
     <div class="navrow"><button class="ghost" onclick="prev()">← Atras</button><div class="spacer"></div>
       <button class="cta" onclick="next()">Continuar</button></div>`;
   onPick=null;
-  setTimeout(restaurarZonaPaso1,20);
+  setTimeout(restaurarUbicacion,20);
 }
-function elegirBimUbicacionTop(mk,el){
+function elegirUbicacionMercado(mk,el){
   S.bimMercado=mk;
   document.querySelectorAll('#bimMercadoTop [data-mk]').forEach(b=>b.classList.remove('sel'));
   if(el) el.classList.add('sel');
@@ -1994,14 +1962,18 @@ function elegirBimUbicacionTop(mk,el){
         <option value="">Elegí el país...</option>
         ${PAISES_EXTERIOR.map(p=>`<option value="${p}">${p}</option>`).join('')}
       </select>`;
-    info.innerHTML=`<b>${ico('globo','ico--sm')}Mercado internacional</b>
-      Tarifas en USD acorde a valor hora profesional (EE.UU. / Europa / Oceanía). Trabajo 100% remoto.`;
+    info.innerHTML = esBim()
+      ? `<b>${ico('globo','ico--sm')}Mercado internacional</b>
+      Tarifas en USD acorde a valor hora profesional (EE.UU. / Europa / Oceanía). Trabajo 100% remoto.`
+      : `<b>${ico('globo','ico--sm')}Alcance disponible</b>
+      Para proyectos en el exterior desarrollamos la etapa integral de Proyecto. La Dirección de Obra
+      requiere presencia en territorio, por lo que no la incluimos fuera del país.`;
   }
 }
-function restaurarZonaBim(){
+function restaurarUbicacion(){
   if(!S.bimMercado)return;
   const el=document.querySelector('#bimMercadoTop [data-mk="'+S.bimMercado+'"]');
-  elegirBimUbicacionTop(S.bimMercado,el);
+  elegirUbicacionMercado(S.bimMercado,el);
   if(S.bimMercado==='local'){
     if(S.zona==='rosario'||S.zona==='gran'){
       elegirModoZona('rosario',document.querySelector('#s1 [data-modo="rosario"]'));
@@ -2144,15 +2116,6 @@ function elegirModoZona(modo,el){
       </select>
       <div id="ciudadBox" style="margin-top:12px"></div>`;
     info.textContent='Elegí la provincia en el desplegable de arriba.';
-  } else if(modo==='exterior'){
-    S.pais='ext'; S.zona='exterior'; S.alcanceBloqueado=true; S.alcance='proyecto'; S.ciudadTexto='';
-    box.innerHTML=`<select id="paisSelect" class="sel-input" onchange="elegirPaisExterior(this.value)">
-        <option value="">Elegí el país...</option>
-        ${PAISES_EXTERIOR.map(p=>`<option value="${p}">${p}</option>`).join('')}
-      </select>`;
-    info.innerHTML=`<b>${ico('globo','ico--sm')}Alcance disponible</b>
-      Para proyectos en el exterior desarrollamos la etapa integral de Proyecto. La Dirección de Obra
-      requiere presencia en territorio, por lo que no la incluimos fuera del país.`;
   }
 }
 function elegirPaisExterior(v){
@@ -2202,29 +2165,8 @@ function elegirCiudadAR(v){
     info.innerHTML=`<b>${ico('mapa','ico--sm')}Alcance disponible</b> ${v}, ${p}. Trabajamos 100% a distancia en la fase de Proyecto. La Dirección de Obra presencial se reserva a nuestro corredor local (Santa Fe / Gran Rosario).`;
   }
 }
-function restaurarZonaPaso1(){
-  if(!S.zona)return;
-  if(S.zona==='exterior'){
-    elegirModoZona('exterior',document.querySelector('#s1 [data-modo="exterior"]'));
-    const paisSel=document.getElementById('paisSelect');
-    if(paisSel&&S.ciudadTexto){ paisSel.value=S.ciudadTexto; elegirPaisExterior(S.ciudadTexto); }
-  } else if(S.zona==='rosario'||S.zona==='gran'){
-    elegirModoZona('rosario',document.querySelector('#s1 [data-modo="rosario"]'));
-    const sel=document.getElementById('rosarioSelect');
-    if(sel&&S.barrio){ sel.value=S.barrio; elegirRosario(S.barrio); }
-  } else if(S.zona==='restosf'||S.zona==='otras_prov'){
-    elegirModoZona('argentina',document.querySelector('#s1 [data-modo="argentina"]'));
-    const provSel=document.getElementById('provinciaSelect');
-    if(provSel&&S.provincia){
-      provSel.value=S.provincia; elegirProvincia(S.provincia);
-      const ciudadSel=document.getElementById('ciudadSelect');
-      if(ciudadSel&&S.ciudadTexto){ ciudadSel.value=S.ciudadTexto; elegirCiudadAR(S.ciudadTexto); }
-    }
-  }
-}
-
 function validarPaso1(){
-  if(esBim() && !S.bimMercado){alerta('Elegí Local/LatAm o Exterior.');return false}
+  if(!S.bimMercado){alerta('Elegí Local/LatAm o Exterior.');return false}
   if(!S.zona){alerta('Elegí tu zona.');return false}
   return true;
 }
@@ -2552,65 +2494,39 @@ function toggleRefItem(el){
   el.parentElement.querySelectorAll('.ref-item').forEach(o=>o.classList.remove('open'));
   if(!open) el.classList.add('open');
 }
-function construirPaso4(){
+function construirPasoSuperficie(){
   const rem=S.tipo==='remodelacion';
-  const bimTop=document.getElementById('s2bimTop');
-  const btnNoBim=document.getElementById('btnAbrirCalcNoBim');
-  const m2Row=document.getElementById('m2RowBox');
-  if(esBim()){
-    document.getElementById('s4title').textContent='Superficie del proyecto o ambiente';
-    document.getElementById('s4lead').textContent='Mínimo 5 m² — un baño, una cocina o un ambiente puntual también se cotizan. Indicá los m² o sumalos abajo.';
-    if(bimTop) bimTop.classList.remove('hidden');
-    if(btnNoBim) btnNoBim.classList.add('hidden');
-    if(m2Row) m2Row.classList.add('compact');
-    const interiorChk=document.getElementById('bimInteriorChk');
-    if(interiorChk) interiorChk.classList.toggle('sel',!!S.bimInterior);
-    renderBimAmbList();
-  } else {
-    document.getElementById('s4title').textContent=rem?'Superficie a intervenir':'Superficie cubierta';
-    document.getElementById('s4lead').textContent=rem
-      ?'Indicá los m² del sector que se va a reformar, no la superficie total de la propiedad.'
-      :'Indicá los m² cubiertos totales. Si todavía no lo tenés definido, armá la planta ambiente por ambiente.';
-    if(bimTop) bimTop.classList.add('hidden');
-    if(btnNoBim) btnNoBim.classList.remove('hidden');
-    if(m2Row) m2Row.classList.remove('compact');
-  }
+  document.getElementById('s4title').textContent = esBim()
+    ? 'Superficie del proyecto o ambiente'
+    : (rem?'Superficie a intervenir':'Superficie cubierta');
+  document.getElementById('s4lead').textContent = esBim()
+    ? 'Mínimo 5 m² — un baño, una cocina o un ambiente puntual también se cotizan. Elegí cómo definir la superficie.'
+    : (rem
+        ? 'Indicá los m² del sector que se va a reformar, no la superficie total de la propiedad. Elegí cómo definir la superficie.'
+        : 'Indicá los m² cubiertos totales. Elegí cómo definir la superficie.');
+  restaurarSuperficie();
   sincroM2(S.m2);
   sincroM2Semi(S.m2semi);
 }
-function renderBimAmbList(){
-  const cont=document.getElementById('bimAmbList');
-  if(!cont)return;
-  cont.innerHTML=AMB.map(a=>`
-    <div class="amb-row">
-      <div><span class="anm">${ico(a.ico,'ico--sm')}${a.n}</span><span class="am">${String(a.m).replace('.',',')} m² c/u</span></div>
-      <div class="stepper">
-        <button type="button" onclick="bimAmbQtyChange('${a.id}',-1)" aria-label="Quitar ${a.n}">−</button>
-        <span class="val" id="v_bimAmb_${a.id}">${S.bimAmbQty[a.id]||0}</span>
-        <button type="button" onclick="bimAmbQtyChange('${a.id}',1)" aria-label="Sumar ${a.n}">+</button>
-      </div>
-    </div>`).join('');
-  pintarBimAmbTotal();
+function elegirMetodoSuperficie(k,el){
+  if(k==='planta'){ abrirCalc(); return; }
+  S.metodoSup='m2';
+  document.querySelectorAll('#s2metodoOpts [data-metodo]').forEach(b=>b.classList.remove('sel'));
+  if(el) el.classList.add('sel');
+  const panel=document.getElementById('s2panel');
+  if(panel) panel.classList.remove('hidden');
 }
-function bimAmbQtyChange(id,d){
-  const prev=S.bimAmbQty[id]||0;
-  const nuevo=Math.max(0,prev+d);
-  S.bimAmbQty[id]=nuevo;
-  const el=document.getElementById('v_bimAmb_'+id);
-  if(el) el.textContent=nuevo;
-  pintarBimAmbTotal();
-}
-function totalBimAmbM2(){
-  return AMB.reduce((s,a)=>s+(S.bimAmbQty[a.id]||0)*a.m,0);
-}
-function pintarBimAmbTotal(){
-  const el=document.getElementById('bimAmbTotal');
-  if(el) el.textContent=Math.round(totalBimAmbM2()*10)/10;
-}
-function usarBimAmbEstimacion(){
-  const total=totalBimAmbM2();
-  if(total<5){ alerta('Sumá al menos 5 m² de ambientes.'); return; }
-  sincroM2(total);
+function restaurarSuperficie(){
+  document.querySelectorAll('#s2metodoOpts [data-metodo]').forEach(b=>b.classList.remove('sel'));
+  const panel=document.getElementById('s2panel');
+  if(S.metodoSup==='m2'){
+    document.querySelector('#s2metodoOpts [data-metodo="m2"]')?.classList.add('sel');
+    if(panel) panel.classList.remove('hidden');
+  } else if(panel){
+    panel.classList.add('hidden');
+  }
+  const interiorChk=document.getElementById('bimInteriorChk');
+  if(interiorChk) interiorChk.classList.toggle('sel',!!S.bimInterior);
 }
 function construirPaso6(){
   document.getElementById('s6opts').innerHTML=Object.entries(EXTRAS).map(([k,x])=>{
@@ -2869,11 +2785,13 @@ function totalCalc(){
 }
 function usarEstimacion(){
   const t=totalCalc();
-  if(t<10){alerta('Sumá al menos un ambiente para calcular la superficie.');return}
+  if(t<5){alerta('Sumá al menos un ambiente para calcular la superficie (mínimo 5 m²).');return}
   sincroM2(t);
   S.layout=burbujas.map(b=>({uid:b.uid,id:b.id,m:b.m,n:b.n,ico:b.ico,t:b.t,x:b.x,y:b.y}));
   S.conexiones=conexiones.map(c=>({from:c.from,to:c.to}));
+  S.metodoSup='m2';
   cerrarModal('modalM2');
+  restaurarSuperficie();
 }
 
 /* ============================================================
@@ -3302,9 +3220,9 @@ async function enviarPorEmail(){
 }
 function reiniciar(){
   Object.assign(S,{servicios:[],tipo:null,pais:null,provincia:null,zona:null,ciudadTexto:'',barrio:null,espacio:null,profundidad:null,
-    ambienteRemod:null,ambientes:[],alcance:null,alcanceBloqueado:false,calidad:null,
+    ambienteRemod:null,ambientes:[],alcance:null,alcanceBloqueado:false,calidad:null,metodoSup:null,
     m2:120,m2semi:0,tareaProyecto:null,tareaDireccion:null,extras:[],m2Piscina:24,layout:[],conexiones:[],
-    tieneCAD:null,bimMercado:null,bimNombreProyecto:'',bimInterior:false,bimDisciplinas:[],bimLod:300,bimRenderInt:0,bimRenderExt:0,bimAmbQty:{},
+    tieneCAD:null,bimMercado:null,bimNombreProyecto:'',bimInterior:false,bimDisciplinas:[],bimLod:300,bimRenderInt:0,bimRenderExt:0,
     feedback:null,nombre:'',apellido:'',email:'',supabaseId:null,localLeadId:null,guardadoPromise:null});
   envioLeadEnCurso = false;
   envioWaEnCurso = false;
@@ -3321,9 +3239,7 @@ function reiniciar(){
   ['leadNombre','leadEmail','fWa','bimNombreInput'].forEach(id=>{const e=document.getElementById(id); if(e) e.value=''});
   burbujas=[]; burbujaSel=null; conexiones=[]; modoFlechas=false; origenFlecha=null; modoZona=null;
   AMB.forEach(a=>{conteo[a.id]=0;const e=document.getElementById('v_'+a.id);if(e)e.textContent='0'});
-  const m2Row=document.getElementById('m2RowBox'); if(m2Row) m2Row.classList.remove('compact');
-  const s2bimTop=document.getElementById('s2bimTop'); if(s2bimTop) s2bimTop.classList.add('hidden');
-  const btnNoBim=document.getElementById('btnAbrirCalcNoBim'); if(btnNoBim) btnNoBim.classList.remove('hidden');
+  const s2panel=document.getElementById('s2panel'); if(s2panel) s2panel.classList.add('hidden');
   sincroM2(120); sincroM2Semi(0); irA(0);
 }
 if(document.getElementById('anio')) document.getElementById('anio').textContent=new Date().getFullYear();
