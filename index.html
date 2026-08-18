@@ -1014,7 +1014,7 @@ button,.btn{border-radius:var(--r-pill)}
       </button>
       <div class="m2-box">
         <div class="m2-read">
-          <input type="number" id="m2Input" value="120" min="10" max="1500" step="1" aria-label="Metros cuadrados">
+          <input type="number" id="m2Input" value="120" min="10" max="20000" step="1" aria-label="Metros cuadrados">
           <span>m² cubiertos</span>
         </div>
         <div class="range-track-wrap"><input type="range" id="m2Range" min="15" max="1000" step="5" value="120" aria-label="Deslizador de superficie"></div>
@@ -1049,12 +1049,26 @@ button,.btn{border-radius:var(--r-pill)}
         <div class="opts opts--2" id="s3opts"></div>
       </div>
       <div id="s3bim" class="hidden">
-        <div class="step-num tech"><span id="numS3bim">03</span> · Punto de partida</div>
-        <h2>¿Ya tenés un legajo en CAD?</h2>
+        <div class="step-num tech"><span id="numS3bim">03</span> · Mercado del cliente</div>
+        <h2>¿Dónde está tu cliente?</h2>
+        <p class="lead">Define la tabla de tarifas aplicable al servicio BIM.</p>
+        <div class="opts opts--2" id="s3bimMercado"></div>
+
+        <div class="step-num tech" style="margin-top:26px">Punto de partida</div>
+        <h2 style="font-size:1.15rem">¿Ya tenés un legajo en CAD?</h2>
         <p class="lead">Define si partimos de cero o de una base digital existente para modelar en BIM.</p>
         <div class="opts opts--2" id="s3bimCad"></div>
-        <div class="step-num tech" style="margin-top:26px">Etapas de BIM a contratar</div>
-        <p class="lead" style="margin-bottom:14px">Elegí una, varias o todas las etapas que vimos al principio.</p>
+
+        <div class="step-num tech" style="margin-top:26px">Proyecto / ambiente</div>
+        <div class="field full" style="margin-bottom:10px">
+          <label for="bimNombreInput">Nombre de referencia (aparece en tu PDF)</label>
+          <input type="text" id="bimNombreInput" maxlength="60" placeholder="Ej: Casa Familia Pérez, Comedor, Edificio Rosario…" oninput="S.bimNombreProyecto=sanitizarTexto(this.value)">
+        </div>
+        <button type="button" class="chk" id="bimInteriorChk" onclick="toggleBimInterior(this)">
+          <span class="box"></span>Es un ambiente 100% interior (baño, cocina, habitación) — sin fachada</button>
+
+        <div class="step-num tech" style="margin-top:26px">Disciplinas a modelar</div>
+        <p class="lead" style="margin-bottom:14px">Elegí una, varias o todas. El precio se arma como % del costo base según lo seleccionado.</p>
         <div class="checks" id="s3bimEtapas" style="margin-bottom:8px"></div>
       </div>
       <div class="navrow"><button class="ghost" onclick="prev()">← Atras</button><div class="spacer"></div>
@@ -1076,11 +1090,16 @@ button,.btn{border-radius:var(--r-pill)}
       <div id="s4bim" class="hidden">
         <div class="step-num tech"><span id="numS4bim">04</span> · Detalle técnico del modelo</div>
         <h2>¿Con qué nivel de detalle?</h2>
-        <p class="lead">El LOD (Level of Development) define cuánta información contiene el modelo. A mayor LOD, mayor precisión y mayor trabajo de modelado.</p>
+        <p class="lead">El LOD (Level of Development) define cuánta información contiene el modelo.</p>
         <div class="opts" id="s4bimLod"></div>
+        <p class="lead tech" id="s4bimLodNota" style="margin-top:6px;font-size:.82rem;opacity:.75"></p>
+
+        <div class="step-num tech" style="margin-top:26px">BEP / Coordinación</div>
+        <p class="lead" id="s4bimBepNota" style="margin-bottom:10px"></p>
+
         <div class="step-num tech" style="margin-top:26px">Imágenes y renders</div>
-        <p class="lead" style="margin-bottom:14px">Opcional: vistas fotorrealistas generadas a partir del mismo modelo BIM.</p>
-        <div class="checks" id="s4bimRenders"></div>
+        <p class="lead" style="margin-bottom:14px">Opcional: vistas fotorrealistas generadas a partir del mismo modelo BIM. Elegí cantidad; 5 o más renders en total tienen 15% OFF.</p>
+        <div id="s4bimRenders"></div>
       </div>
       <div class="navrow"><button class="ghost" onclick="prev()">← Atras</button><div class="spacer"></div>
         <button class="cta" onclick="next()">Continuar</button></div>
@@ -1687,32 +1706,37 @@ function renderProcesoAdaptivo(tipo){
 }
 
 /* ============================================================
-   PRECIOS DOCUMENTACION BIM (referencia de mercado, ajustado a valores
-   moderados: PowerKH "How much BIM services cost" 2025, guía de costes
-   MEP BIM ($0,50–2,50/pie² según LOD), bimrevitservices.com España
-   (30–80€/hora, vivienda unifamiliar 800–2.500€ arquitectura), y
-   familiasrevitgratis.com "Calculadora BIM" 2026. No incluye trámites,
-   permisos ni dirección de obra: eso se cotiza aparte, vía CAUPSF.
+   PRECIOS DOCUMENTACION BIM Y RENDERS — motor por mercado
+   Local/LatAm vs. Internacional (EE.UU./Europa/Oceanía), con
+   escalas por superficie, disciplinas, BEP y renders por unidad.
+   No incluye trámites, permisos ni dirección de obra: eso se
+   cotiza aparte, vía CAUPSF.
    ============================================================ */
-const BIM_PRECIOS = {
-  reunion:      {n:'Reunión de arranque (BEP)', d:'Definimos disciplinas, LOD y reglas de trabajo antes de modelar.', flat:180},
-  arquitectonico:{n:'Modelado arquitectónico', d:'Muros, aberturas, cubiertas y terminaciones en 3D paramétrico.', m2:2.5},
-  estructura:   {n:'Modelado de estructura', d:'Fundaciones, columnas, vigas y losas, coordinado con el calculista.', m2:1.8},
-  mep:          {n:'Modelado de instalaciones (MEP)', d:'Sanitario, eléctrico, climatización y contra incendio en su propia disciplina.', m2:3.5},
-  coordinacion: {n:'Coordinación y detección de interferencias', d:'Cruce de modelos (clash detection) entre todas las disciplinas.', m2:1.2},
-  documentacion:{n:'Documentación coordinada y entrega', d:'Planos, cómputos y detalles extraídos del modelo ya coordinado.', m2:1.0}
+const BIM_MERCADOS = {
+  local:{n:'Local / LatAm', d:'Tarifa de mercado regional.', microFloor:150, peq:3.50, med:1.80, gde:0.90},
+  intl: {n:'Internacional', d:'EE.UU. / Europa / Oceanía · valor hora USD 20–25.', microFloor:300, peq:8.00, med:4.50, gde:2.50}
+};
+const BIM_DISCIPLINAS = {
+  arquitectura:{n:'Arquitectura', d:'Muros, aberturas, cubiertas y terminaciones en 3D paramétrico.', pct:0.35, ico:'plano'},
+  estructura:  {n:'Estructura', d:'Fundaciones, columnas, vigas y losas, coordinado con el calculista.', pct:0.25, ico:'balanza'},
+  mep:         {n:'Instalaciones (MEP)', d:'Sanitario, eléctrico, climatización y contra incendio, mayor complejidad de ruteo.', pct:0.40, ico:'cubo'}
 };
 const BIM_LOD = {
-  200:{n:'LOD 200', sub:'Geometría aproximada', d:'Volúmenes y elementos genéricos, sin detalle constructivo. Sirve para anteproyecto.', mult:0.7},
-  300:{n:'LOD 300', sub:'Geometría precisa', d:'Elementos con dimensiones y ubicación exactas. El estándar más pedido para coordinación.', mult:1.0},
-  350:{n:'LOD 350', sub:'Coordinación multidisciplinaria', d:'Incluye interfaces entre disciplinas: uniones, pases e interferencias resueltas.', mult:1.25},
-  400:{n:'LOD 400', sub:'Fabricación', d:'Detalle suficiente para fabricación e instalación en obra.', mult:1.6},
-  500:{n:'LOD 500', sub:'Conforme a obra', d:'El modelo refleja exactamente lo construido, para mantenimiento y gestión del activo.', mult:1.4}
+  200:{n:'LOD 200', sub:'Geometría aproximada', d:'Volúmenes y elementos genéricos, sin detalle constructivo. Sirve para anteproyecto.'},
+  300:{n:'LOD 300', sub:'Geometría precisa', d:'Elementos con dimensiones y ubicación exactas. El estándar más pedido para coordinación.'},
+  400:{n:'LOD 400', sub:'Fabricación', d:'Detalle suficiente para fabricación e instalación en obra.'},
+  500:{n:'LOD 500', sub:'Conforme a obra', d:'El modelo refleja exactamente lo construido, para mantenimiento y gestión del activo.'}
 };
-const BIM_RENDERS = {
-  interior:{n:'Renders interiores', d:'Vistas fotorrealistas de ambientes clave, generadas desde el modelo BIM.', flat:350},
-  exterior:{n:'Renders exteriores', d:'Vistas fotorrealistas de fachadas y volumetría exterior.', flat:300}
+const BIM_RENDER_PRECIOS = {
+  local:{interior:75,  exterior:110},
+  intl: {interior:120, exterior:180}
 };
+const BIM_BEP_UMBRAL_M2 = 200;   // desde acá se cobra BEP/Coordinación
+const BIM_BEP_PCT = 0.10;        // 10% sobre subtotal de modelado
+const BIM_LOD500_MIN_M2 = 100;   // LOD 500 solo disponible por encima de esto
+const BIM_RENDER_DESCUENTO_QTY = 5;   // cantidad total de renders que dispara el descuento
+const BIM_RENDER_DESCUENTO_PCT = 0.15; // 15% OFF
+const BIM_DOC_COEF = {si:1.0, no:1.35}; // digitalizado vs. sin digitalizar
 
 /* ============================================================
    ESTADO
@@ -1720,7 +1744,7 @@ const BIM_RENDERS = {
 const S = {servicios:[],tipo:null,pais:null,provincia:null,zona:null,ciudadTexto:'',barrio:null,espacio:null,profundidad:null,
   ambienteRemod:null,ambientes:[],alcance:null,alcanceBloqueado:false,calidad:null,
   m2:120,m2semi:0,tareaProyecto:null,tareaDireccion:null,extras:[],m2Piscina:24,layout:[],conexiones:[],
-  tieneCAD:null,bimEtapas:[],bimLod:300,bimRenders:[],
+  tieneCAD:null,bimMercado:null,bimNombreProyecto:'',bimInterior:false,bimDisciplinas:[],bimLod:300,bimRenderInt:0,bimRenderExt:0,
   feedback:null,nombre:'',apellido:'',email:'',supabaseId:null,localLeadId:null,guardadoPromise:null};
 let paso = 0;
 const TOTAL = 7;
@@ -1808,8 +1832,9 @@ function next(){
   if(id==='s2'){ if(!S.m2||S.m2<10){alerta('Ingresá una superficie válida.');return} construirPaso3(); irA(paso+1); return }
   if(id==='s3'){
     if(esBim()){
+      if(!S.bimMercado){alerta('Elegí el mercado del cliente (Local o Internacional).');return}
       if(!S.tieneCAD){alerta('Indicá si ya tenés un legajo en CAD.');return}
-      if(!S.bimEtapas.length){alerta('Elegí al menos una etapa de BIM.');return}
+      if(!S.bimDisciplinas.length){alerta('Elegí al menos una disciplina a modelar.');return}
     } else if(!S.calidad){alerta('Elegí un nivel de terminaciones.');return}
     construirPaso2(); irA(paso+1); return
   }
@@ -2102,13 +2127,14 @@ function construirPaso2(){
   const normal=document.getElementById('s4normal'), bim=document.getElementById('s4bim');
   if(esBim()){
     normal.classList.add('hidden'); bim.classList.remove('hidden');
-    document.getElementById('s4bimLod').innerHTML=Object.entries(BIM_LOD).map(([k,l],i)=>`
-      <button class="opt ${S.bimLod==Number(k)?'sel':''}" onclick="elegirBimLod(${k})">
-        <span class="opt-mark">0${i+1}</span><span class="oi">${ico('cubo','ico--lg')}</span>
-        <span class="ot">${l.n} · ${l.sub}</span><span class="od">${l.d}</span></button>`).join('');
-    document.getElementById('s4bimRenders').innerHTML=Object.entries(BIM_RENDERS).map(([k,r])=>`
-      <button class="chk ${S.bimRenders.includes(k)?'sel':''}" onclick="toggleBimRender(this,'${k}')">
-        <span class="box"></span>${r.n}</button>`).join('');
+    renderBimLod();
+    const bepNota=document.getElementById('s4bimBepNota');
+    if(bepNota){
+      bepNota.textContent = S.m2>=BIM_BEP_UMBRAL_M2
+        ? 'Superficie ≥ '+BIM_BEP_UMBRAL_M2+' m²: se suma un 10% adicional sobre el subtotal de modelado.'
+        : 'Superficie < '+BIM_BEP_UMBRAL_M2+' m²: el ítem BEP/Coordinación va absorbido en la base (USD 0).';
+    }
+    renderBimRenders();
     return;
   }
   normal.classList.remove('hidden'); bim.classList.add('hidden');
@@ -2169,16 +2195,77 @@ function construirPaso2(){
     </div>`;
   elegirAlcance(S.alcance);
 }
-function elegirBimLod(k){
-  S.bimLod=Number(k);
-  document.querySelectorAll('#s4bimLod .opt').forEach(b=>b.classList.remove('sel'));
-  const btn=[...document.querySelectorAll('#s4bimLod .opt')].find(b=>b.getAttribute('onclick')===`elegirBimLod(${k})`);
-  if(btn) btn.classList.add('sel');
+function lod500Deshabilitado(){ return (S.m2||0) < BIM_LOD500_MIN_M2; }
+function renderBimLod(){
+  const cont=document.getElementById('s4bimLod');
+  if(!cont)return;
+  if(lod500Deshabilitado() && S.bimLod===500) S.bimLod=300;
+  cont.innerHTML=Object.entries(BIM_LOD).map(([k,l],i)=>{
+    const disabled = Number(k)===500 && lod500Deshabilitado();
+    return `<button class="opt ${S.bimLod==Number(k)?'sel':''}" ${disabled?'disabled aria-disabled="true"':''}
+        onclick="${disabled?'':`elegirBimLod(${k})`}" style="${disabled?'opacity:.4;cursor:not-allowed':''}">
+        <span class="opt-mark">0${i+1}</span><span class="oi">${ico('cubo','ico--lg')}</span>
+        <span class="ot">${l.n} · ${l.sub}</span>
+        <span class="od">${disabled?'LOD 500 disponible únicamente para proyectos > '+BIM_LOD500_MIN_M2+' m²':l.d}</span></button>`;
+  }).join('');
+  const nota=document.getElementById('s4bimLodNota');
+  if(nota) nota.textContent = lod500Deshabilitado()
+    ? 'LOD 500 disponible únicamente para proyectos > '+BIM_LOD500_MIN_M2+' m² (tu superficie actual: '+(S.m2||0)+' m²).'
+    : '';
 }
-function toggleBimRender(el,k){
+function elegirBimLod(k){
+  if(Number(k)===500 && lod500Deshabilitado())return;
+  S.bimLod=Number(k);
+  renderBimLod();
+}
+function toggleBimInterior(el){
+  S.bimInterior=!S.bimInterior;
+  el.classList.toggle('sel',S.bimInterior);
+  if(S.bimInterior && S.bimRenderExt>0) S.bimRenderExt=0;
+  renderBimRenders();
+}
+function renderBimRenders(){
+  const cont=document.getElementById('s4bimRenders');
+  if(!cont)return;
+  const precios=BIM_RENDER_PRECIOS[S.bimMercado||'local'];
+  const qtyTotal=S.bimRenderInt+S.bimRenderExt;
+  const descuento=qtyTotal>=BIM_RENDER_DESCUENTO_QTY;
+  let html=`<div class="amb-row"><div><span class="anm">${ico('cuadro','ico--sm')}Renders interiores</span>
+      <span class="am">USD ${precios.interior} c/u</span></div>
+      <div class="stepper">
+        <button onclick="bimRenderQty('int',-1)" aria-label="Quitar render interior">−</button>
+        <span class="val" id="v_bimRenderInt">${S.bimRenderInt}</span>
+        <button onclick="bimRenderQty('int',1)" aria-label="Sumar render interior">+</button>
+      </div></div>`;
+  if(!S.bimInterior){
+    html+=`<div class="amb-row"><div><span class="anm">${ico('cuadro','ico--sm')}Renders exteriores</span>
+        <span class="am">USD ${precios.exterior} c/u</span></div>
+        <div class="stepper">
+          <button onclick="bimRenderQty('ext',-1)" aria-label="Quitar render exterior">−</button>
+          <span class="val" id="v_bimRenderExt">${S.bimRenderExt}</span>
+          <button onclick="bimRenderQty('ext',1)" aria-label="Sumar render exterior">+</button>
+        </div></div>`;
+  } else {
+    html+=`<p class="lead" style="font-size:.82rem;opacity:.7;margin-top:6px">Ambiente 100% interior: los renders exteriores quedan ocultos.</p>`;
+  }
+  html+=`<p class="lead" style="font-size:.82rem;margin-top:10px;${descuento?'color:var(--nude)':'opacity:.7'}">
+      ${descuento?'✓ 15% OFF aplicado por elegir 5 o más renders en total.':'Elegí 5 o más renders en total para acceder a 15% OFF.'}</p>`;
+  cont.innerHTML=html;
+}
+function bimRenderQty(tipo,d){
+  if(tipo==='int'){ S.bimRenderInt=Math.max(0,S.bimRenderInt+d); }
+  else { if(S.bimInterior)return; S.bimRenderExt=Math.max(0,S.bimRenderExt+d); }
+  renderBimRenders();
+}
+function elegirBimMercado(v,el){
+  S.bimMercado=v;
+  document.querySelectorAll('#s3bimMercado .opt').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function toggleBimDisciplina(el,k){
   el.classList.toggle('sel');
-  const i=S.bimRenders.indexOf(k);
-  if(i>-1) S.bimRenders.splice(i,1); else S.bimRenders.push(k);
+  const i=S.bimDisciplinas.indexOf(k);
+  if(i>-1) S.bimDisciplinas.splice(i,1); else S.bimDisciplinas.push(k);
 }
 function elegirAlcance(v){
   if(!v)return;
@@ -2298,16 +2385,24 @@ function construirPaso3(){
   const normal=document.getElementById('s3normal'), bim=document.getElementById('s3bim');
   if(esBim()){
     normal.classList.add('hidden'); bim.classList.remove('hidden');
+    document.getElementById('s3bimMercado').innerHTML=Object.entries(BIM_MERCADOS).map(([k,mk],i)=>`
+      <button class="opt ${S.bimMercado===k?'sel':''}" onclick="elegirBimMercado('${k}',this)">
+        <span class="opt-mark">0${i+1}</span><span class="oi">${ico(k==='local'?'pin':'globo','ico--lg')}</span>
+        <span class="ot">${mk.n}</span><span class="od">${mk.d}</span></button>`).join('');
     document.getElementById('s3bimCad').innerHTML=['si','no'].map((v,i)=>{
       const t=v==='si'?{n:'Sí, ya tengo un legajo en CAD',d:'Partimos de tu documentación existente: el modelado es más rápido y el presupuesto baja.'}
-                       :{n:'No, no tengo nada digitalizado',d:'Partimos de cero: relevamiento y armado de la base de modelado incluidos.'};
+                       :{n:'No, no tengo nada digitalizado',d:'Partimos de cero: relevamiento y armado de la base de modelado incluidos (+35%).'};
       return `<button class="opt ${S.tieneCAD===v?'sel':''}" onclick="elegirTieneCAD('${v}',this)">
         <span class="opt-mark">0${i+1}</span><span class="oi">${ico(v==='si'?'check':'lapiz','ico--lg')}</span>
         <span class="ot">${t.n}</span><span class="od">${t.d}</span></button>`;
     }).join('');
-    document.getElementById('s3bimEtapas').innerHTML=Object.entries(BIM_PRECIOS).map(([k,e])=>`
-      <button class="chk ${S.bimEtapas.includes(k)?'sel':''}" onclick="toggleBimEtapa(this,'${k}')">
-        <span class="box"></span>${e.n}</button>`).join('');
+    const nombreInput=document.getElementById('bimNombreInput');
+    if(nombreInput) nombreInput.value=S.bimNombreProyecto||'';
+    const interiorChk=document.getElementById('bimInteriorChk');
+    if(interiorChk) interiorChk.classList.toggle('sel',!!S.bimInterior);
+    document.getElementById('s3bimEtapas').innerHTML=Object.entries(BIM_DISCIPLINAS).map(([k,e])=>`
+      <button class="chk ${S.bimDisciplinas.includes(k)?'sel':''}" onclick="toggleBimDisciplina(this,'${k}')">
+        <span class="box"></span>${e.n} <span class="tech" style="opacity:.6">· ${Math.round(e.pct*100)}%</span></button>`).join('');
     return;
   }
   normal.classList.remove('hidden'); bim.classList.add('hidden');
@@ -2331,11 +2426,6 @@ function elegirTieneCAD(v,el){
   S.tieneCAD=v;
   document.querySelectorAll('#s3bimCad .opt').forEach(b=>b.classList.remove('sel'));
   el.classList.add('sel');
-}
-function toggleBimEtapa(el,k){
-  el.classList.toggle('sel');
-  const i=S.bimEtapas.indexOf(k);
-  if(i>-1) S.bimEtapas.splice(i,1); else S.bimEtapas.push(k);
 }
 function verRef(k){
   const c=CALIDADES[k], cn=CONCEPTOS[k];
@@ -2737,36 +2827,73 @@ function descargarEsquema(which){
 
 let R={};
 function calcularBIM(){
-  const m2=S.m2;
+  const m2=S.m2||0;
+  const mercado=BIM_MERCADOS[S.bimMercado]||BIM_MERCADOS.local;
+  const mkKey=S.bimMercado||'local';
   const lod=BIM_LOD[S.bimLod]||BIM_LOD[300];
-  let subtotalUsd=0;
+
+  /* 1) costo base según tramo de superficie */
+  let costoBase, tramo;
+  if(m2<=50){ costoBase=mercado.microFloor; tramo='Micro (piso mínimo)'; }
+  else if(m2<=300){ costoBase=m2*mercado.peq; tramo='Pequeño'; }
+  else if(m2<=1500){ costoBase=m2*mercado.med; tramo='Mediano'; }
+  else { costoBase=m2*mercado.gde; tramo='Grande'; }
+
+  /* 2) subtotal por disciplinas seleccionadas */
+  const disciplinas=S.bimDisciplinas.map(k=>{
+    const d=BIM_DISCIPLINAS[k];
+    return {k, n:d.n, d:d.d, pct:d.pct, montoUsd:costoBase*d.pct};
+  });
+  const subtotalDisciplinas=disciplinas.reduce((s,d)=>s+d.montoUsd,0);
+
+  /* 3) coeficiente por estado de documentación */
+  const coefDoc=BIM_DOC_COEF[S.tieneCAD]||1.0;
+  const subtotalModelado=subtotalDisciplinas*coefDoc;
+
+  /* 4) BEP / coordinación */
+  const aplicaBEP = m2>=BIM_BEP_UMBRAL_M2;
+  const bepUsd = aplicaBEP ? subtotalModelado*BIM_BEP_PCT : 0;
+  const subtotalModeladoConBEP = subtotalModelado+bepUsd;
+
+  /* 5) renders por unidad, con descuento por volumen */
+  const preciosRender=BIM_RENDER_PRECIOS[mkKey];
+  const totalInt=S.bimRenderInt*preciosRender.interior;
+  const totalExt=S.bimRenderExt*preciosRender.exterior;
+  const rendersSinDescuento=totalInt+totalExt;
+  const qtyRenders=S.bimRenderInt+S.bimRenderExt;
+  const aplicaDescuentoRender=qtyRenders>=BIM_RENDER_DESCUENTO_QTY;
+  const descuentoRender=aplicaDescuentoRender?rendersSinDescuento*BIM_RENDER_DESCUENTO_PCT:0;
+  const rendersUsd=rendersSinDescuento-descuentoRender;
+
+  const totalUsd=subtotalModeladoConBEP+rendersUsd;
+
   const detalle=[];
-  S.bimEtapas.forEach(k=>{
-    const e=BIM_PRECIOS[k];
-    let costo = e.flat!=null ? e.flat : e.m2*m2*lod.mult;
-    if(k==='arquitectonico' && S.tieneCAD==='si') costo*=0.8;
-    subtotalUsd+=costo;
-    detalle.push({n:e.n, d:e.d, costoUsd:costo});
-  });
-  let rendersUsd=0;
-  S.bimRenders.forEach(k=>{
-    const r=BIM_RENDERS[k];
-    rendersUsd+=r.flat;
-    detalle.push({n:r.n, d:r.d, costoUsd:r.flat});
-  });
-  return {lod, detalle, subtotalUsd, rendersUsd, totalUsd:subtotalUsd+rendersUsd};
+  disciplinas.forEach(d=>detalle.push({n:d.n, d:d.d+' · '+Math.round(d.pct*100)+'% del costo base', costoUsd:d.montoUsd}));
+  if(coefDoc!==1.0) detalle.push({n:'Recargo sin digitalizar', d:'+35% por partir de croquis/relevamiento en vez de CAD', costoUsd:subtotalDisciplinas*(coefDoc-1)});
+  if(aplicaBEP) detalle.push({n:'BEP / Coordinación', d:'10% del subtotal de modelado (superficie ≥ '+BIM_BEP_UMBRAL_M2+' m²)', costoUsd:bepUsd});
+  if(S.bimRenderInt>0) detalle.push({n:'Renders interiores ×'+S.bimRenderInt, d:'USD '+preciosRender.interior+' c/u', costoUsd:totalInt});
+  if(S.bimRenderExt>0) detalle.push({n:'Renders exteriores ×'+S.bimRenderExt, d:'USD '+preciosRender.exterior+' c/u', costoUsd:totalExt});
+  if(descuentoRender>0) detalle.push({n:'Descuento por volumen de renders', d:'−15% por elegir '+qtyRenders+' renders en total', costoUsd:-descuentoRender});
+
+  return {mercado, mkKey, lod, tramo, costoBase, disciplinas, subtotalDisciplinas, coefDoc, subtotalModelado,
+    aplicaBEP, bepUsd, subtotalModeladoConBEP, preciosRender, totalInt, totalExt, rendersSinDescuento,
+    qtyRenders, aplicaDescuentoRender, descuentoRender, rendersUsd, detalle, totalUsd};
 }
 function calcular(){
   if(esBim()){
     const zona=ZONAS[S.zona]||ZONAS.rosario;
     const b=calcularBIM();
     R={
-      esBimCalc:true, zona, lod:b.lod, detalle:b.detalle,
+      esBimCalc:true, zona, mercado:b.mercado, mkKey:b.mkKey, lod:b.lod, tramo:b.tramo, detalle:b.detalle,
       supComp:S.m2, cub:S.m2, semicub:0,
-      subtotal:b.subtotalUsd*TC_REFERENCIA, renders:b.rendersUsd*TC_REFERENCIA,
+      costoBase:b.costoBase, disciplinas:b.disciplinas, subtotalDisciplinas:b.subtotalDisciplinas, coefDoc:b.coefDoc,
+      subtotalModelado:b.subtotalModelado, aplicaBEP:b.aplicaBEP, bepUsd:b.bepUsd,
+      subtotalModeladoConBEP:b.subtotalModeladoConBEP, qtyRenders:b.qtyRenders, preciosRender:b.preciosRender,
+      aplicaDescuentoRender:b.aplicaDescuentoRender, descuentoRender:b.descuentoRender,
+      subtotal:b.subtotalModeladoConBEP*TC_REFERENCIA, renders:b.rendersUsd*TC_REFERENCIA,
       total:b.totalUsd*TC_REFERENCIA,
-      tarea:{n:'Documentación BIM ('+S.bimEtapas.length+' etapa'+(S.bimEtapas.length>1?'s':'')+')',p:null,ico:'cubo'},
-      origenCosto:'Cotización de mercado para servicios BIM (modelado, LOD y coordinación). No incluye trámites, permisos ni dirección de obra: eso se cotiza aparte según CAUPSF.'
+      tarea:{n:'Documentación BIM ('+S.bimDisciplinas.length+' disciplina'+(S.bimDisciplinas.length>1?'s':'')+')',p:null,ico:'cubo'},
+      origenCosto:'Cotización de mercado para servicios BIM ('+b.mercado.n+'): modelado por disciplina, BEP y renders. No incluye trámites, permisos ni dirección de obra: eso se cotiza aparte según CAUPSF.'
     };
     return R;
   }
@@ -2833,18 +2960,21 @@ function calcularYRender(){
 
   if(R.esBimCalc){
     document.getElementById('s8title').textContent='Listo, '+S.nombre+'. Esta es tu estimación';
-    document.getElementById('s8lead').textContent='Documentación BIM sobre '+R.supComp.toLocaleString('es-AR',{maximumFractionDigits:1})+' m². Valores de referencia de mercado, expresados en dólares (USD).';
+    document.getElementById('s8lead').textContent=(S.bimNombreProyecto?S.bimNombreProyecto+' · ':'')+'Documentación BIM sobre '+R.supComp.toLocaleString('es-AR',{maximumFractionDigits:1})+' m² · Mercado '+R.mercado.n+'. Valores de referencia de mercado, expresados en dólares (USD).';
     document.getElementById('resTotalBig').textContent=usd(R.total);
     document.getElementById('resTotal').textContent=usd(R.total);
     document.getElementById('resFecha').textContent=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'});
     if(obraBloque) obraBloque.classList.add('hidden');
 
     let f='';
-    f+=fichaItem('cinta','Superficie',S.m2+' m²','Base del cálculo de modelado');
+    f+=fichaItem(R.mkKey==='local'?'pin':'globo','Ubicación / mercado',R.mercado.n,'Tabla de tarifas aplicada');
+    if(S.bimNombreProyecto) f+=fichaItem('doc','Proyecto / ambiente',S.bimNombreProyecto,'');
+    f+=fichaItem('cinta','Superficie',S.m2+' m²','Tramo: '+R.tramo);
+    f+=fichaItem('lapiz','Documentación base',S.tieneCAD==='si'?'DWG Digitalizado':'Sin digitalizar — desde cero',S.tieneCAD==='si'?'Coeficiente x1,00':'Coeficiente x1,35 (+35%)');
     f+=fichaItem('cubo','Nivel de detalle',R.lod.n,R.lod.sub);
-    f+=fichaItem('lapiz','Punto de partida',S.tieneCAD==='si'?'Legajo en CAD existente':'Sin digitalizar','Desde cero, incluye relevamiento');
-    f+=fichaItem('doc','Etapas contratadas',S.bimEtapas.length+' de 6',S.bimEtapas.map(k=>BIM_PRECIOS[k].n).join(', '));
-    if(S.bimRenders.length) f+=fichaItem('cuadro','Renders',S.bimRenders.map(k=>BIM_RENDERS[k].n).join(' + '),'Generados desde el mismo modelo');
+    f+=fichaItem('balanza','Disciplinas',R.disciplinas.map(d=>d.n).join(', ')||'—',R.disciplinas.length+' de 3 seleccionadas');
+    f+=fichaItem('calc','BEP / Coordinación',R.aplicaBEP?usd(R.bepUsd*TC_REFERENCIA):'No aplica',R.aplicaBEP?'10% del subtotal de modelado':'Superficie < '+BIM_BEP_UMBRAL_M2+' m²');
+    if(R.qtyRenders>0) f+=fichaItem('cuadro','Renders',(S.bimRenderInt?S.bimRenderInt+' interiores':'')+(S.bimRenderInt&&S.bimRenderExt?' + ':'')+(S.bimRenderExt?S.bimRenderExt+' exteriores':''),R.aplicaDescuentoRender?'15% OFF aplicado':'Generados desde el mismo modelo');
     document.getElementById('resFicha').innerHTML=f;
 
     let b='';
@@ -2926,11 +3056,18 @@ function textoCotizacion(){
   if(w) L.push('WhatsApp: '+w);
   if(R.esBimCalc){
     L.push(''); L.push('*DOCUMENTACIÓN BIM*');
-    L.push('· Superficie: '+S.m2+' m²');
+    L.push('· Ubicación / mercado: '+R.mercado.n);
+    if(S.bimNombreProyecto) L.push('· Proyecto / ambiente: '+S.bimNombreProyecto);
+    L.push('· Superficie: '+S.m2+' m² (tramo '+R.tramo+')');
+    L.push('· Documentación base: '+(S.tieneCAD==='si'?'DWG Digitalizado (x1,00)':'Sin digitalizar — desde cero (x1,35)'));
     L.push('· Nivel de detalle: '+R.lod.n+' ('+R.lod.sub+')');
-    L.push('· Punto de partida: '+(S.tieneCAD==='si'?'Legajo en CAD existente':'Sin digitalizar'));
-    L.push('· Etapas: '+S.bimEtapas.map(k=>BIM_PRECIOS[k].n).join(', '));
-    if(S.bimRenders.length) L.push('· Renders: '+S.bimRenders.map(k=>BIM_RENDERS[k].n).join(', '));
+    L.push('· Disciplinas: '+(R.disciplinas.map(d=>d.n+' '+Math.round(d.pct*100)+'%').join(', ')||'—'));
+    L.push('· BEP / Coordinación: '+(R.aplicaBEP?usd(R.bepUsd*TC_REFERENCIA)+' (10%)':'No aplica (< '+BIM_BEP_UMBRAL_M2+' m²)'));
+    if(R.qtyRenders>0){
+      if(S.bimRenderInt) L.push('· Renders interiores: '+S.bimRenderInt+' × '+usd(R.preciosRender?R.preciosRender.interior*TC_REFERENCIA:0));
+      if(S.bimRenderExt) L.push('· Renders exteriores: '+S.bimRenderExt+' × '+usd(R.preciosRender?R.preciosRender.exterior*TC_REFERENCIA:0));
+      if(R.aplicaDescuentoRender) L.push('· Descuento renders (≥5, 15% OFF): -'+usd(R.descuentoRender*TC_REFERENCIA));
+    }
     L.push(''); L.push('*LOS NUMEROS — valores en USD, referencia de mercado*');
     R.detalle.forEach(d=>L.push('· '+d.n+': '+usd(d.costoUsd*TC_REFERENCIA)));
     L.push('· TOTAL ESTIMADO: '+usd(R.total));
@@ -3018,7 +3155,7 @@ function reiniciar(){
   Object.assign(S,{servicios:[],tipo:null,pais:null,provincia:null,zona:null,ciudadTexto:'',barrio:null,espacio:null,profundidad:null,
     ambienteRemod:null,ambientes:[],alcance:null,alcanceBloqueado:false,calidad:null,
     m2:120,m2semi:0,tareaProyecto:null,tareaDireccion:null,extras:[],m2Piscina:24,layout:[],conexiones:[],
-    tieneCAD:null,bimEtapas:[],bimLod:300,bimRenders:[],
+    tieneCAD:null,bimMercado:null,bimNombreProyecto:'',bimInterior:false,bimDisciplinas:[],bimLod:300,bimRenderInt:0,bimRenderExt:0,
     feedback:null,nombre:'',apellido:'',email:'',supabaseId:null,localLeadId:null,guardadoPromise:null});
   envioLeadEnCurso = false;
   envioWaEnCurso = false;
@@ -3032,7 +3169,7 @@ function reiniciar(){
   document.getElementById('btnStart').disabled=true;
   document.getElementById('fbThanks').classList.add('hidden');
   const leadErrEl=document.getElementById('leadErr'); if(leadErrEl) leadErrEl.innerHTML='';
-  ['leadNombre','leadEmail','fWa'].forEach(id=>{const e=document.getElementById(id); if(e) e.value=''});
+  ['leadNombre','leadEmail','fWa','bimNombreInput'].forEach(id=>{const e=document.getElementById(id); if(e) e.value=''});
   burbujas=[]; burbujaSel=null; conexiones=[]; modoFlechas=false; origenFlecha=null; modoZona=null;
   AMB.forEach(a=>{conteo[a.id]=0;const e=document.getElementById('v_'+a.id);if(e)e.textContent='0'});
   sincroM2(120); sincroM2Semi(0); irA(0);
@@ -3609,11 +3746,14 @@ async function descargarPDFCliente(){
   /* ---- Ficha: replica exacta de los mismos datos que se ven en pantalla ---- */
   const ficha=[];
   if(R.esBimCalc){
-    ficha.push({label:'Superficie',value:S.m2+' m²',sub:'Base del cálculo de modelado'});
+    ficha.push({label:'Ubicación / mercado',value:R.mercado.n,sub:'Tabla de tarifas aplicada'});
+    if(S.bimNombreProyecto) ficha.push({label:'Proyecto / ambiente',value:S.bimNombreProyecto,sub:S.m2+' m²'});
+    ficha.push({label:'Superficie',value:S.m2+' m²',sub:'Tramo: '+R.tramo});
+    ficha.push({label:'Documentación base',value:S.tieneCAD==='si'?'DWG Digitalizado':'Sin digitalizar — desde cero',sub:S.tieneCAD==='si'?'Coeficiente x1,00':'Coeficiente x1,35 (+35%)'});
     ficha.push({label:'Nivel de detalle',value:R.lod.n,sub:R.lod.sub});
-    ficha.push({label:'Punto de partida',value:S.tieneCAD==='si'?'Legajo en CAD existente':'Sin digitalizar',sub:'Desde cero, incluye relevamiento'});
-    ficha.push({label:'Etapas contratadas',value:S.bimEtapas.length+' de 6',sub:S.bimEtapas.map(k=>BIM_PRECIOS[k].n).join(', ')});
-    if(S.bimRenders.length) ficha.push({label:'Renders',value:S.bimRenders.map(k=>BIM_RENDERS[k].n).join(' + '),sub:'Generados desde el mismo modelo'});
+    ficha.push({label:'Disciplinas',value:R.disciplinas.map(d=>d.n).join(', ')||'—',sub:R.disciplinas.map(d=>d.n+' '+Math.round(d.pct*100)+'%').join(' · ')});
+    ficha.push({label:'BEP / Coordinación',value:R.aplicaBEP?usd(R.bepUsd*TC_REFERENCIA):'No aplica',sub:R.aplicaBEP?'10% del subtotal de modelado':'Superficie < '+BIM_BEP_UMBRAL_M2+' m²'});
+    if(R.qtyRenders>0) ficha.push({label:'Renders',value:(S.bimRenderInt?S.bimRenderInt+' interiores':'')+(S.bimRenderInt&&S.bimRenderExt?' + ':'')+(S.bimRenderExt?S.bimRenderExt+' exteriores':''),sub:R.aplicaDescuentoRender?'15% OFF por volumen aplicado':'Generados desde el mismo modelo'});
   } else {
     ficha.push({label:'Superficie cubierta',value:S.m2+' m²',sub:R.semicub?('+ '+R.semicub+' m² semicubiertos'):''});
     ficha.push({label:'Superficie computable',value:R.supComp.toLocaleString('es-AR',{maximumFractionDigits:1})+' m²',sub:'Cubierta + semicubierta × 0,5'});
