@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Administración | Mengibar Studio x Sasha Ruiz</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#142129">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://kvqxffvaalxphmqrmjxw.supabase.co https://*.supabase.co https://cdn.jsdelivr.net; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
+<link rel="canonical" href="https://www.sasharuiz.com.ar/admin.html">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --navy:#142129; --papel:#F7F5F2; --blanco:#FFFFFF;
+  --nude:#D7BAAA; --nude-dark:#C29E88; --azul:#6E8595;
+  --linea:rgba(247,245,242,.16); --linea-2:rgba(247,245,242,.34);
+  --c-bg:#142129; --c-surf:#1B2C36; --c-surf2:#243743;
+  --c-txt:#F7F5F2; --c-mut:rgba(247,245,242,.62);
+  --c-ln:rgba(247,245,242,.16); --c-ln2:rgba(247,245,242,.34);
+  --t:all .32s ease; --max:1200px; --r:16px; --r-lg:24px; --r-pill:999px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--c-bg);color:var(--c-txt);font-family:'Montserrat',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+img,svg{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:inherit}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 28px}
+.hidden{display:none !important}
+.tech{font-weight:500;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;font-variant-numeric:tabular-nums lining-nums;font-feature-settings:"tnum" 1,"lnum" 1}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--nude);outline-offset:3px}
+
+.ico{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.25;
+  stroke-linecap:square;stroke-linejoin:miter;flex-shrink:0;vector-effect:non-scaling-stroke}
+.ico--sm{width:15px;height:15px;stroke-width:1.5}
+
+/* ---------- NAV ---------- */
+.nav{position:sticky;top:0;z-index:70;background:var(--navy);border-bottom:1px solid var(--linea)}
+.nav-in{max-width:var(--max);margin:0 auto;padding:14px clamp(14px,4vw,40px);display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.nav-brand{font-family:'Poppins',sans-serif;font-weight:700;font-size:1.05rem;letter-spacing:.01em;display:flex;align-items:center;gap:10px;white-space:nowrap;text-decoration:none;color:var(--papel)}
+.nav-brand .x{color:var(--azul);font-weight:400;opacity:.7}
+.nav-brand .nb-name{color:rgba(247,245,242,.6);font-weight:500;opacity:.85}
+.nav-links{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.nav-links a{font-family:'Poppins',sans-serif;font-weight:600;font-size:.78rem;letter-spacing:.03em;color:rgba(247,245,242,.72);text-decoration:none;padding:9px 16px;border:1px solid var(--linea-2);border-radius:var(--r-pill);transition:var(--t)}
+.nav-links a:hover{border-color:var(--nude);color:var(--nude)}
+
+/* ---------- MAIN / SECCIONES ---------- */
+main{flex:1;padding:44px 0 70px}
+.admin-titlebar{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.admin-titlebar h1{font-family:'Poppins',sans-serif;font-weight:700;font-size:1.5rem;color:var(--c-txt)}
+.admin-sub{font-size:.86rem;color:var(--c-mut);margin-bottom:28px}
+
+.login-box{max-width:380px;margin:60px auto 0;background:var(--c-surf);border:1px solid var(--c-ln2);border-radius:var(--r-lg);padding:38px 34px;text-align:center}
+.login-box h1{font-family:'Poppins',sans-serif;font-weight:700;font-size:1.2rem;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
+.login-box .modal-sub{font-size:.86rem;color:var(--c-mut);margin-bottom:22px}
+
+.cta{background:var(--nude);color:var(--navy);border:1px solid var(--navy);font-family:'Poppins',sans-serif;font-weight:700;font-size:.88rem;letter-spacing:.03em;padding:15px 30px;transition:var(--t);display:inline-flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;border-radius:999px;box-shadow:0 4px 14px rgba(20,33,41,.14)}
+.cta:hover{background:var(--nude-dark);transform:translateY(-1px);box-shadow:0 6px 18px rgba(20,33,41,.2)}
+.cta:active{transform:translateY(0) scale(.97);box-shadow:0 2px 6px rgba(20,33,41,.16)}
+.cta:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+.cta--full{width:100%}
+.ghost{border:1px solid var(--c-ln2);padding:13px 24px;font-family:'Poppins',sans-serif;font-weight:600;font-size:.82rem;transition:var(--t);background:transparent;color:var(--c-txt);border-radius:999px}
+.ghost:hover{border-color:var(--nude);color:var(--nude)}
+.ghost:active{transform:scale(.96)}
+
+.sel-input{width:100%;padding:13px 16px;border:1px solid var(--c-ln2);background:var(--c-bg);color:var(--c-txt);
+  border-radius:10px;font-family:'Montserrat',sans-serif;font-size:.88rem;appearance:none}
+.sel-input:focus{border-color:var(--azul);outline:none}
+
+.error-banner{max-width:520px;margin:60px auto;background:rgba(224,133,133,.1);border:1px solid #E08585;border-radius:var(--r);padding:22px 24px;text-align:center;color:#E08585;font-size:.9rem}
+
+/* ---------- ADMIN DASHBOARD ---------- */
+.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
+.admin-card{border:1px solid var(--c-ln);background:var(--c-surf);padding:16px;text-align:center;border-radius:12px}
+.admin-card .av{font-family:'Poppins',sans-serif;font-weight:900;font-size:1.7rem;color:var(--nude);font-variant-numeric:tabular-nums}
+.admin-card .al{font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--c-mut);margin-top:4px;display:block}
+.admin-charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.admin-chart-box{border:1px solid var(--c-ln);background:var(--c-surf);padding:16px;border-radius:12px}
+.admin-chart-box h5{font-family:'Poppins',sans-serif;font-weight:600;font-size:.82rem;margin-bottom:12px;color:var(--c-txt)}
+.admin-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.78rem}
+.admin-bar-row .abl{min-width:120px;color:var(--c-mut)}
+.admin-bar-track{flex:1;height:8px;background:rgba(247,245,242,.08);overflow:hidden;border-radius:4px}
+.admin-bar-fill{height:100%;background:var(--nude)}
+.admin-bar-row .abv{min-width:34px;text-align:right;font-variant-numeric:tabular-nums;color:var(--c-txt)}
+.admin-historial{max-height:520px;overflow-y:auto;border:1px solid var(--c-ln);border-radius:12px}
+.admin-row{display:grid;grid-template-columns:auto 1fr auto auto auto auto;gap:12px;align-items:center;
+  padding:12px 14px;font-size:.78rem;border-bottom:1px solid var(--c-ln);line-height:1.5}
+.admin-row:last-child{border-bottom:none}
+.admin-row .badge{font-size:.64rem;padding:3px 9px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;border-radius:6px}
+.admin-row .badge.on{background:rgba(215,186,170,.2);color:var(--nude)}
+.admin-row .badge.off{background:rgba(247,245,242,.08);color:var(--c-mut)}
+.admin-tabs{display:flex;align-items:center;gap:8px;margin:18px 0 4px;border-bottom:1px solid var(--c-ln);padding-bottom:0}
+.admin-tab{padding:10px 18px;font-size:.76rem;letter-spacing:.04em;text-transform:uppercase;font-weight:600;
+  color:var(--c-mut);border-bottom:2px solid transparent;transition:var(--t)}
+.admin-tab.sel{color:var(--nude);border-bottom-color:var(--nude)}
+.admin-tab-panel{padding-top:16px}
+.admin-tab-panel.hidden{display:none}
+.navrow{display:flex;justify-content:space-between;gap:14px;margin-top:24px;align-items:center;flex-wrap:wrap}
+.navrow .spacer{flex:1}
+
+@media(max-width:700px){
+  .admin-stats{grid-template-columns:1fr 1fr}
+  .admin-charts{grid-template-columns:1fr}
+  .admin-row{grid-template-columns:1fr auto;grid-template-areas:"a b" "c c" "d d";font-size:.72rem}
+  .admin-tabs{flex-wrap:wrap}
+  .nav-in{justify-content:center;text-align:center}
+}
+
+/* ---------- FOOTER ---------- */
+.foot{background:var(--navy);color:rgba(247,245,242,.72);padding:22px 0;border-top:1px solid var(--linea)}
+.foot-bottom{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:rgba(247,245,242,.5);font-size:.8rem}
+</style>
+</head>
+<body>
+
+<svg style="display:none">
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M5.5 2.5h8.6L18.5 7v14.5h-13z"/><path d="M14 2.5V7h4.5"/><path d="M8.4 11.6h7.2M8.4 14.6h7.2M8.4 17.6h4.4"/></symbol>
+<symbol id="i-alerta" viewBox="0 0 24 24"><path d="M12 3 22 20.4H2z"/><path d="M12 9.4v5.2M12 17.6h.01"/></symbol>
+<symbol id="i-cerrar" viewBox="0 0 24 24"><path d="M5 5 19 19M19 5 5 19"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m3.5 12.4 5.4 5.4L20.5 6.2"/></symbol>
+</svg>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a href="/" class="nav-brand"><b>Mengibar Studio</b><span class="x">×</span><span class="nb-name">Sasha Ruiz</span></a>
+    <div class="nav-links">
+      <a href="/">Inicio</a>
+      <a href="/cotizador-de-honorarios.html">Cotizador</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="wrap">
+
+    <div id="supabaseErrorBox" class="error-banner hidden">
+      <svg class="ico"><use href="#i-alerta"/></svg>
+      <p style="margin-top:10px">No se pudo inicializar la conexión con Supabase. Verificá tu conexión a internet o recargá la página. Si el problema persiste, contactá al equipo técnico.</p>
+    </div>
+
+    <section id="loginSection">
+      <div class="login-box">
+        <h1><svg class="ico"><use href="#i-doc"/></svg> Panel de administración</h1>
+        <p class="modal-sub">Acceso restringido al equipo del estudio.</p>
+        <input type="password" id="adminPassInput" placeholder="Contraseña" class="sel-input"
+          style="margin-bottom:6px" onkeydown="if(event.key==='Enter'){event.preventDefault();verificarAdminPass()}">
+        <p id="adminLoginErr" style="color:#E08585;font-size:.8rem;margin:8px 0;min-height:1em"></p>
+        <button class="cta cta--full" id="btnVerificarAdminPass" style="margin-top:6px" onclick="verificarAdminPass()">Entrar</button>
+      </div>
+    </section>
+
+    <section id="dashboardSection" class="hidden">
+      <div class="admin-titlebar">
+        <svg class="ico"><use href="#i-doc"/></svg>
+        <h1>Panel de administración</h1>
+      </div>
+      <p class="admin-sub">Datos en tiempo real desde Supabase. Sin caché local: siempre lo último que dejaron los clientes.</p>
+
+      <div id="adminPendientesLocal" style="display:none;margin:10px 0 20px;padding:10px 14px;border:1px solid var(--nude);background:rgba(215,186,170,.12);font-size:.78rem;color:var(--c-txt);border-radius:10px"></div>
+
+      <div class="admin-tabs" role="tablist">
+        <button class="admin-tab sel" id="tabBtnMetricas" role="tab" onclick="cambiarTabAdmin('metricas')">Métricas y Analíticas</button>
+        <button class="admin-tab" id="tabBtnLeads" role="tab" onclick="cambiarTabAdmin('leads')">Gestión de Leads</button>
+        <button class="ghost" style="margin-left:auto;padding:8px 16px;font-size:.68rem" onclick="cargarCotizacionesSupabase()">↻ Actualizar</button>
+      </div>
+
+      <div id="adminTabMetricas" class="admin-tab-panel">
+        <div id="adminStats" class="admin-stats"></div>
+        <div id="adminCharts" class="admin-charts"></div>
+        <div id="adminUbicaciones" class="admin-chart-box" style="margin-top:16px"></div>
+      </div>
+
+      <div id="adminTabLeads" class="admin-tab-panel hidden">
+        <div id="adminLeadsTable" class="admin-historial"></div>
+      </div>
+
+      <div class="navrow">
+        <span class="tech" id="adminSyncStatus" style="color:var(--c-mut)"></span>
+        <div class="spacer"></div>
+        <button class="ghost" onclick="cerrarSesionAdmin()"><svg class="ico ico--sm" style="display:inline;vertical-align:-2px;margin-right:6px"><use href="#i-cerrar"/></svg>Cerrar sesión</button>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-bottom">
+    <span>© 2026 Sasha Ruiz. Todos los derechos reservados.</span>
+    <span><a href="/cotizador-de-honorarios.html">Volver al cotizador</a></span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script>
+/* ============================================================
+   SUPABASE — conexión de solo panel admin
+   ============================================================ */
+const SUPABASE_URL = 'https://kvqxffvaalxphmqrmjxw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2cXhmZnZhYWx4cGhtcXJtanh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MzM2NjYsImV4cCI6MjEwMjEwOTY2Nn0.xwfujk1JsO6GM89lIKyPOu0ixFX-dX1vgC9IqWmgvvQ';
+let supabaseClient = null;
+try{
+  if(window.supabase && typeof window.supabase.createClient==='function' &&
+     SUPABASE_ANON_KEY && SUPABASE_ANON_KEY.indexOf('PEGAR_AQUI')===-1){
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+}catch(e){ supabaseClient = null; }
+
+if(!supabaseClient){
+  const box=document.getElementById('supabaseErrorBox');
+  if(box) box.classList.remove('hidden');
+  const btn=document.getElementById('btnVerificarAdminPass');
+  if(btn) btn.disabled=true;
+  const errEl=document.getElementById('adminLoginErr');
+  if(errEl) errEl.textContent='No se pudo conectar a Supabase.';
+}
+
+/* Sanitización básica anti-XSS para campos de texto libre */
+function sanitizarTexto(str){
+  if(typeof str!=='string') return '';
+  return str.replace(/[<>"'`&]/g, c=>({'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;','&':'&amp;'}[c])).trim().slice(0,180);
+}
+
+const ico = (n,c='') => `<svg class="ico ${c}"><use href="#i-${n}"/></svg>`;
+
+/* ============================================================
+   RESPALDO LOCAL — leads/actualizaciones que no pudieron guardarse
+   en Supabase (mismo mecanismo que el cotizador público, para poder
+   ver y reintentar sincronización desde el panel admin).
+   ============================================================ */
+const LOCAL_LEADS_KEY = 'mengibarLeadsPendientes';
+const LOCAL_UPDATES_KEY = 'mengibarActualizacionesPendientes';
+function leerLeadsPendientesLocal(){
+  try{
+    const raw = localStorage.getItem(LOCAL_LEADS_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){ return []; }
+}
+function borrarLeadPendienteLocal(localId){
+  try{
+    const arr = leerLeadsPendientesLocal().filter(l=>l._localId!==localId);
+    localStorage.setItem(LOCAL_LEADS_KEY, JSON.stringify(arr));
+  }catch(e){}
+}
+function leerActualizacionesPendientesLocal(){
+  try{
+    const raw = localStorage.getItem(LOCAL_UPDATES_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){ return []; }
+}
+function borrarActualizacionPendienteLocal(localId){
+  try{
+    const arr = leerActualizacionesPendientesLocal().filter(l=>l._localId!==localId);
+    localStorage.setItem(LOCAL_UPDATES_KEY, JSON.stringify(arr));
+  }catch(e){}
+}
+/* Intenta reenviar a Supabase todo lo que haya quedado pendiente en este
+   dispositivo: tanto leads completos sin insertar como actualizaciones
+   sueltas sobre leads que sí llegaron a insertarse. Se llama sola al
+   cargar la página, al cargar el dashboard y a pedido manual. */
+async function sincronizarLeadsPendientes(){
+  if(!supabaseClient) return {intentados:0, exitosos:0};
+  let intentados=0, exitosos=0;
+  const pendientes = leerLeadsPendientesLocal();
+  intentados += pendientes.length;
+  for(const lead of pendientes){
+    try{
+      const reg = Object.assign({}, lead);
+      const localId = reg._localId;
+      delete reg._localId; delete reg._guardadoLocal;
+      const {error} = await supabaseClient.from('cotizaciones').insert([reg]);
+      if(!error){ borrarLeadPendienteLocal(localId); exitosos++; }
+    }catch(e){ /* sigue pendiente, se reintenta la próxima vez */ }
+  }
+  const actualizaciones = leerActualizacionesPendientesLocal();
+  intentados += actualizaciones.length;
+  for(const upd of actualizaciones){
+    try{
+      const {error} = await supabaseClient.from('cotizaciones').update(upd.patch).eq('id', upd.supabaseId);
+      if(!error){ borrarActualizacionPendienteLocal(upd._localId); exitosos++; }
+    }catch(e){ /* sigue pendiente */ }
+  }
+  return {intentados, exitosos};
+}
+window.addEventListener('load', ()=>{ sincronizarLeadsPendientes(); });
+
+/* ============================================================
+   AUTENTICACIÓN Y NAVEGACIÓN DE PÁGINA (antes eran modales)
+   ============================================================ */
+function mostrarLogin(){
+  document.getElementById('loginSection').classList.remove('hidden');
+  document.getElementById('dashboardSection').classList.add('hidden');
+  document.getElementById('adminPassInput').value='';
+  document.getElementById('adminLoginErr').textContent='';
+  setTimeout(()=>{ const el=document.getElementById('adminPassInput'); if(el) el.focus(); },80);
+}
+function mostrarDashboard(){
+  document.getElementById('loginSection').classList.add('hidden');
+  document.getElementById('dashboardSection').classList.remove('hidden');
+}
+async function verificarAdminPass(){
+  const v=document.getElementById('adminPassInput').value;
+  const errEl=document.getElementById('adminLoginErr');
+  const btn=document.getElementById('btnVerificarAdminPass');
+  if(!supabaseClient){ errEl.textContent='No se pudo conectar a Supabase.'; return; }
+  if(btn) btn.disabled=true;
+  errEl.textContent='Verificando…';
+  try{
+    /* La contraseña se valida en el servidor (función admin_listar_cotizaciones):
+       nunca queda escrita en el código de la página. */
+    const {data,error}=await supabaseClient.rpc('admin_listar_cotizaciones',{clave:v});
+    if(error) throw error;
+    try{ sessionStorage.setItem('mengibarAdminClave', v); }catch(e){}
+    SUPABASE_RECORDS=data||[];
+    errEl.textContent='';
+    cambiarTabAdmin('metricas');
+    renderAdminStats(SUPABASE_RECORDS);
+    renderAdminCharts(SUPABASE_RECORDS);
+    renderAdminUbicaciones(SUPABASE_RECORDS);
+    renderAdminLeadsTable(SUPABASE_RECORDS);
+    renderAdminPendientesLocal();
+    mostrarDashboard();
+  }catch(e){
+    errEl.textContent='Contraseña incorrecta.';
+  } finally {
+    if(btn) btn.disabled=false;
+  }
+}
+function cerrarSesionAdmin(){
+  try{ sessionStorage.removeItem('mengibarAdminClave'); }catch(e){}
+  mostrarLogin();
+}
+function cambiarTabAdmin(tab){
+  document.getElementById('tabBtnMetricas').classList.toggle('sel', tab==='metricas');
+  document.getElementById('tabBtnLeads').classList.toggle('sel', tab==='leads');
+  document.getElementById('adminTabMetricas').classList.toggle('hidden', tab!=='metricas');
+  document.getElementById('adminTabLeads').classList.toggle('hidden', tab!=='leads');
+}
+
+/* ============================================================
+   DASHBOARD 100% SUPABASE (SIN LOCALSTORAGE PARA LOS DATOS)
+   ============================================================ */
+let SUPABASE_RECORDS=[];
+function renderAdminPendientesLocal(){
+  const box=document.getElementById('adminPendientesLocal');
+  if(!box) return;
+  const pendientes=leerLeadsPendientesLocal();
+  const actualizaciones=leerActualizacionesPendientesLocal();
+  const total=pendientes.length+actualizaciones.length;
+  if(!total){ box.style.display='none'; box.innerHTML=''; return; }
+  box.style.display='block';
+  const partes=[];
+  if(pendientes.length) partes.push(pendientes.length+' lead'+(pendientes.length!==1?'s':'')+' completo'+(pendientes.length!==1?'s':''));
+  if(actualizaciones.length) partes.push(actualizaciones.length+' actualización'+(actualizaciones.length!==1?'es':'')+' suelta'+(actualizaciones.length!==1?'s':'')+' (voto, pedido de mail, teléfono o pdf)');
+  box.innerHTML = ico('alerta','ico--sm') + ' <strong>'+partes.join(' y ')+'</strong> '
+    + (total!==1?'quedaron':'quedó') + ' guardado'+(total!==1?'s':'')+' solo en <em>este dispositivo</em> '
+    + '(no se pudieron sincronizar con Supabase). Se reintenta solo en cada carga de página desde este mismo navegador. '
+    + '<button class="ghost" style="margin-left:8px;padding:4px 10px;font-size:.68rem" onclick="reintentarSyncManual()">Reintentar ahora</button>';
+}
+async function reintentarSyncManual(){
+  await sincronizarLeadsPendientes();
+  renderAdminPendientesLocal();
+  cargarCotizacionesSupabase();
+}
+async function cargarCotizacionesSupabase(){
+  const stats=document.getElementById('adminStats');
+  const charts=document.getElementById('adminCharts');
+  const ubic=document.getElementById('adminUbicaciones');
+  const tabla=document.getElementById('adminLeadsTable');
+  const sync=document.getElementById('adminSyncStatus');
+  if(!stats||!tabla) return;
+  await sincronizarLeadsPendientes();
+  renderAdminPendientesLocal();
+  if(!supabaseClient){
+    const msg='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">Falta configurar la anon key de Supabase para ver datos en tiempo real.</p>';
+    stats.innerHTML=''; charts.innerHTML=''; if(ubic) ubic.innerHTML=''; tabla.innerHTML=msg;
+    return;
+  }
+  if(sync) sync.textContent='Sincronizando…';
+  tabla.innerHTML='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">Cargando cotizaciones…</p>';
+  let clave=null;
+  try{ clave=sessionStorage.getItem('mengibarAdminClave'); }catch(e){}
+  if(!clave){ mostrarLogin(); return; }
+  try{
+    const {data,error}=await supabaseClient.rpc('admin_listar_cotizaciones',{clave});
+    if(error) throw error;
+    SUPABASE_RECORDS=data||[];
+    renderAdminStats(SUPABASE_RECORDS);
+    renderAdminCharts(SUPABASE_RECORDS);
+    renderAdminUbicaciones(SUPABASE_RECORDS);
+    renderAdminLeadsTable(SUPABASE_RECORDS);
+    if(sync) sync.textContent=SUPABASE_RECORDS.length+' registro'+(SUPABASE_RECORDS.length!==1?'s':'')+' · actualizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){
+    const msg='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">No se pudo conectar con Supabase. Verificá la anon key y la tabla `cotizaciones`.</p>';
+    tabla.innerHTML=msg;
+    if(sync) sync.textContent='Sin conexión';
+  }
+}
+function renderAdminStats(arr){
+  const stats=document.getElementById('adminStats');
+  const total=arr.length;
+  const promM2 = total? Math.round(arr.reduce((s,r)=>s+(Number(r.superficie_m2)||0),0)/total*10)/10 : 0;
+  const honorariosAcum = arr.reduce((s,r)=>s+(Number(r.presupuesto_usd)||0),0);
+  const nObraNueva = arr.filter(r=>r.modalidad_obra==='Obra nueva').length;
+  const pctObraNueva = total? Math.round(nObraNueva/total*100) : 0;
+  stats.innerHTML = [
+    ['Total de cotizaciones', total],
+    ['m² promedio', promM2],
+    ['Honorarios acumulados', 'USD '+Math.round(honorariosAcum).toLocaleString('es-AR')],
+    ['Obra nueva', pctObraNueva+'%']
+  ].map(([l,v])=>`<div class="admin-card"><span class="av">${v}</span><span class="al">${l}</span></div>`).join('');
+}
+function donutSVG(pctA,colA,pctB,colB){
+  const r=42, c=2*Math.PI*r, offA=c*(1-pctA);
+  return `<svg viewBox="0 0 110 110" width="110" height="110">
+    <circle cx="55" cy="55" r="${r}" fill="none" stroke="${colB}" stroke-width="14"/>
+    <circle cx="55" cy="55" r="${r}" fill="none" stroke="${colA}" stroke-width="14"
+      stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${offA.toFixed(1)}"
+      transform="rotate(-90 55 55)" stroke-linecap="round"/>
+    <text x="55" y="60" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="700"
+      font-size="18" fill="#F7F5F2">${Math.round(pctA*100)}%</text>
+  </svg>`;
+}
+function renderAdminCharts(arr){
+  const charts=document.getElementById('adminCharts');
+  const total=arr.length;
+  const nObraNueva = arr.filter(r=>r.modalidad_obra==='Obra nueva').length;
+  const nRemod = total-nObraNueva;
+  const pctObraNueva = total? nObraNueva/total : 0;
+
+  const servCount={};
+  arr.forEach(r=>{
+    const key=(r.tipo_servicio||'Sin especificar').split(',')[0].trim();
+    servCount[key]=(servCount[key]||0)+1;
+  });
+  const servTop=Object.entries(servCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const maxServ=Math.max(1,...servTop.map(s=>s[1]));
+
+  const rangos=[[0,60,'0–60 m²'],[60,80,'60–80 m²'],[80,150,'80–150 m²'],[150,Infinity,'150+ m²']];
+  const rangoCount=rangos.map(([min,max,label])=>({
+    label, n:arr.filter(r=>{const m2=Number(r.superficie_m2)||0; return m2>min && m2<=max;}).length
+  }));
+  const maxRango=Math.max(1,...rangoCount.map(r=>r.n));
+
+  charts.innerHTML = `
+    <div class="admin-chart-box">
+      <h5>Obra nueva vs. Reforma</h5>
+      <div style="display:flex;align-items:center;gap:18px">
+        ${donutSVG(pctObraNueva,'#D7BAAA',1-pctObraNueva,'#6E8595')}
+        <div style="font-size:.78rem">
+          <div style="color:var(--nude);margin-bottom:6px">● Obra nueva — ${nObraNueva}</div>
+          <div style="color:var(--azul)">● Reforma — ${nRemod}</div>
+        </div>
+      </div>
+    </div>
+    <div class="admin-chart-box">
+      <h5>Servicios más cotizados</h5>
+      ${servTop.length? servTop.map(([k,v])=>`
+        <div class="admin-bar-row">
+          <span class="abl">${k}</span>
+          <span class="admin-bar-track"><span class="admin-bar-fill" style="width:${(v/maxServ*100).toFixed(0)}%"></span></span>
+          <span class="abv">${v}</span>
+        </div>`).join('') : '<p style="font-size:.8rem;color:var(--c-mut)">Todavía no hay datos suficientes.</p>'}
+    </div>
+    <div class="admin-chart-box">
+      <h5>Rango de m² cotizados</h5>
+      ${arr.length? rangoCount.map(r=>`
+        <div class="admin-bar-row">
+          <span class="abl">${r.label}</span>
+          <span class="admin-bar-track"><span class="admin-bar-fill" style="width:${(r.n/maxRango*100).toFixed(0)}%"></span></span>
+          <span class="abv">${r.n}</span>
+        </div>`).join('') : '<p style="font-size:.8rem;color:var(--c-mut)">Todavía no hay datos suficientes.</p>'}
+    </div>`;
+}
+function renderAdminUbicaciones(arr){
+  const ubic=document.getElementById('adminUbicaciones');
+  if(!ubic) return;
+  const cont={};
+  arr.forEach(r=>{
+    const key=(r.ubicacion||'Sin especificar').trim()||'Sin especificar';
+    cont[key]=(cont[key]||0)+1;
+  });
+  const top=Object.entries(cont).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const max=Math.max(1,...top.map(t=>t[1]));
+  ubic.innerHTML = `<h5>Ubicaciones más frecuentes</h5>
+    ${top.length? top.map(([k,v])=>`
+      <div class="admin-bar-row">
+        <span class="abl">${sanitizarTexto(k)}</span>
+        <span class="admin-bar-track"><span class="admin-bar-fill" style="width:${(v/max*100).toFixed(0)}%"></span></span>
+        <span class="abv">${v}</span>
+      </div>`).join('') : '<p style="font-size:.8rem;color:var(--c-mut)">Todavía no hay datos suficientes.</p>'}`;
+}
+function renderAdminLeadsTable(arr){
+  const tabla=document.getElementById('adminLeadsTable');
+  if(!arr.length){
+    tabla.innerHTML='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">Todavía no hay leads registrados en Supabase.</p>';
+    return;
+  }
+  tabla.innerHTML = arr.map((r,i)=>{
+    const f=r.created_at?new Date(r.created_at):null;
+    const fechaTxt=f&&!isNaN(f)?f.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'2-digit'}):'—';
+    const nombreTxt=sanitizarTexto(r.nombre||'Sin nombre');
+    const emailTxt=sanitizarTexto(r.email||'—');
+    const telTxt=sanitizarTexto(r.telefono||'');
+    const ubicTxt=sanitizarTexto(r.ubicacion||'');
+    const servTxt=sanitizarTexto(r.tipo_servicio||'');
+    const modTxt=sanitizarTexto(r.modalidad_obra||'');
+    const pidioPdf=!!r.pdf_generado;
+    const pidioMail=!!r.quiere_email;
+    const fbEstilo={economico:{t:'Le pareció económico',c:'#8FD19E'},razonable:{t:'Le pareció razonable',c:'var(--nude)'},elevado:{t:'Le pareció elevado',c:'#E3907A'}};
+    const fb=r.feedback?(fbEstilo[r.feedback]||{t:sanitizarTexto(r.feedback),c:'var(--c-mut)'}):null;
+    let badges='';
+    if(telTxt) badges+=`<span class="badge on" style="margin-right:4px;margin-bottom:4px">WhatsApp: ${telTxt}</span>`;
+    if(fb) badges+=`<span class="badge" style="margin-right:4px;margin-bottom:4px;background:${fb.c}22;color:${fb.c};border:1px solid ${fb.c}55">${fb.t}</span>`;
+    if(pidioMail) badges+=`<span class="badge" style="margin-right:4px;margin-bottom:4px;background:rgba(110,133,149,.22);color:var(--azul);border:1px solid rgba(110,133,149,.4)">Pidió envío por mail</span>`;
+    return `<div class="admin-row">
+      <span class="tech" style="color:var(--c-mut)">${fechaTxt}</span>
+      <span>
+        <b style="display:block">${nombreTxt}</b>
+        <span style="font-size:.72rem;color:var(--c-mut)">${emailTxt}</span><br>
+        <span style="font-size:.72rem;color:var(--c-mut)">${modTxt}${ubicTxt?' · '+ubicTxt:''} · ${servTxt}</span>
+        ${badges?'<div style="margin-top:6px">'+badges+'</div>':''}
+      </span>
+      <span class="tech">${r.superficie_m2||'—'} m²</span>
+      <span class="tech">USD ${(Number(r.presupuesto_usd)||0).toLocaleString('es-AR')}</span>
+      <span class="badge ${pidioPdf?'on':'off'}">${pidioPdf?'Solicitó PDF':'Sin PDF'}</span>
+      <button class="ghost" style="font-size:.66rem;padding:8px 12px;white-space:nowrap" onclick="generarPDFCotizacion(${i})">Generar / Descargar PDF</button>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   MOTOR DE PDF "LAYOUT MENGIBAR" — versión admin (a partir de los
+   campos guardados en Supabase, sin el detalle vivo de la visita)
+   ============================================================ */
+const PDF_FONT_URLS = {
+  poppinsBold:   'https://cdn.jsdelivr.net/fontsource/fonts/poppins@latest/latin-700-normal.ttf',
+  montserratReg: 'https://cdn.jsdelivr.net/fontsource/fonts/montserrat@latest/latin-400-normal.ttf'
+};
+const _pdfFontCache = {};
+function _arrayBufferToBase64(buf){
+  const bytes = new Uint8Array(buf);
+  let binary = '';
+  const chunk = 0x8000;
+  for(let i=0;i<bytes.length;i+=chunk){
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+  }
+  return btoa(binary);
+}
+async function _cargarFuenteBase64(url){
+  if(_pdfFontCache[url]) return _pdfFontCache[url];
+  const resp = await fetch(url);
+  if(!resp.ok) throw new Error('font_fetch_failed_'+resp.status);
+  const buf = await resp.arrayBuffer();
+  const b64 = _arrayBufferToBase64(buf);
+  _pdfFontCache[url] = b64;
+  return b64;
+}
+async function prepararFuentesPDF(doc){
+  const timeout = (ms)=>new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout_fuente')),ms));
+  const out = {head:'helvetica', body:'helvetica'};
+  try{
+    const b64 = await Promise.race([_cargarFuenteBase64(PDF_FONT_URLS.poppinsBold), timeout(5000)]);
+    doc.addFileToVFS('Poppins-Bold.ttf', b64);
+    doc.addFont('Poppins-Bold.ttf', 'Poppins', 'bold');
+    out.head='Poppins';
+  }catch(e){ /* se queda con helvetica para los títulos */ }
+  try{
+    const b64 = await Promise.race([_cargarFuenteBase64(PDF_FONT_URLS.montserratReg), timeout(5000)]);
+    doc.addFileToVFS('Montserrat-Regular.ttf', b64);
+    doc.addFont('Montserrat-Regular.ttf', 'Montserrat', 'normal');
+    out.body='Montserrat';
+  }catch(e){ /* se queda con helvetica para el texto de cuerpo */ }
+  return out;
+}
+const PDF_C = {
+  navy:[20,33,41], surf:[27,44,54], surf2:[36,55,67],
+  nude:[215,186,170], azul:[110,133,149], papel:[247,245,242],
+  linea:[46,64,75]
+};
+function pdfBgNavy(doc){
+  doc.setFillColor(PDF_C.navy[0],PDF_C.navy[1],PDF_C.navy[2]);
+  doc.rect(0,0,210,297,'F');
+}
+function pdfHeaderMengibar(doc, subtitle, F){
+  doc.setDrawColor(PDF_C.nude[0],PDF_C.nude[1],PDF_C.nude[2]); doc.setLineWidth(.6); doc.line(14,24,196,24);
+  doc.setTextColor(PDF_C.papel[0],PDF_C.papel[1],PDF_C.papel[2]); doc.setFont(F.head,'bold'); doc.setFontSize(15);
+  doc.text('ESTUDIO MENGIBAR', 14, 14);
+  doc.setFont(F.body,'normal'); doc.setFontSize(8.8); doc.setTextColor(PDF_C.nude[0],PDF_C.nude[1],PDF_C.nude[2]);
+  doc.text('Arq. Sasha Ruiz · '+(subtitle||'Cotización de honorarios profesionales'), 14, 20.5);
+}
+function pdfFooterMengibar(doc, pageNum, F){
+  doc.setDrawColor(PDF_C.linea[0],PDF_C.linea[1],PDF_C.linea[2]); doc.setLineWidth(.3); doc.line(14,283,196,283);
+  doc.setTextColor(PDF_C.azul[0],PDF_C.azul[1],PDF_C.azul[2]); doc.setFont(F.body,'normal'); doc.setFontSize(7.5);
+  doc.text('Estudio Mengibar · Arq. Sasha Ruiz · CAUPSF / Ley 10653 · Santa Fe, Argentina', 14, 289);
+  doc.text('Pág. '+pageNum, 196, 289, {align:'right'});
+}
+function pdfBloqueHeader(doc,y,titulo,F){
+  doc.setFont(F.head,'bold'); doc.setFontSize(8.6); doc.setTextColor(PDF_C.nude[0],PDF_C.nude[1],PDF_C.nude[2]);
+  doc.text(titulo.toUpperCase(),18,y);
+  doc.setDrawColor(PDF_C.linea[0],PDF_C.linea[1],PDF_C.linea[2]); doc.setLineWidth(.3); doc.line(14,y+3.5,196,y+3.5);
+  return y+10;
+}
+async function construirPDFCotizacion(data){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  const C=PDF_C;
+  const F=await prepararFuentesPDF(doc);
+  let page=1;
+  pdfBgNavy(doc); pdfHeaderMengibar(doc,data.subtitle,F); pdfFooterMengibar(doc,page,F);
+  let y=34;
+  const ensureSpace=(need)=>{
+    if(y+need>278){ doc.addPage(); page++; pdfBgNavy(doc); pdfHeaderMengibar(doc,data.subtitle,F); pdfFooterMengibar(doc,page,F); y=34; }
+  };
+
+  ensureSpace(26);
+  doc.setFillColor(C.nude[0],C.nude[1],C.nude[2]); doc.roundedRect(14,y,182,22,2,2,'F');
+  doc.setFont(F.head,'bold'); doc.setFontSize(7.6); doc.setTextColor(C.navy[0],C.navy[1],C.navy[2]);
+  doc.text('TOTAL HONORARIOS PROFESIONALES',19,y+8);
+  doc.setFontSize(19);
+  doc.text(data.totalTxt,19,y+17.5);
+  doc.setFont(F.body,'normal'); doc.setFontSize(7.5);
+  doc.text(data.fechaTxt||'',191,y+8,{align:'right'});
+  y+=30;
+
+  const ficha=data.ficha||[];
+  if(ficha.length){
+    const colW=182/3, colX=[14,14+colW,14+colW*2];
+    for(let i=0;i<ficha.length;i+=3){
+      const grupo=ficha.slice(i,i+3);
+      const alturas=grupo.map(it=>{
+        doc.setFont(F.body,'normal'); doc.setFontSize(6.6);
+        const subL=it.sub?doc.splitTextToSize(it.sub,colW-8):[];
+        doc.setFont(F.head,'bold'); doc.setFontSize(8.2);
+        const valL=doc.splitTextToSize(String(it.value||''),colW-8);
+        return 9+valL.length*4+(subL.length?subL.length*3.4+2:0)+5;
+      });
+      const rowH=Math.max(...alturas,20);
+      ensureSpace(rowH+2);
+      grupo.forEach((it,ci)=>{
+        const cx=colX[ci];
+        doc.setFillColor(C.surf[0],C.surf[1],C.surf[2]); doc.rect(cx,y,colW-(ci<2?1:0),rowH,'F');
+        doc.setFillColor(C.nude[0],C.nude[1],C.nude[2]); doc.circle(cx+7,y+8,1.6,'F');
+        doc.setFont(F.head,'bold'); doc.setFontSize(6.3); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+        doc.text((it.label||'').toUpperCase(),cx+12,y+6.5);
+        doc.setFont(F.head,'bold'); doc.setFontSize(8.2); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
+        const valL=doc.splitTextToSize(String(it.value||''),colW-16);
+        doc.text(valL,cx+12,y+11.5);
+        if(it.sub){
+          doc.setFont(F.body,'normal'); doc.setFontSize(6.6); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+          const subL=doc.splitTextToSize(it.sub,colW-16);
+          doc.text(subL,cx+12,y+11.5+valL.length*4+2.5);
+        }
+      });
+      y+=rowH+1;
+    }
+    y+=6;
+  }
+
+  if(data.esquemaImg){
+    ensureSpace(20);
+    y=pdfBloqueHeader(doc,y,'Esquema de tu distribución',F);
+    const maxW=178, maxH=150;
+    let w=data.esquemaImg.w, h=data.esquemaImg.h;
+    const scale=Math.min(maxW/w,maxH/h);
+    w*=scale; h*=scale;
+    ensureSpace(h+10);
+    doc.setFillColor(C.surf[0],C.surf[1],C.surf[2]); doc.rect(14,y,182,h+4,'F');
+    doc.addImage(data.esquemaImg.dataUrl,'PNG',14+(182-w)/2,y+2,w,h);
+    y+=h+12;
+  }
+
+  if(data.obra){
+    ensureSpace(28);
+    y=pdfBloqueHeader(doc,y,'Costo de construcción estimado',F);
+    doc.setFillColor(C.surf2[0],C.surf2[1],C.surf2[2]); doc.rect(14,y-4,182,11,'F');
+    doc.setFont(F.body,'normal'); doc.setFontSize(7.8); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
+    doc.text(data.obra.det||'',18,y+2);
+    doc.setFont(F.body,'normal'); doc.setFontSize(9); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+    doc.text(data.obra.val||'',192,y+2,{align:'right'});
+    y+=11;
+    doc.setFont(F.body,'normal'); doc.setFontSize(7); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+    const notaL=doc.splitTextToSize('Lo presupuesta y ejecuta la empresa constructora. No forma parte de mis honorarios: lo muestro porque es la base sobre la que se calculan.',176);
+    doc.text(notaL,18,y+3); y+=notaL.length*3.4+8;
+  }
+
+  ensureSpace(20);
+  y=pdfBloqueHeader(doc,y,'Desglose de honorarios',F);
+  (data.filas||[]).forEach(f=>{
+    doc.setFont(F.body,'normal'); doc.setFontSize(6.8);
+    const sublines=f.sub?doc.splitTextToSize(f.sub,140):[];
+    const alto=Math.max(11, 4.5+sublines.length*3.2+3);
+    ensureSpace(alto+3);
+    doc.setFont(F.head,'bold'); doc.setFontSize(8.6); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
+    doc.text(f.label,18,y);
+    if(sublines.length){
+      doc.setFont(F.body,'normal'); doc.setFontSize(6.8); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+      doc.text(sublines,18,y+4.3);
+    }
+    doc.setFont(F.head,'bold'); doc.setFontSize(9); doc.setTextColor(C.papel[0],C.papel[1],C.papel[2]);
+    doc.text(f.valor,192,y,{align:'right'});
+    y+=alto;
+    doc.setDrawColor(C.linea[0],C.linea[1],C.linea[2]); doc.setLineWidth(.25); doc.line(14,y-2,196,y-2);
+  });
+  y+=4;
+
+  ensureSpace(18);
+  doc.setFillColor(C.nude[0],C.nude[1],C.nude[2]); doc.roundedRect(14,y-6,182,15,2,2,'F');
+  doc.setTextColor(C.navy[0],C.navy[1],C.navy[2]); doc.setFont(F.head,'bold'); doc.setFontSize(9.5);
+  doc.text('Total honorarios',19,y+2.5);
+  doc.setFontSize(14);
+  doc.text(data.totalTxt,191,y+2.8,{align:'right'});
+  y+=17;
+
+  ensureSpace(20);
+  doc.setFont(F.body,'normal'); doc.setFontSize(7.4); doc.setTextColor(C.azul[0],C.azul[1],C.azul[2]);
+  [
+    'Aportes obligatorios incluidos: Ley 10653 — 5% Colegio + 13% Caja Jubilatoria + 5% Asistencial (23% s/honorario).',
+    'Estimación orientativa, válida por 7 a 15 días corridos. El presupuesto final se determina tras la visita técnica.',
+    'TC de referencia: '+(data.tcTxt||'')
+  ].forEach(n=>{ ensureSpace(10); const l=doc.splitTextToSize(n,178); doc.text(l,14,y); y+=3.8*l.length+1.5; });
+
+  return doc;
+}
+/* Descarga desde el panel admin: reconstruye una versión simplificada del
+   mismo layout, a partir de los campos guardados en Supabase. */
+async function generarPDFCotizacion(i){
+  const r=SUPABASE_RECORDS[i];
+  if(!r) return;
+  await generarPDFDesdeRegistro(r);
+}
+async function generarPDFDesdeRegistro(r){
+  if(!window.jspdf || !window.jspdf.jsPDF){ alert('No se pudo cargar el generador de PDF. Revisá tu conexión.'); return; }
+  const nombre=sanitizarTexto(r.nombre||'Cliente');
+  const fbMap={economico:'Le pareció económico',razonable:'Le pareció razonable',elevado:'Le pareció elevado'};
+  const ficha=[
+    {label:'Cliente',value:nombre,sub:sanitizarTexto(r.email||'')},
+    {label:'Modalidad',value:sanitizarTexto(r.modalidad_obra||'—')},
+    {label:'Servicio',value:sanitizarTexto(r.tipo_servicio||'—')},
+    {label:'Ubicación',value:sanitizarTexto(r.ubicacion||'—')},
+    {label:'Superficie computable',value:(r.superficie_m2||'—')+' m²'},
+    {label:'Contacto',value:sanitizarTexto(r.telefono||'Sin WhatsApp cargado')},
+    {label:'Opinión del cliente',value:r.feedback?(fbMap[r.feedback]||sanitizarTexto(r.feedback)):'Sin votar todavía'},
+    {label:'Pidió envío por mail',value:r.quiere_email?'Sí':'No'}
+  ];
+  const filas=[{label:'Honorario estimado', sub:'Total informado al cliente en el cotizador web', valor:'USD '+(Number(r.presupuesto_usd)||0).toLocaleString('es-AR')}];
+  const doc=await construirPDFCotizacion({
+    subtitle:'Resumen de cotización (panel administrativo) · '+nombre,
+    fechaTxt:r.created_at?new Date(r.created_at).toLocaleDateString('es-AR'):'—',
+    ficha, obra:null, filas,
+    totalTxt:'USD '+(Number(r.presupuesto_usd)||0).toLocaleString('es-AR'),
+    tcTxt:'Ver condiciones vigentes al momento de la consulta',
+    esquemaImg:null
+  });
+  doc.save('cotizacion-'+nombre.replace(/\s+/g,'_').toLowerCase()+'.pdf');
+}
+
+/* ============================================================
+   INICIO — ¿ya había una sesión admin activa en este navegador?
+   ============================================================ */
+(function initAdminPage(){
+  let clave=null;
+  try{ clave=sessionStorage.getItem('mengibarAdminClave'); }catch(e){}
+  if(clave && supabaseClient){
+    mostrarDashboard();
+    cambiarTabAdmin('metricas');
+    cargarCotizacionesSupabase();
+  } else {
+    mostrarLogin();
+  }
+})();
+</script>
+</body>
+</html>
