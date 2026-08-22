@@ -502,6 +502,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;background:var(--nude
   background:linear-gradient(90deg,rgba(215,186,170,.16),rgba(110,133,149,.10));
   border:1px dashed var(--nude);color:var(--c-txt);text-align:left;transition:var(--t)}
 .plan-cta:hover{background:rgba(215,186,170,.24);border-style:solid;transform:translateY(-2px)}
+.plan-cta:active{background:rgba(215,186,170,.24);border-style:solid;transform:scale(.98)}
 .plan-cta .pt{font-family:'Poppins',sans-serif;font-weight:700;font-size:1rem;display:block;margin-bottom:3px}
 .plan-cta .pd{font-size:.83rem;font-weight:300;color:var(--c-mut)}
 .plan-cta .ico{color:var(--nude)}
@@ -566,39 +567,6 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;background:var(--nude
 .infotip.open .infotip-pop{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
 @media(hover:hover){.infotip:hover .infotip-pop{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}}
 @media(prefers-reduced-motion:reduce){.infotip{animation:none}}
-
-/* admin */
-.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
-.admin-card{border:1px solid var(--c-ln);background:var(--c-surf);padding:16px;text-align:center}
-.admin-card .av{font-family:'Poppins',sans-serif;font-weight:900;font-size:1.7rem;color:var(--nude);font-variant-numeric:tabular-nums}
-.admin-card .al{font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--c-mut);margin-top:4px;display:block}
-.admin-charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
-.admin-chart-box{border:1px solid var(--c-ln);background:var(--c-surf);padding:16px}
-.admin-chart-box h5{font-family:'Poppins',sans-serif;font-weight:600;font-size:.82rem;margin-bottom:12px;color:var(--c-txt)}
-.admin-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.78rem}
-.admin-bar-row .abl{min-width:120px;color:var(--c-mut)}
-.admin-bar-track{flex:1;height:8px;background:rgba(247,245,242,.08);overflow:hidden}
-.admin-bar-fill{height:100%;background:var(--nude)}
-.admin-bar-row .abv{min-width:34px;text-align:right;font-variant-numeric:tabular-nums;color:var(--c-txt)}
-.admin-historial{max-height:340px;overflow-y:auto;border:1px solid var(--c-ln)}
-.admin-row{display:grid;grid-template-columns:auto 1fr auto auto auto auto;gap:12px;align-items:center;
-  padding:12px 14px;font-size:.78rem;border-bottom:1px solid var(--c-ln);line-height:1.5}
-.admin-row:last-child{border-bottom:none}
-.admin-row .badge{font-size:.64rem;padding:3px 9px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
-.admin-row .badge.on{background:rgba(215,186,170,.2);color:var(--nude)}
-.admin-row .badge.off{background:rgba(247,245,242,.08);color:var(--c-mut)}
-.admin-tabs{display:flex;align-items:center;gap:8px;margin:18px 0 4px;border-bottom:1px solid var(--c-ln);padding-bottom:0}
-.admin-tab{padding:10px 18px;font-size:.76rem;letter-spacing:.04em;text-transform:uppercase;font-weight:600;
-  color:var(--c-mut);border-bottom:2px solid transparent;transition:var(--t)}
-.admin-tab.sel{color:var(--nude);border-bottom-color:var(--nude)}
-.admin-tab-panel{padding-top:16px}
-.admin-tab-panel.hidden{display:none}
-@media(max-width:700px){
-  .admin-stats{grid-template-columns:1fr 1fr}
-  .admin-charts{grid-template-columns:1fr}
-  .admin-row{grid-template-columns:1fr auto;grid-template-areas:"a b" "c c" "d d";font-size:.72rem}
-  .admin-tabs{flex-wrap:wrap}
-}
 
 /* geolocalizador */
 .geo-search{display:flex;gap:10px;margin:6px 0 16px}
@@ -694,6 +662,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;background:var(--nude
 .ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
 .ref-item{border:1px solid rgba(247,245,242,.16);padding:14px;cursor:pointer;transition:var(--t);border-radius:10px}
 .ref-item:hover{border-color:var(--aca-celeste)}
+.ref-item:active{border-color:var(--aca-celeste);transform:scale(.98)}
 .ref-item.open{border-color:var(--aca-celeste);background:rgba(167,210,221,.06)}
 .ref-item .rh{color:var(--nude);margin-bottom:7px;display:flex;align-items:center;gap:8px;justify-content:space-between}
 .ref-item .rh .chev{transition:transform .2s ease;color:var(--aca-celeste);font-size:.75rem}
@@ -732,9 +701,15 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;background:var(--nude
   .ficha{grid-template-columns:1fr 1fr}
 }
 @media(max-width:600px){
-  .wrap,.nav-in,.cotz-in{padding-left:20px;padding-right:20px}
+  .wrap,.nav-in,.cotz-in{padding-left:16px;padding-right:16px}
   .sec{padding:60px 0}
   .hero{padding:44px 0 0}
+  .nav-in{padding-top:6px;padding-bottom:6px;gap:8px}
+  .nav-brand{gap:0}
+  .nav-brand .nb-text{display:none}
+  .nav-brand .nb-logo,.nav.scrolled .nb-logo{width:42px;height:42px}
+  .nav-toggle{width:44px;height:44px}
+  .nav-toggle .bars{width:16px;height:12px}
   .nav-links{gap:14px}
   .nav-links .hide-sm{display:none}
   .pasos{grid-template-columns:1fr}
@@ -758,10 +733,10 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;background:var(--nude
 /* ===================== CERO PUNTAS CUADRADAS (global) ===================== */
 img,input,select,textarea,.modal,.overlay .modal,.canvas,#geoMap,.m2-box,.aviso,.info-panel,
 .bloque,.card,.qren,#refRender,.amb-row,.nota,.fb-thanks,.plan-list,.esquema-box,.foto-block,
-.foto-block img,.admin-card,.admin-stat,.admin-row,.admin-modal,textarea,.stepper,.stepper button,
+.foto-block img,textarea,.stepper,.stepper button,
 .geo-search input,.sel-input,.res-line,.ficha-i{border-radius:var(--r)}
-.modal,.overlay .modal,.canvas,#geoMap,.bloque,.card,.foto-block,.admin-modal{border-radius:var(--r-lg)}
-.opt,.chk,.qcard,.fb-btn,.stepper button,.ref-item,.concept-item,.esquema-box,.admin-card,.admin-stat{border-radius:var(--r)}
+.modal,.overlay .modal,.canvas,#geoMap,.bloque,.card,.foto-block{border-radius:var(--r-lg)}
+.opt,.chk,.qcard,.fb-btn,.stepper button,.ref-item,.concept-item,.esquema-box{border-radius:var(--r)}
 button,.btn{border-radius:var(--r-pill)}
 .cta,.ghost,.nav-cta,.card-cta,.wa-fab,.ig-fab,.geo-search button{border-radius:var(--r-pill)}
 
@@ -898,49 +873,6 @@ Cotizador de Honorarios de Arquitectura es una herramienta de estimación online
       <p style="margin-bottom:14px"><strong>9. Cookies y almacenamiento local.</strong> Este sitio utiliza almacenamiento local del navegador (localStorage/sessionStorage) únicamente con fines técnicos: evitar perder tu cotización si falla la conexión, y mantener tu sesión iniciada en el panel administrativo. No utilizamos cookies de seguimiento ni de publicidad de terceros.</p>
 
       <p style="margin-bottom:0"><strong>10. Cambios a esta política.</strong> Podemos actualizar esta política ocasionalmente. La fecha de la última actualización figura al principio de este documento.</p>
-    </div>
-  </div>
-</div>
-
-<div class="overlay" id="modalAdminLogin" onclick="cerrarSiFondo(event,'modalAdminLogin')">
-  <div class="modal modal--dark" role="dialog" aria-modal="true" style="max-width:380px">
-    <button class="modal-x" onclick="cerrarModal('modalAdminLogin')" aria-label="Cerrar">×</button>
-    <h4><svg class="ico"><use href="#i-doc"/></svg> Panel de administración</h4>
-    <p class="modal-sub">Acceso restringido al equipo del estudio.</p>
-    <input type="password" id="adminPassInput" placeholder="Contraseña" class="sel-input"
-      style="margin-top:6px" onkeydown="if(event.key==='Enter'){event.preventDefault();verificarAdminPass()}">
-    <p id="adminLoginErr" style="color:#E08585;font-size:.8rem;margin-top:8px;min-height:1em"></p>
-    <button class="cta cta--full" id="btnVerificarAdminPass" style="margin-top:10px" onclick="verificarAdminPass()">Entrar</button>
-  </div>
-</div>
-
-<div class="overlay" id="modalAdminPanel" onclick="cerrarSiFondo(event,'modalAdminPanel')">
-  <div class="modal modal--wide modal--dark admin-modal" role="dialog" aria-modal="true">
-    <button class="modal-x" onclick="cerrarModal('modalAdminPanel')" aria-label="Cerrar">×</button>
-    <h4><svg class="ico"><use href="#i-doc"/></svg> Panel de administración</h4>
-    <p class="modal-sub">Datos en tiempo real desde Supabase. Sin caché local: siempre lo último que dejaron los clientes.</p>
-    <div id="adminPendientesLocal" style="display:none;margin:10px 0;padding:10px 14px;border:1px solid var(--nude);background:rgba(215,186,170,.12);font-size:.78rem;color:var(--c-txt)"></div>
-
-    <div class="admin-tabs" role="tablist">
-      <button class="admin-tab sel" id="tabBtnMetricas" role="tab" onclick="cambiarTabAdmin('metricas')">Métricas y Analíticas</button>
-      <button class="admin-tab" id="tabBtnLeads" role="tab" onclick="cambiarTabAdmin('leads')">Gestión de Leads</button>
-      <button class="ghost" style="margin-left:auto;padding:8px 16px;font-size:.68rem" onclick="cargarCotizacionesSupabase()">↻ Actualizar</button>
-    </div>
-
-    <div id="adminTabMetricas" class="admin-tab-panel">
-      <div id="adminStats" class="admin-stats"></div>
-      <div id="adminCharts" class="admin-charts"></div>
-      <div id="adminUbicaciones" class="admin-chart-box" style="margin-top:16px"></div>
-    </div>
-
-    <div id="adminTabLeads" class="admin-tab-panel hidden">
-      <div id="adminLeadsTable" class="admin-historial"></div>
-    </div>
-
-    <div class="navrow" style="margin-top:18px">
-      <span class="tech" id="adminSyncStatus" style="color:var(--c-mut)"></span>
-      <div class="spacer"></div>
-      <button class="ghost" onclick="cerrarSesionAdmin()">Cerrar sesión</button>
     </div>
   </div>
 </div>
@@ -3385,255 +3317,6 @@ function guardarCotizacionAdmin(){
   }catch(e){ /* nunca debe interrumpir el flujo del cotizador */ }
 }
 
-function abrirAdminLogin(){
-  document.getElementById('adminPassInput').value='';
-  document.getElementById('adminLoginErr').textContent='';
-  abrirModal('modalAdminLogin');
-  setTimeout(()=>document.getElementById('adminPassInput').focus(),80);
-}
-async function verificarAdminPass(){
-  const v=document.getElementById('adminPassInput').value;
-  const errEl=document.getElementById('adminLoginErr');
-  const btn=document.getElementById('btnVerificarAdminPass');
-  if(!supabaseClient){ errEl.textContent='No se pudo conectar a Supabase.'; return; }
-  if(btn) btn.disabled=true;
-  errEl.textContent='Verificando…';
-  try{
-    /* La contraseña se valida en el servidor (función admin_listar_cotizaciones):
-       nunca queda escrita en el código de la página, así que no se puede leer
-       abriendo "ver código fuente" como pasaba antes. */
-    const {data,error}=await supabaseClient.rpc('admin_listar_cotizaciones',{clave:v});
-    if(error) throw error;
-    try{ sessionStorage.setItem('mengibarAdminClave', v); }catch(e){}
-    SUPABASE_RECORDS=data||[];
-    errEl.textContent='';
-    cerrarModal('modalAdminLogin');
-    cambiarTabAdmin('metricas');
-    renderAdminStats(SUPABASE_RECORDS);
-    renderAdminCharts(SUPABASE_RECORDS);
-    renderAdminUbicaciones(SUPABASE_RECORDS);
-    renderAdminLeadsTable(SUPABASE_RECORDS);
-    renderAdminPendientesLocal();
-    abrirModal('modalAdminPanel');
-  }catch(e){
-    errEl.textContent='Contraseña incorrecta.';
-  } finally {
-    if(btn) btn.disabled=false;
-  }
-}
-function cerrarSesionAdmin(){
-  try{ sessionStorage.removeItem('mengibarAdminClave'); }catch(e){}
-  cerrarModal('modalAdminPanel');
-}
-function abrirAdminPanel(){
-  let clave=null;
-  try{ clave=sessionStorage.getItem('mengibarAdminClave'); }catch(e){}
-  if(!clave){ abrirAdminLogin(); return; }
-  cambiarTabAdmin('metricas');
-  cargarCotizacionesSupabase();
-  abrirModal('modalAdminPanel');
-}
-function cambiarTabAdmin(tab){
-  document.getElementById('tabBtnMetricas').classList.toggle('sel', tab==='metricas');
-  document.getElementById('tabBtnLeads').classList.toggle('sel', tab==='leads');
-  document.getElementById('adminTabMetricas').classList.toggle('hidden', tab!=='metricas');
-  document.getElementById('adminTabLeads').classList.toggle('hidden', tab!=='leads');
-}
-
-/* ============================================================
-   FASE 6 — DASHBOARD 100% SUPABASE (SIN LOCALSTORAGE) + MOTOR DE PDF
-   ============================================================ */
-let SUPABASE_RECORDS=[];
-function renderAdminPendientesLocal(){
-  const box=document.getElementById('adminPendientesLocal');
-  if(!box) return;
-  const pendientes=leerLeadsPendientesLocal();
-  const actualizaciones=leerActualizacionesPendientesLocal();
-  const total=pendientes.length+actualizaciones.length;
-  if(!total){ box.style.display='none'; box.innerHTML=''; return; }
-  box.style.display='block';
-  const partes=[];
-  if(pendientes.length) partes.push(pendientes.length+' lead'+(pendientes.length!==1?'s':'')+' completo'+(pendientes.length!==1?'s':''));
-  if(actualizaciones.length) partes.push(actualizaciones.length+' actualización'+(actualizaciones.length!==1?'es':'')+' suelta'+(actualizaciones.length!==1?'s':'')+' (voto, pedido de mail, teléfono o pdf)');
-  box.innerHTML = ico('alerta','ico--sm') + ' <strong>'+partes.join(' y ')+'</strong> '
-    + (total!==1?'quedaron':'quedó') + ' guardado'+(total!==1?'s':'')+' solo en <em>este dispositivo</em> '
-    + '(no se pudieron sincronizar con Supabase). Se reintenta solo en cada carga de página desde este mismo navegador. '
-    + '<button class="ghost" style="margin-left:8px;padding:4px 10px;font-size:.68rem" onclick="reintentarSyncManual()">Reintentar ahora</button>';
-}
-async function reintentarSyncManual(){
-  await sincronizarLeadsPendientes();
-  renderAdminPendientesLocal();
-  cargarCotizacionesSupabase();
-}
-async function cargarCotizacionesSupabase(){
-  const stats=document.getElementById('adminStats');
-  const charts=document.getElementById('adminCharts');
-  const ubic=document.getElementById('adminUbicaciones');
-  const tabla=document.getElementById('adminLeadsTable');
-  const sync=document.getElementById('adminSyncStatus');
-  if(!stats||!tabla) return;
-  await sincronizarLeadsPendientes();
-  renderAdminPendientesLocal();
-  if(!supabaseClient){
-    const msg='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">Falta configurar la anon key de Supabase para ver datos en tiempo real.</p>';
-    stats.innerHTML=''; charts.innerHTML=''; if(ubic) ubic.innerHTML=''; tabla.innerHTML=msg;
-    return;
-  }
-  if(sync) sync.textContent='Sincronizando…';
-  tabla.innerHTML='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">Cargando cotizaciones…</p>';
-  let clave=null;
-  try{ clave=sessionStorage.getItem('mengibarAdminClave'); }catch(e){}
-  if(!clave){ abrirAdminLogin(); return; }
-  try{
-    const {data,error}=await supabaseClient.rpc('admin_listar_cotizaciones',{clave});
-    if(error) throw error;
-    SUPABASE_RECORDS=data||[];
-    renderAdminStats(SUPABASE_RECORDS);
-    renderAdminCharts(SUPABASE_RECORDS);
-    renderAdminUbicaciones(SUPABASE_RECORDS);
-    renderAdminLeadsTable(SUPABASE_RECORDS);
-    if(sync) sync.textContent=SUPABASE_RECORDS.length+' registro'+(SUPABASE_RECORDS.length!==1?'s':'')+' · actualizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
-  }catch(e){
-    const msg='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">No se pudo conectar con Supabase. Verificá la anon key y la tabla `cotizaciones`.</p>';
-    tabla.innerHTML=msg;
-    if(sync) sync.textContent='Sin conexión';
-  }
-}
-function renderAdminStats(arr){
-  const stats=document.getElementById('adminStats');
-  const total=arr.length;
-  const promM2 = total? Math.round(arr.reduce((s,r)=>s+(Number(r.superficie_m2)||0),0)/total*10)/10 : 0;
-  const honorariosAcum = arr.reduce((s,r)=>s+(Number(r.presupuesto_usd)||0),0);
-  const nObraNueva = arr.filter(r=>r.modalidad_obra==='Obra nueva').length;
-  const pctObraNueva = total? Math.round(nObraNueva/total*100) : 0;
-  stats.innerHTML = [
-    ['Total de cotizaciones', total],
-    ['m² promedio', promM2],
-    ['Honorarios acumulados', 'USD '+Math.round(honorariosAcum).toLocaleString('es-AR')],
-    ['Obra nueva', pctObraNueva+'%']
-  ].map(([l,v])=>`<div class="admin-card"><span class="av">${v}</span><span class="al">${l}</span></div>`).join('');
-}
-function donutSVG(pctA,colA,pctB,colB){
-  const r=42, c=2*Math.PI*r, offA=c*(1-pctA);
-  return `<svg viewBox="0 0 110 110" width="110" height="110">
-    <circle cx="55" cy="55" r="${r}" fill="none" stroke="${colB}" stroke-width="14"/>
-    <circle cx="55" cy="55" r="${r}" fill="none" stroke="${colA}" stroke-width="14"
-      stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${offA.toFixed(1)}"
-      transform="rotate(-90 55 55)" stroke-linecap="round"/>
-    <text x="55" y="60" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="700"
-      font-size="18" fill="#F7F5F2">${Math.round(pctA*100)}%</text>
-  </svg>`;
-}
-function renderAdminCharts(arr){
-  const charts=document.getElementById('adminCharts');
-  const total=arr.length;
-  const nObraNueva = arr.filter(r=>r.modalidad_obra==='Obra nueva').length;
-  const nRemod = total-nObraNueva;
-  const pctObraNueva = total? nObraNueva/total : 0;
-
-  const servCount={};
-  arr.forEach(r=>{
-    const key=(r.tipo_servicio||'Sin especificar').split(',')[0].trim();
-    servCount[key]=(servCount[key]||0)+1;
-  });
-  const servTop=Object.entries(servCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  const maxServ=Math.max(1,...servTop.map(s=>s[1]));
-
-  const rangos=[[0,60,'0–60 m²'],[60,80,'60–80 m²'],[80,150,'80–150 m²'],[150,Infinity,'150+ m²']];
-  const rangoCount=rangos.map(([min,max,label])=>({
-    label, n:arr.filter(r=>{const m2=Number(r.superficie_m2)||0; return m2>min && m2<=max;}).length
-  }));
-  const maxRango=Math.max(1,...rangoCount.map(r=>r.n));
-
-  charts.innerHTML = `
-    <div class="admin-chart-box">
-      <h5>Obra nueva vs. Reforma</h5>
-      <div style="display:flex;align-items:center;gap:18px">
-        ${donutSVG(pctObraNueva,'#D7BAAA',1-pctObraNueva,'#6E8595')}
-        <div style="font-size:.78rem">
-          <div style="color:var(--nude);margin-bottom:6px">● Obra nueva — ${nObraNueva}</div>
-          <div style="color:var(--azul)">● Reforma — ${nRemod}</div>
-        </div>
-      </div>
-    </div>
-    <div class="admin-chart-box">
-      <h5>Servicios más cotizados</h5>
-      ${servTop.length? servTop.map(([k,v])=>`
-        <div class="admin-bar-row">
-          <span class="abl">${k}</span>
-          <span class="admin-bar-track"><span class="admin-bar-fill" style="width:${(v/maxServ*100).toFixed(0)}%"></span></span>
-          <span class="abv">${v}</span>
-        </div>`).join('') : '<p style="font-size:.8rem;color:var(--c-mut)">Todavía no hay datos suficientes.</p>'}
-    </div>
-    <div class="admin-chart-box">
-      <h5>Rango de m² cotizados</h5>
-      ${arr.length? rangoCount.map(r=>`
-        <div class="admin-bar-row">
-          <span class="abl">${r.label}</span>
-          <span class="admin-bar-track"><span class="admin-bar-fill" style="width:${(r.n/maxRango*100).toFixed(0)}%"></span></span>
-          <span class="abv">${r.n}</span>
-        </div>`).join('') : '<p style="font-size:.8rem;color:var(--c-mut)">Todavía no hay datos suficientes.</p>'}
-    </div>`;
-}
-function renderAdminUbicaciones(arr){
-  const ubic=document.getElementById('adminUbicaciones');
-  if(!ubic) return;
-  const cont={};
-  arr.forEach(r=>{
-    const key=(r.ubicacion||'Sin especificar').trim()||'Sin especificar';
-    cont[key]=(cont[key]||0)+1;
-  });
-  const top=Object.entries(cont).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const max=Math.max(1,...top.map(t=>t[1]));
-  ubic.innerHTML = `<h5>Ubicaciones más frecuentes</h5>
-    ${top.length? top.map(([k,v])=>`
-      <div class="admin-bar-row">
-        <span class="abl">${sanitizarTexto(k)}</span>
-        <span class="admin-bar-track"><span class="admin-bar-fill" style="width:${(v/max*100).toFixed(0)}%"></span></span>
-        <span class="abv">${v}</span>
-      </div>`).join('') : '<p style="font-size:.8rem;color:var(--c-mut)">Todavía no hay datos suficientes.</p>'}`;
-}
-function renderAdminLeadsTable(arr){
-  const tabla=document.getElementById('adminLeadsTable');
-  if(!arr.length){
-    tabla.innerHTML='<p style="padding:16px;font-size:.82rem;color:var(--c-mut)">Todavía no hay leads registrados en Supabase.</p>';
-    return;
-  }
-  tabla.innerHTML = arr.map((r,i)=>{
-    const f=r.created_at?new Date(r.created_at):null;
-    const fechaTxt=f&&!isNaN(f)?f.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'2-digit'}):'—';
-    const nombreTxt=sanitizarTexto(r.nombre||'Sin nombre');
-    const emailTxt=sanitizarTexto(r.email||'—');
-    const telTxt=sanitizarTexto(r.telefono||'');
-    const ubicTxt=sanitizarTexto(r.ubicacion||'');
-    const servTxt=sanitizarTexto(r.tipo_servicio||'');
-    const modTxt=sanitizarTexto(r.modalidad_obra||'');
-    const pidioPdf=!!r.pdf_generado;
-    const pidioMail=!!r.quiere_email;
-    const fbEstilo={economico:{t:'Le pareció económico',c:'#8FD19E'},razonable:{t:'Le pareció razonable',c:'var(--nude)'},elevado:{t:'Le pareció elevado',c:'#E3907A'}};
-    const fb=r.feedback?(fbEstilo[r.feedback]||{t:sanitizarTexto(r.feedback),c:'var(--c-mut)'}):null;
-    /* Fila de badges bien visibles: teléfono, voto de feedback y pedido de mail.
-       Antes vivían como texto chico enterrado en la línea de datos — ahora son
-       pastillas propias, con color, imposibles de pasar por alto. */
-    let badges='';
-    if(telTxt) badges+=`<span class="badge on" style="margin-right:4px;margin-bottom:4px">WhatsApp: ${telTxt}</span>`;
-    if(fb) badges+=`<span class="badge" style="margin-right:4px;margin-bottom:4px;background:${fb.c}22;color:${fb.c};border:1px solid ${fb.c}55">${fb.t}</span>`;
-    if(pidioMail) badges+=`<span class="badge" style="margin-right:4px;margin-bottom:4px;background:rgba(110,133,149,.22);color:var(--azul);border:1px solid rgba(110,133,149,.4)">Pidió envío por mail</span>`;
-    return `<div class="admin-row">
-      <span class="tech" style="color:var(--c-mut)">${fechaTxt}</span>
-      <span>
-        <b style="display:block">${nombreTxt}</b>
-        <span style="font-size:.72rem;color:var(--c-mut)">${emailTxt}</span><br>
-        <span style="font-size:.72rem;color:var(--c-mut)">${modTxt}${ubicTxt?' · '+ubicTxt:''} · ${servTxt}</span>
-        ${badges?'<div style="margin-top:6px">'+badges+'</div>':''}
-      </span>
-      <span class="tech">${r.superficie_m2||'—'} m²</span>
-      <span class="tech">USD ${(Number(r.presupuesto_usd)||0).toLocaleString('es-AR')}</span>
-      <span class="badge ${pidioPdf?'on':'off'}">${pidioPdf?'Solicitó PDF':'Sin PDF'}</span>
-      <button class="ghost" style="font-size:.66rem;padding:8px 12px;white-space:nowrap" onclick="generarPDFCotizacion(${i})">Generar / Descargar PDF</button>
-    </div>`;
-  }).join('');
-}
 
 /* ---------- Motor de PDF "Layout Mengibar" (compartido: cliente + admin) ---------- */
 function svgToPngDataUrl(svgEl, scale){
@@ -3954,44 +3637,11 @@ async function descargarPDFCliente(){
   if(wTel && wTel.value.trim()) actualizarTelefonoSupabase(wTel.value.trim());
   marcarPdfGeneradoSupabase();
 }
-/* Descarga desde el panel admin: reconstruye una versión simplificada del mismo layout,
-   a partir de los campos guardados en Supabase (sin el detalle vivo de R/S de esa visita). */
-async function generarPDFCotizacion(i){
-  const r=SUPABASE_RECORDS[i];
-  if(!r) return;
-  await generarPDFDesdeRegistro(r);
-}
-async function generarPDFDesdeRegistro(r){
-  if(!window.jspdf || !window.jspdf.jsPDF){ alert('No se pudo cargar el generador de PDF. Revisá tu conexión.'); return; }
-  const nombre=sanitizarTexto(r.nombre||'Cliente');
-  const fbMap={economico:'Le pareció económico',razonable:'Le pareció razonable',elevado:'Le pareció elevado'};
-  const ficha=[
-    {label:'Cliente',value:nombre,sub:sanitizarTexto(r.email||'')},
-    {label:'Modalidad',value:sanitizarTexto(r.modalidad_obra||'—')},
-    {label:'Servicio',value:sanitizarTexto(r.tipo_servicio||'—')},
-    {label:'Ubicación',value:sanitizarTexto(r.ubicacion||'—')},
-    {label:'Superficie computable',value:(r.superficie_m2||'—')+' m²'},
-    {label:'Contacto',value:sanitizarTexto(r.telefono||'Sin WhatsApp cargado')},
-    {label:'Opinión del cliente',value:r.feedback?(fbMap[r.feedback]||sanitizarTexto(r.feedback)):'Sin votar todavía'},
-    {label:'Pidió envío por mail',value:r.quiere_email?'Sí':'No'}
-  ];
-  const filas=[{label:'Honorario estimado', sub:'Total informado al cliente en el cotizador web', valor:'USD '+(Number(r.presupuesto_usd)||0).toLocaleString('es-AR')}];
-  const doc=await construirPDFCotizacion({
-    subtitle:'Resumen de cotización (panel administrativo) · '+nombre,
-    fechaTxt:r.created_at?new Date(r.created_at).toLocaleDateString('es-AR'):'—',
-    ficha, obra:null, filas,
-    totalTxt:'USD '+(Number(r.presupuesto_usd)||0).toLocaleString('es-AR'),
-    tcTxt:'Ver condiciones vigentes al momento de la consulta',
-    esquemaImg:null
-  });
-  doc.save('cotizacion-'+nombre.replace(/\s+/g,'_').toLowerCase()+'.pdf');
-}
 
-/* Acceso: atajo de teclado Ctrl+Shift+A, o abrir la URL con #admin */
-document.addEventListener('keydown', e=>{
-  if(e.ctrlKey && e.shiftKey && (e.key==='A'||e.key==='a')){ e.preventDefault(); abrirAdminLogin(); }
-});
-if(window.location.hash==='#admin'){ abrirAdminLogin(); }
+/* El panel de administración se movió a /admin.html (página independiente).
+   Ver ese archivo para el login, dashboard, métricas y generación de PDF
+   desde el panel admin — usa las mismas credenciales y la misma tabla
+   `cotizaciones` de Supabase. */
 </script>
 
 <footer class="foot">
