@@ -229,6 +229,7 @@ h1.hero-title .word:nth-child(5){animation-delay:.37s}
 .reg-card{position:relative;overflow:hidden;background:linear-gradient(270deg,#335665 0%,var(--navy) 42%,#060b0e 100%);color:var(--papel);border-radius:var(--r-lg);padding:34px 30px;display:flex;flex-direction:column;min-height:230px;box-shadow:0 22px 40px -20px rgba(20,33,41,.55);transition:box-shadow var(--t),transform var(--t)}
 .reg-card::before{content:'';position:absolute;top:-35%;left:50%;transform:translateX(-50%);width:70%;height:70%;background:radial-gradient(circle,rgba(215,186,170,.18),transparent 70%);pointer-events:none;filter:blur(8px)}
 .reg-card:hover{transform:translateY(-5px)}
+.reg-card:active{transform:translateY(-2px) scale(.99)}
 .reg-card h3{position:relative;font-family:'Poppins',sans-serif;font-weight:700;font-size:1.12rem;margin-bottom:12px;letter-spacing:-.01em;line-height:1.25}
 .reg-card p{position:relative;font-size:.88rem;color:rgba(247,245,242,.78)}
 @media(max-width:860px){.reg-grid{grid-template-columns:1fr}}
@@ -243,6 +244,7 @@ h1.hero-title .word:nth-child(5){animation-delay:.37s}
 .zona-card:nth-child(3){transition-delay:.24s}
 .zona-card:nth-child(4){transition-delay:.36s}
 .zona-card:hover{transform:translateY(-4px)}
+.zona-card:active{transform:translateY(-2px) scale(.99)}
 .zona-card h3{font-family:'Poppins',sans-serif;font-weight:700;font-size:1.12rem;margin-bottom:16px;color:var(--navy);letter-spacing:-.01em}
 .zona-card ul{list-style:none;font-size:.85rem;color:rgba(20,33,41,.85)}
 .zona-card ul li{padding:7px 0;display:flex;gap:9px;align-items:flex-start;border-top:1px solid rgba(20,33,41,.2)}
@@ -257,6 +259,7 @@ h1.hero-title .word:nth-child(5){animation-delay:.37s}
 .faq-item:last-child{border-bottom:1px solid var(--linea-2)}
 .faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 4px;text-align:left;font-family:'Poppins',sans-serif;font-weight:600;font-size:1rem;letter-spacing:-.01em;color:var(--navy)}
 .faq-q:hover{color:var(--azul)}
+.faq-q:active{color:var(--azul)}
 .faq-q .plus{flex-shrink:0;width:26px;height:26px;border:1px solid var(--linea-2);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;transition:var(--t)}
 .faq-q .plus::before,.faq-q .plus::after{content:'';position:absolute;background:var(--navy);transition:var(--t)}
 .faq-q .plus::before{width:10px;height:1.5px}
@@ -289,6 +292,7 @@ h1.hero-title .word:nth-child(5){animation-delay:.37s}
 .foot-bottom{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:rgba(20,33,41,.55);font-size:.8rem}
 .foot-bottom a{transition:var(--t)}
 .foot-bottom a:hover{color:var(--azul)}
+.foot-bottom a:active{color:var(--azul)}
 
 /* ---------- BOTONES ---------- */
 .cta{position:relative;background:var(--nude);color:var(--navy);border:1px solid var(--navy);font-family:'Poppins',sans-serif;font-weight:700;font-size:.88rem;letter-spacing:.03em;padding:15px 30px;transition:var(--t);display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;box-shadow:0 4px 14px rgba(20,33,41,.14),0 14px 26px -16px rgba(20,33,41,.35)}
@@ -296,6 +300,7 @@ h1.hero-title .word:nth-child(5){animation-delay:.37s}
 .cta:active{transform:translateY(0) scale(.97);box-shadow:0 2px 6px rgba(20,33,41,.16)}
 .cta--ghost{background:transparent;color:var(--navy);border:1px solid var(--navy);box-shadow:none}
 .cta--ghost:hover{background:rgba(20,33,41,.06)}
+.cta--ghost:active{background:rgba(20,33,41,.06)}
 .cta--plain{padding-left:34px;padding-right:34px}
 .cta--final{background:linear-gradient(120deg,var(--nude) 0%,#E4CBB9 45%,var(--nude-dark) 100%);border:1px solid rgba(20,33,41,.2);animation:ctaPulse 1.7s ease-out infinite}
 .cta--final:hover{background:linear-gradient(120deg,#E4CBB9 0%,var(--nude-dark) 55%,#B78C71 100%);animation-play-state:paused;box-shadow:0 12px 28px -6px rgba(215,186,170,.6),0 22px 44px -18px rgba(20,33,41,.55)}
@@ -320,6 +325,14 @@ h1.hero-title .word:nth-child(5){animation-delay:.37s}
   .cta-banda{padding:40px 24px}
   .wa-fab{right:16px;bottom:16px;padding:14px}
   .ig-fab{right:16px;bottom:78px;padding:14px}
+}
+@media(max-width:600px){
+  .nav-in{padding-top:8px;padding-bottom:8px;gap:8px}
+  .nav-brand{gap:0}
+  .nav-brand .nb-text{display:none}
+  .nav-brand .nb-logo,.nav.scrolled .nb-logo{width:42px;height:42px}
+  .nav-toggle{width:44px;height:44px}
+  .nav-toggle .bars{width:16px;height:12px}
 }
 </style>
 </head>
