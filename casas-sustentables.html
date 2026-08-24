@@ -119,7 +119,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--nude);outline-offse
 
 /* ---------- NAV ---------- */
 .nav{position:sticky;top:0;z-index:70;background:var(--navy);border-bottom:none;transition:box-shadow .45s ease,margin .45s cubic-bezier(.22,.61,.36,1),max-width .45s cubic-bezier(.22,.61,.36,1),border-radius .45s cubic-bezier(.22,.61,.36,1);will-change:margin,max-width,border-radius}
-.nav.scrolled{background:var(--navy);box-shadow:0 10px 28px -14px rgba(0,0,0,.45);margin:12px auto 0;max-width:min(920px,92%);border-radius:999px}
+.nav.scrolled{background:rgba(20,33,41,.88);backdrop-filter:blur(16px) saturate(150%);-webkit-backdrop-filter:blur(16px) saturate(150%);box-shadow:0 10px 28px -14px rgba(0,0,0,.45);margin:12px auto 0;max-width:min(920px,92%);border-radius:999px}
 .nav.scrolled .nav-in{padding:8px 22px}
 .nav.scrolled .nb-logo{width:60px;height:60px}
 .nav .nav-brand{color:var(--papel)}
@@ -250,7 +250,6 @@ h1.hero-title{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(3
 .obra-card::before{content:'';position:absolute;top:-32%;right:-22%;width:70%;height:70%;background:radial-gradient(circle,rgba(167,210,221,.12),transparent 70%);pointer-events:none;filter:blur(10px)}
 .obra-card::after{content:'';position:absolute;bottom:-28%;left:-18%;width:55%;height:55%;background:radial-gradient(circle,rgba(215,186,170,.08),transparent 70%);pointer-events:none;filter:blur(12px)}
 .obra-card:hover{animation-play-state:paused;box-shadow:0 28px 48px -18px rgba(20,33,41,.6),inset 0 1px 0 rgba(255,255,255,.08)}
-.obra-card:active{animation-play-state:paused;box-shadow:0 28px 48px -18px rgba(20,33,41,.6),inset 0 1px 0 rgba(255,255,255,.08);transform:scale(.985)}
 @keyframes obraWobble{
   0%,100%{transform:rotate(0deg)}
   25%{transform:rotate(-1.15deg)}
@@ -275,7 +274,6 @@ h1.hero-title{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(3
 .obra-nota{font-size:.72rem;color:rgba(247,245,242,.55);margin-top:2px}
 .obra-cta{position:relative;margin-top:16px;align-self:flex-start;display:inline-flex;align-items:center;gap:7px;color:var(--navy);background:var(--nude);font-family:'Poppins',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:.01em;text-decoration:none;padding:9px 16px;border-radius:999px;transition:var(--t);animation:obraCtaPulse 2.2s ease-out infinite}
 .obra-cta:hover{background:var(--nude-dark);gap:10px;animation-play-state:paused}
-.obra-cta:active{background:var(--nude-dark);gap:10px;animation-play-state:paused;transform:scale(.96)}
 @keyframes obraCtaPulse{
   0%{box-shadow:0 0 0 0 rgba(215,186,170,.6)}
   60%{box-shadow:0 0 0 10px rgba(215,186,170,0)}
@@ -293,7 +291,6 @@ h1.hero-title{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(3
 .faq-item:last-child{border-bottom:1px solid var(--linea-2)}
 .faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 4px;text-align:left;font-family:'Poppins',sans-serif;font-weight:600;font-size:1rem;letter-spacing:-.01em;color:var(--navy)}
 .faq-q:hover{color:var(--azul)}
-.faq-q:active{color:var(--azul)}
 .faq-q .plus{flex-shrink:0;width:26px;height:26px;border:1px solid var(--linea-2);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;transition:var(--t)}
 .faq-q .plus::before,.faq-q .plus::after{content:'';position:absolute;background:var(--navy);transition:var(--t)}
 .faq-q .plus::before{width:10px;height:1.5px}
@@ -343,7 +340,6 @@ h1.hero-title .word:nth-child(3){animation-delay:.23s}
 .foot-bottom--solo{border-top:none;margin-top:0;padding-top:0}
 .foot-bottom a{color:var(--navy);transition:var(--t)}
 .foot-bottom a:hover{color:var(--azul)}
-.foot-bottom a:active{color:var(--azul)}
 
 /* ---------- BOTONES ---------- */
 .cta{position:relative;background:var(--nude);color:var(--navy);border:1px solid var(--navy);font-family:'Poppins',sans-serif;font-weight:700;font-size:.88rem;letter-spacing:.03em;padding:15px 30px;transition:var(--t);display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;box-shadow:0 4px 14px rgba(20,33,41,.14),0 14px 26px -16px rgba(20,33,41,.35)}
@@ -351,7 +347,6 @@ h1.hero-title .word:nth-child(3){animation-delay:.23s}
 .cta:active{transform:translateY(0) scale(.97);box-shadow:0 2px 6px rgba(20,33,41,.16)}
 .cta--ghost{background:transparent;color:var(--navy);border:1px solid var(--navy);box-shadow:none}
 .cta--ghost:hover{background:rgba(20,33,41,.06)}
-.cta--ghost:active{background:rgba(20,33,41,.06)}
 .cta--academy{background:var(--aca-yellow);color:var(--aca-dark);border:none}
 .cta--academy:hover{background:#f5c62c}
 .cta--final{background:linear-gradient(120deg,var(--nude) 0%,#E4CBB9 45%,var(--nude-dark) 100%);border:1px solid rgba(20,33,41,.2);animation:ctaPulse 1.7s ease-out infinite}
@@ -379,14 +374,6 @@ h1.hero-title .word:nth-child(3){animation-delay:.23s}
   .cta-banda{padding:40px 24px}
   .wa-fab{right:16px;bottom:16px;padding:14px}
   .ig-fab{right:16px;bottom:78px;padding:14px}
-}
-@media(max-width:600px){
-  .nav-in{padding-top:8px;padding-bottom:8px;gap:8px}
-  .nav-brand{gap:0}
-  .nav-brand .nb-text{display:none}
-  .nav-brand .nb-logo,.nav.scrolled .nb-logo{width:42px;height:42px}
-  .nav-toggle{width:44px;height:44px}
-  .nav-toggle .bars{width:16px;height:12px}
 }
 </style>
 </head>
