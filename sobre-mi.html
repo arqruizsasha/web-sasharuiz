@@ -148,6 +148,10 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--nude);outline-offse
 .nav-brand b{color:var(--navy);font-weight:700;text-decoration:none}
 .nav-brand .x{color:var(--azul);font-weight:400;opacity:.55}
 .nav-brand span.nb-name{color:var(--azul);font-weight:500;text-decoration:none;opacity:.72}
+@media(max-width:640px){
+  .nav-brand{gap:0}
+  .nav-brand .nb-text{display:none}
+}
 .brand-x{opacity:.5;font-weight:400;font-size:.8em}
 .nav-toggle{width:54px;height:54px;display:flex;align-items:center;justify-content:center;border:1px solid var(--linea-2);border-radius:var(--r-pill);transition:var(--t);flex-shrink:0}
 .nav-toggle:hover{border-color:var(--navy);background:rgba(20,33,41,.05)}
