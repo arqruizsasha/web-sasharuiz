@@ -30,7 +30,7 @@
   "@graph":[
     {
       "@type":"Person",
-      "@id":"https://www.sasharuiz.com.ar/sobre-mi.html#sasharuiz",
+      "@id":"https://www.sasharuiz.com.ar/#sasharuiz",
       "name":"Sasha Ruiz",
       "jobTitle":"Arquitecta · BIM Manager",
       "email":"arqruizsasha@gmail.com",
@@ -61,11 +61,34 @@
       "@type":"ProfessionalService",
       "@id":"https://www.sasharuiz.com.ar/#service",
       "name":"Mengibar Studio x Sasha Ruiz",
+      "description":"Diseño y construcción integral de casas sustentables premium en barrios cerrados de Rosario, Funes, Roldán e Ibarlucea, con metodología BIM que garantiza costo cerrado y cero sorpresas presupuestarias en obra.",
       "url":"https://www.sasharuiz.com.ar/",
       "email":"arqruizsasha@gmail.com",
-      "founder":{"@id":"https://www.sasharuiz.com.ar/sobre-mi.html#sasharuiz"},
+      "telephone":"+543413632019",
+      "priceRange":"USD",
+      "founder":{"@id":"https://www.sasharuiz.com.ar/#sasharuiz"},
+      "areaServed":[
+        {"@type":"City","name":"Rosario"},
+        {"@type":"City","name":"Funes"},
+        {"@type":"City","name":"Roldán"},
+        {"@type":"City","name":"Ibarlucea"},
+        {"@type":"AdministrativeArea","name":"Gran Rosario"},
+        {"@type":"AdministrativeArea","name":"Santa Fe","addressCountry":"AR"}
+      ],
+      "address":{"@type":"PostalAddress","addressLocality":"Rosario","addressRegion":"Santa Fe","addressCountry":"AR"},
+      "sameAs":["https://instagram.com/arqmengibar","https://instagram.com/mengibaracademy"]
+    },
+    {
+      "@type":"LocalBusiness",
+      "@id":"https://www.sasharuiz.com.ar/#localbusiness",
+      "name":"Mengibar Studio x Sasha Ruiz",
+      "image":"https://www.sasharuiz.com.ar/assets/og-sasha-ruiz.jpg",
+      "email":"arqruizsasha@gmail.com",
+      "telephone":"+543413632019",
+      "priceRange":"USD",
+      "address":{"@type":"PostalAddress","addressLocality":"Rosario","addressRegion":"Santa Fe","addressCountry":"AR"},
       "areaServed":["Rosario","Funes","Roldán","Ibarlucea","Gran Rosario"],
-      "address":{"@type":"PostalAddress","addressLocality":"Rosario","addressRegion":"Santa Fe","addressCountry":"AR"}
+      "url":"https://www.sasharuiz.com.ar/"
     }
   ]
 }
@@ -107,7 +130,13 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--nude);outline-offse
 
 /* ---------- NAV ---------- */
 .nav{position:sticky;top:0;z-index:70;background:var(--papel);border-bottom:none;transition:box-shadow .45s ease,margin .45s cubic-bezier(.22,.61,.36,1),max-width .45s cubic-bezier(.22,.61,.36,1),border-radius .45s cubic-bezier(.22,.61,.36,1);will-change:margin,max-width,border-radius}
-.nav.scrolled{background:rgba(247,245,242,.72);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);box-shadow:0 10px 28px -14px rgba(20,33,41,.25);margin:12px auto 0;max-width:min(920px,92%);border-radius:999px}
+.nav.scrolled{background:transparent;backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);box-shadow:0 10px 28px -14px rgba(20,33,41,.25);margin:12px auto 0;max-width:min(920px,92%);border-radius:999px}
+.ticker2{background:var(--papel);overflow:hidden;white-space:nowrap;padding:16px 0;border-top:none;border-bottom:none}
+.ticker2-track{display:inline-flex;align-items:center;animation:tickerMove2 38s linear infinite}
+.ticker2-track span{display:inline-flex;align-items:center;gap:12px;font-family:'Poppins',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:.03em;padding:0 24px;color:var(--navy);white-space:nowrap}
+.ticker2-track span::after{content:'●';margin-left:24px;color:var(--nude);font-size:.5rem}
+@keyframes tickerMove2{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+@media(prefers-reduced-motion: reduce){.ticker2-track{animation:none}}
 .nav.scrolled .nav-in{padding:8px 22px}
 .nav.scrolled .nb-logo{width:60px;height:60px}
 .nav-in{max-width:100%;margin:0 auto;padding:6px clamp(14px,4vw,40px);display:flex;justify-content:space-between;align-items:center;gap:20px;position:relative}
@@ -374,6 +403,31 @@ h1.hero-title .word:nth-child(7){animation-delay:.53s}
     </div>
   </div>
 </section>
+
+<div class="ticker2" aria-hidden="true">
+  <div class="ticker2-track">
+    <span>Diseño y construcción de casas sustentables · Rosario</span>
+    <span>Casas en barrios cerrados · Funes, Roldán, Ibarlucea</span>
+    <span>Proyecto llave en mano sin sorpresas de obra</span>
+    <span>Metodología BIM · Control de costos garantizado</span>
+    <span>Arquitectura sustentable premium</span>
+    <span>Dirección de obra con costo cerrado</span>
+    <span>Estudio de arquitectura en barrio cerrado</span>
+    <span>Eficiencia energética y diseño bioclimático</span>
+    <span>Documentación técnica BIM de alta precisión</span>
+    <span>Vivienda unifamiliar de alta gama · Gran Rosario</span>
+    <span>Diseño y construcción de casas sustentables · Rosario</span>
+    <span>Casas en barrios cerrados · Funes, Roldán, Ibarlucea</span>
+    <span>Proyecto llave en mano sin sorpresas de obra</span>
+    <span>Metodología BIM · Control de costos garantizado</span>
+    <span>Arquitectura sustentable premium</span>
+    <span>Dirección de obra con costo cerrado</span>
+    <span>Estudio de arquitectura en barrio cerrado</span>
+    <span>Eficiencia energética y diseño bioclimático</span>
+    <span>Documentación técnica BIM de alta precisión</span>
+    <span>Vivienda unifamiliar de alta gama · Gran Rosario</span>
+  </div>
+</div>
 
 <!-- ===================== 02 PROPUESTA DE VALOR DUAL ===================== -->
 <section class="sec" id="propuesta">
