@@ -119,7 +119,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--nude);outline-offse
 
 /* ---------- NAV ---------- */
 .nav{position:sticky;top:0;z-index:70;background:var(--navy);border-bottom:none;transition:box-shadow .45s ease,margin .45s cubic-bezier(.22,.61,.36,1),max-width .45s cubic-bezier(.22,.61,.36,1),border-radius .45s cubic-bezier(.22,.61,.36,1);will-change:margin,max-width,border-radius}
-.nav.scrolled{background:rgba(20,33,41,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 28px -14px rgba(0,0,0,.45);margin:12px auto 0;max-width:min(920px,92%);border-radius:999px}
+.nav.scrolled{background:rgba(20,33,41,.28);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 28px -14px rgba(0,0,0,.45);margin:12px auto 0;max-width:min(920px,92%);border-radius:999px}
 .nav.scrolled .nav-in{padding:8px 22px}
 .nav.scrolled .nb-logo{width:60px;height:60px}
 .nav .nav-brand{color:var(--papel)}
@@ -168,6 +168,16 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--nude);outline-offse
 @media(max-width:480px){
   .nav-links{width:100vw;padding:76px 26px 26px}
   .nav-links-close{right:16px}
+}
+@media(max-width:640px){
+  .nav{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
+  .nav.scrolled{margin:10px auto 0;max-width:94%}
+  .nav-in{padding:10px clamp(14px,4vw,28px)}
+  .nav-brand{gap:0}
+  .nav-brand .nb-logo{width:52px;height:52px}
+  .nav.scrolled .nb-logo{width:44px;height:44px}
+  .nav-brand .nb-text{display:none}
+  .nav-toggle{width:46px;height:46px}
 }
 
 /* ---------- HERO PILAR ---------- */
