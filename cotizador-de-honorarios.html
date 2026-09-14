@@ -18,37 +18,82 @@
 <script type="application/ld+json">
 {
   "@context":"https://schema.org",
-  "@type":"WebApplication",
-  "name":"Cotizador de Honorarios de Arquitectura · Ley 10653 CAUPSF",
-  "url":"https://www.sasharuiz.com.ar/cotizador-de-honorarios",
-  "applicationCategory":"BusinessApplication",
-  "operatingSystem":"Web",
-  "description":"Herramienta online para estimar honorarios de diseño y dirección de obra de arquitectura en Santa Fe, según la Ley 10653 y la escala CAUPSF.",
-  "offers":{"@type":"Offer","price":"0","priceCurrency":"ARS"},
-  "provider":{
-    "@type":"ProfessionalService",
-    "name":"Mengibar Studio · Arq. Sasha Ruiz",
-    "areaServed":[
-      {"@type":"City","name":"Rosario"},
-      {"@type":"City","name":"Funes"},
-      {"@type":"City","name":"Roldán"},
-      {"@type":"City","name":"Ibarlucea"},
-      {"@type":"AdministrativeArea","name":"Santa Fe, Argentina"}
-    ],
-    "address":{"@type":"PostalAddress","addressLocality":"Rosario","addressRegion":"Santa Fe","addressCountry":"AR"},
-    "telephone":"+543413632019"
-  }
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context":"https://schema.org",
-  "@type":"FAQPage",
-  "mainEntity":[
-    {"@type":"Question","name":"¿Cómo se calculan los honorarios de arquitectura en Santa Fe?",
-     "acceptedAnswer":{"@type":"Answer","text":"Se calculan aplicando la escala de honorarios del CAUPSF (Ley 10653) sobre el Monto de Obra, que resulta de multiplicar la Superficie Computable (cubierta + 50% de la semicubierta) por el valor del m² vigente."}},
-    {"@type":"Question","name":"¿Este cotizador reemplaza un presupuesto de obra?",
-     "acceptedAnswer":{"@type":"Answer","text":"No. Estima honorarios profesionales de anteproyecto, proyecto y dirección de obra. El costo de materiales y mano de obra lo presupuesta la empresa constructora."}}
+  "@graph":[
+    {
+      "@type":"ProfessionalService",
+      "@id":"https://www.sasharuiz.com.ar/#service",
+      "name":"Mengibar Studio x Sasha Ruiz",
+      "url":"https://www.sasharuiz.com.ar/",
+      "description":"Diseño y construcción integral (Design & Build) de casas sustentables premium en barrios cerrados de Rosario, Funes, Roldán e Ibarlucea, con metodología BIM que garantiza costo cerrado y cero sorpresas presupuestarias en obra.",
+      "email":"arqruizsasha@gmail.com",
+      "areaServed":[
+        {"@type":"City","name":"Rosario"},
+        {"@type":"City","name":"Funes"},
+        {"@type":"City","name":"Roldán"},
+        {"@type":"City","name":"Ibarlucea"},
+        {"@type":"AdministrativeArea","name":"Gran Rosario"},
+        {"@type":"AdministrativeArea","name":"Santa Fe","addressCountry":"AR"}
+      ],
+      "address":{"@type":"PostalAddress","addressLocality":"Rosario","addressRegion":"Santa Fe","addressCountry":"AR"},
+      "telephone":"+543413632019",
+      "priceRange":"USD",
+      "founder":{"@id":"https://www.sasharuiz.com.ar/#sasharuiz"},
+      "sameAs":["https://instagram.com/arqmengibar","https://instagram.com/mengibaracademy"]
+    },
+    {
+      "@type":"Person",
+      "@id":"https://www.sasharuiz.com.ar/#sasharuiz",
+      "name":"Sasha Ruiz",
+      "jobTitle":"Arquitecta · BIM Manager",
+      "email":"arqruizsasha@gmail.com",
+      "url":"https://www.sasharuiz.com.ar/sobre-mi",
+      "worksFor":{"@id":"https://www.sasharuiz.com.ar/#service"},
+      "founder":[
+        {"@type":"Organization","name":"Mengibar Studio x Sasha Ruiz"},
+        {"@type":"Organization","name":"Mengibar Academy x Sasha Ruiz"}
+      ],
+      "sameAs":["https://instagram.com/arqmengibar"]
+    },
+    {
+      "@type":"LocalBusiness",
+      "@id":"https://www.sasharuiz.com.ar/#localbusiness",
+      "name":"Mengibar Studio x Sasha Ruiz",
+      "image":"https://www.sasharuiz.com.ar/assets/og-sasha-ruiz.jpg",
+      "email":"arqruizsasha@gmail.com",
+      "telephone":"+543413632019",
+      "priceRange":"USD",
+      "address":{"@type":"PostalAddress","addressLocality":"Rosario","addressRegion":"Santa Fe","addressCountry":"AR"},
+      "areaServed":["Rosario","Funes","Roldán","Ibarlucea","Gran Rosario"],
+      "url":"https://www.sasharuiz.com.ar/"
+    },
+    {
+      "@type":"WebApplication",
+      "@id":"https://www.sasharuiz.com.ar/cotizador-de-honorarios#app",
+      "name":"Cotizador de Honorarios de Arquitectura · Ley 10653 CAUPSF",
+      "url":"https://www.sasharuiz.com.ar/cotizador-de-honorarios",
+      "applicationCategory":"BusinessApplication",
+      "operatingSystem":"Web",
+      "description":"Herramienta online para estimar honorarios de diseño y dirección de obra de arquitectura en Santa Fe, según la Ley 10653 y la escala CAUPSF.",
+      "offers":{"@type":"Offer","price":"0","priceCurrency":"ARS"},
+      "provider":{"@id":"https://www.sasharuiz.com.ar/#service"},
+      "isPartOf":{"@id":"https://www.sasharuiz.com.ar/#service"}
+    },
+    {
+      "@type":"FAQPage",
+      "@id":"https://www.sasharuiz.com.ar/cotizador-de-honorarios#faq",
+      "mainEntity":[
+        {
+          "@type":"Question",
+          "name":"¿Cómo se calculan los honorarios de arquitectura en Santa Fe?",
+          "acceptedAnswer":{"@type":"Answer","text":"Se calculan aplicando la escala de honorarios del CAUPSF (Ley 10653) sobre el Monto de Obra, que resulta de multiplicar la Superficie Computable (cubierta + 50% de la semicubierta) por el valor del m² vigente."}
+        },
+        {
+          "@type":"Question",
+          "name":"¿Este cotizador reemplaza un presupuesto de obra?",
+          "acceptedAnswer":{"@type":"Answer","text":"No. Estima honorarios profesionales de anteproyecto, proyecto y dirección de obra. El costo de materiales y mano de obra lo presupuesta la empresa constructora."}
+        }
+      ]
+    }
   ]
 }
 </script>

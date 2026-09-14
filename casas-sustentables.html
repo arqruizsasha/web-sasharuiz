@@ -30,9 +30,9 @@
   "@graph":[
     {
       "@type":"ProfessionalService",
-      "@id":"https://www.sasharuiz.com.ar/casas-sustentables#service",
+      "@id":"https://www.sasharuiz.com.ar/#service",
       "name":"Mengibar Studio x Sasha Ruiz",
-      "url":"https://www.sasharuiz.com.ar/casas-sustentables",
+      "url":"https://www.sasharuiz.com.ar/",
       "description":"Diseño y construcción integral (Design & Build) de casas sustentables premium en barrios cerrados de Rosario, Funes, Roldán e Ibarlucea, con metodología BIM que garantiza costo cerrado y cero sorpresas presupuestarias en obra.",
       "email":"arqruizsasha@gmail.com",
       "areaServed":[
@@ -44,15 +44,44 @@
         {"@type":"AdministrativeArea","name":"Santa Fe","addressCountry":"AR"}
       ],
       "address":{"@type":"PostalAddress","addressLocality":"Rosario","addressRegion":"Santa Fe","addressCountry":"AR"},
+      "telephone":"+543413632019",
       "priceRange":"USD",
-      "founder":{
-        "@type":"Person",
-        "name":"Sasha Ruiz",
-        "jobTitle":"Arquitecta · BIM Manager",
-        "email":"arqruizsasha@gmail.com",
-        "url":"https://www.sasharuiz.com.ar/sobre-mi"
-      },
+      "founder":{"@id":"https://www.sasharuiz.com.ar/#sasharuiz"},
       "sameAs":["https://instagram.com/arqmengibar","https://instagram.com/mengibaracademy"]
+    },
+    {
+      "@type":"Person",
+      "@id":"https://www.sasharuiz.com.ar/#sasharuiz",
+      "name":"Sasha Ruiz",
+      "jobTitle":"Arquitecta · BIM Manager",
+      "email":"arqruizsasha@gmail.com",
+      "url":"https://www.sasharuiz.com.ar/sobre-mi",
+      "worksFor":{"@id":"https://www.sasharuiz.com.ar/#service"},
+      "founder":[
+        {"@type":"Organization","name":"Mengibar Studio x Sasha Ruiz"},
+        {"@type":"Organization","name":"Mengibar Academy x Sasha Ruiz"}
+      ],
+      "sameAs":["https://instagram.com/arqmengibar"]
+    },
+    {
+      "@type":"LocalBusiness",
+      "@id":"https://www.sasharuiz.com.ar/#localbusiness",
+      "name":"Mengibar Studio x Sasha Ruiz",
+      "image":"https://www.sasharuiz.com.ar/assets/og-sasha-ruiz.jpg",
+      "email":"arqruizsasha@gmail.com",
+      "telephone":"+543413632019",
+      "priceRange":"USD",
+      "address":{"@type":"PostalAddress","addressLocality":"Rosario","addressRegion":"Santa Fe","addressCountry":"AR"},
+      "areaServed":["Rosario","Funes","Roldán","Ibarlucea","Gran Rosario"],
+      "url":"https://www.sasharuiz.com.ar/"
+    },
+    {
+      "@type":"WebPage",
+      "@id":"https://www.sasharuiz.com.ar/casas-sustentables#page",
+      "name":"Casas Sustentables Premium",
+      "url":"https://www.sasharuiz.com.ar/casas-sustentables",
+      "description":"Diseño y construcción integral (Design & Build) de casas sustentables premium en barrios cerrados de Rosario, Funes, Roldán e Ibarlucea, con metodología BIM que garantiza costo cerrado y cero sorpresas presupuestarias en obra.",
+      "isPartOf":{"@id":"https://www.sasharuiz.com.ar/#service"}
     },
     {
       "@type":"FAQPage",
@@ -61,22 +90,42 @@
         {
           "@type":"Question",
           "name":"¿Cómo se garantiza que no haya sobrecostos al construir una casa en un barrio cerrado?",
-          "acceptedAnswer":{"@type":"Answer","text":"Con metodología BIM: el proyecto se modela y coordina por completo antes de iniciar obra, lo que permite un cómputo métrico exacto, un presupuesto cerrado desde el día uno y seguimiento permanente de avance físico contra el presupuesto original. El resultado es 0% de desvío presupuestario, algo que la contratación tradicional no puede asegurar."
+          "acceptedAnswer":{"@type":"Answer","text":"Con metodología BIM: el proyecto se modela y coordina por completo antes de iniciar obra, lo que permite un cómputo métrico exacto, un presupuesto cerrado desde el día uno y seguimiento permanente de avance físico contra el presupuesto original. El resultado es 0% de desvío presupuestario, algo que la contratación tradicional no puede asegurar."}
         },
         {
           "@type":"Question",
           "name":"¿Qué elementos hacen que una casa sea sustentable en el clima de Rosario y alrededores?",
-          "acceptedAnswer":{"@type":"Answer","text":"Orientación e implantación bioclimática, aislamiento térmico eficiente en envolvente y carpinterías, control solar pasivo, ventilación cruzada y selección de materiales de alta gama con bajo impacto energético. Esta combinación reduce el consumo de climatización hasta un 35% respecto a una vivienda tradicional en la región."
+          "acceptedAnswer":{"@type":"Answer","text":"Orientación e implantación bioclimática, aislamiento térmico eficiente en envolvente y carpinterías, control solar pasivo, ventilación cruzada y selección de materiales de alta gama con bajo impacto energético. Esta combinación reduce el consumo de climatización hasta un 35% respecto a una vivienda tradicional en la región."}
         },
         {
           "@type":"Question",
           "name":"¿Cuánto tiempo demora el proceso completo desde el diseño hasta la entrega de llave?",
-          "acceptedAnswer":{"@type":"Answer","text":"El anteproyecto y legajo de obra se desarrollan íntegramente en BIM antes de iniciar la construcción, lo que reduce imprevistos y tiempos muertos en obra. El plazo total depende de la superficie y complejidad del proyecto, y se define y se firma contractualmente antes de comenzar, con cronograma de obra monitoreado semana a semana."
+          "acceptedAnswer":{"@type":"Answer","text":"El anteproyecto y legajo de obra se desarrollan íntegramente en BIM antes de iniciar la construcción, lo que reduce imprevistos y tiempos muertos en obra. El plazo total depende de la superficie y complejidad del proyecto, y se define y se firma contractualmente antes de comenzar, con cronograma de obra monitoreado semana a semana."}
         },
         {
           "@type":"Question",
           "name":"¿Qué diferencia el modelo Design & Build (Diseño + Obra) de la contratación tradicional?",
-          "acceptedAnswer":{"@type":"Answer","text":"En el modelo tradicional, arquitecto y constructor son partes separadas, lo que multiplica los conflictos de interpretación y los sobrecostos. En Design & Build, Mengibar Studio x Sasha Ruiz es responsable único del diseño y de la dirección de obra, con un único interlocutor, un único presupuesto y una única responsabilidad sobre plazos y calidad final."
+          "acceptedAnswer":{"@type":"Answer","text":"En el modelo tradicional, arquitecto y constructor son partes separadas, lo que multiplica los conflictos de interpretación y los sobrecostos. En Design & Build, Mengibar Studio x Sasha Ruiz es responsable único del diseño y de la dirección de obra, con un único interlocutor, un único presupuesto y una única responsabilidad sobre plazos y calidad final."}
+        },
+        {
+          "@type":"Question",
+          "name":"¿Cuánto cuesta construir una casa sustentable en un barrio cerrado en Rosario o Funes?",
+          "acceptedAnswer":{"@type":"Answer","text":"El costo depende de la superficie computable y el nivel de terminación elegido. Como referencia, el valor base de obra vigente en la región es de $1.170.000 ARS por m² (Modelo 01, CAUPSF), sobre el que se calculan los honorarios profesionales según la escala de la Ley 10653. Podés obtener una estimación personalizada de tu proyecto en minutos con el cotizador de honorarios online."}
+        },
+        {
+          "@type":"Question",
+          "name":"¿Trabajan en Funes, Roldán e Ibarlucea además de Rosario?",
+          "acceptedAnswer":{"@type":"Answer","text":"Sí. Mengibar Studio x Sasha Ruiz diseña y dirige obra en los principales barrios cerrados y urbanizaciones privadas de Rosario, Funes, Roldán e Ibarlucea, con experiencia concreta en los reglamentos internos de edificación de cada barrio."}
+        },
+        {
+          "@type":"Question",
+          "name":"¿Cómo se calculan los honorarios de arquitecto en Santa Fe según la Ley 10653?",
+          "acceptedAnswer":{"@type":"Answer","text":"Se aplican sobre el Monto de Obra (Superficie Computable × valor del m² vigente), con una escala progresiva del CAUPSF según la superficie del proyecto, más los aportes de ley correspondientes. El desglose cubre anteproyecto, legajo de obra y dirección técnica. Podés calcular el monto exacto de tu proyecto en el cotizador de honorarios."}
+        },
+        {
+          "@type":"Question",
+          "name":"¿Qué estándares o certificaciones de sustentabilidad se aplican en los proyectos?",
+          "acceptedAnswer":{"@type":"Answer","text":"Cada proyecto se diseña bajo criterios bioclimáticos y de eficiencia energética alineados a estándares internacionales como LEED y EDGE, adaptando la estrategia de orientación, envolvente, aislación y control solar al clima específico de la región de Rosario."}
         }
       ]
     }
@@ -583,6 +632,42 @@ h1.hero-title .word:nth-child(3){animation-delay:.23s}
         </button>
         <div class="faq-a">
           <p>En el modelo tradicional, arquitecto y constructor son partes separadas, lo que multiplica los conflictos de interpretación y los sobrecostos. En Design &amp; Build, Mengibar Studio x Sasha Ruiz es responsable único del diseño y de la dirección de obra, con un único interlocutor, un único presupuesto y una única responsabilidad sobre plazos y calidad final.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button type="button" class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+          <span>¿Cuánto cuesta construir una casa sustentable en un barrio cerrado en Rosario o Funes?</span>
+          <span class="plus" aria-hidden="true"></span>
+        </button>
+        <div class="faq-a">
+          <p>El costo depende de la superficie computable y el nivel de terminación elegido. Como referencia, el valor base de obra vigente en la región es de $1.170.000 ARS por m² (Modelo 01, CAUPSF), sobre el que se calculan los honorarios profesionales según la escala de la Ley 10653. Podés obtener una estimación personalizada de tu proyecto en minutos con el <a href="/cotizador-de-honorarios">cotizador de honorarios online</a>.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button type="button" class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+          <span>¿Trabajan en Funes, Roldán e Ibarlucea además de Rosario?</span>
+          <span class="plus" aria-hidden="true"></span>
+        </button>
+        <div class="faq-a">
+          <p>Sí. Mengibar Studio x Sasha Ruiz diseña y dirige obra en los principales barrios cerrados y urbanizaciones privadas de Rosario, Funes, Roldán e Ibarlucea, con experiencia concreta en los reglamentos internos de edificación de cada barrio.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button type="button" class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+          <span>¿Cómo se calculan los honorarios de arquitecto en Santa Fe según la Ley 10653?</span>
+          <span class="plus" aria-hidden="true"></span>
+        </button>
+        <div class="faq-a">
+          <p>Se aplican sobre el Monto de Obra (Superficie Computable × valor del m² vigente), con una escala progresiva del CAUPSF según la superficie del proyecto, más los aportes de ley correspondientes. El desglose cubre anteproyecto, legajo de obra y dirección técnica. Podés calcular el monto exacto de tu proyecto en el <a href="/cotizador-de-honorarios">cotizador de honorarios</a>.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button type="button" class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+          <span>¿Qué estándares o certificaciones de sustentabilidad se aplican en los proyectos?</span>
+          <span class="plus" aria-hidden="true"></span>
+        </button>
+        <div class="faq-a">
+          <p>Cada proyecto se diseña bajo criterios bioclimáticos y de eficiencia energética alineados a estándares internacionales como LEED y EDGE, adaptando la estrategia de orientación, envolvente, aislación y control solar al clima específico de la región de Rosario.</p>
         </div>
       </div>
     </div>

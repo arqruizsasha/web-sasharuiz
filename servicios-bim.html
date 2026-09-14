@@ -30,10 +30,10 @@
   "@graph":[
     {
       "@type":"ProfessionalService",
-      "@id":"https://www.sasharuiz.com.ar/servicios-bim#service",
+      "@id":"https://www.sasharuiz.com.ar/#service",
       "name":"Mengibar Studio x Sasha Ruiz",
-      "url":"https://www.sasharuiz.com.ar/servicios-bim",
-      "description":"Servicios de modelado BIM 3D, legajos ejecutivos, cómputo métrico, detección de interferencias y coordinación de disciplinas (BIM 4D/5D) para arquitectura residencial y desarrollos en Rosario, Funes, Roldán e Ibarlucea.",
+      "url":"https://www.sasharuiz.com.ar/",
+      "description":"Diseño y construcción integral (Design & Build) de casas sustentables premium en barrios cerrados de Rosario, Funes, Roldán e Ibarlucea, con metodología BIM que garantiza costo cerrado y cero sorpresas presupuestarias en obra.",
       "email":"arqruizsasha@gmail.com",
       "areaServed":[
         {"@type":"City","name":"Rosario"},
@@ -44,15 +44,44 @@
         {"@type":"AdministrativeArea","name":"Santa Fe","addressCountry":"AR"}
       ],
       "address":{"@type":"PostalAddress","addressLocality":"Rosario","addressRegion":"Santa Fe","addressCountry":"AR"},
+      "telephone":"+543413632019",
       "priceRange":"USD",
-      "founder":{
-        "@type":"Person",
-        "name":"Sasha Ruiz",
-        "jobTitle":"Arquitecta · BIM Manager",
-        "email":"arqruizsasha@gmail.com",
-        "url":"https://www.sasharuiz.com.ar/sobre-mi"
-      },
+      "founder":{"@id":"https://www.sasharuiz.com.ar/#sasharuiz"},
       "sameAs":["https://instagram.com/arqmengibar","https://instagram.com/mengibaracademy"]
+    },
+    {
+      "@type":"Person",
+      "@id":"https://www.sasharuiz.com.ar/#sasharuiz",
+      "name":"Sasha Ruiz",
+      "jobTitle":"Arquitecta · BIM Manager",
+      "email":"arqruizsasha@gmail.com",
+      "url":"https://www.sasharuiz.com.ar/sobre-mi",
+      "worksFor":{"@id":"https://www.sasharuiz.com.ar/#service"},
+      "founder":[
+        {"@type":"Organization","name":"Mengibar Studio x Sasha Ruiz"},
+        {"@type":"Organization","name":"Mengibar Academy x Sasha Ruiz"}
+      ],
+      "sameAs":["https://instagram.com/arqmengibar"]
+    },
+    {
+      "@type":"LocalBusiness",
+      "@id":"https://www.sasharuiz.com.ar/#localbusiness",
+      "name":"Mengibar Studio x Sasha Ruiz",
+      "image":"https://www.sasharuiz.com.ar/assets/og-sasha-ruiz.jpg",
+      "email":"arqruizsasha@gmail.com",
+      "telephone":"+543413632019",
+      "priceRange":"USD",
+      "address":{"@type":"PostalAddress","addressLocality":"Rosario","addressRegion":"Santa Fe","addressCountry":"AR"},
+      "areaServed":["Rosario","Funes","Roldán","Ibarlucea","Gran Rosario"],
+      "url":"https://www.sasharuiz.com.ar/"
+    },
+    {
+      "@type":"WebPage",
+      "@id":"https://www.sasharuiz.com.ar/servicios-bim#page",
+      "name":"Documentación y Servicios BIM",
+      "url":"https://www.sasharuiz.com.ar/servicios-bim",
+      "description":"Servicios de modelado BIM 3D, legajos ejecutivos, cómputo métrico, detección de interferencias y coordinación de disciplinas (BIM 4D/5D) para arquitectura residencial y desarrollos en Rosario, Funes, Roldán e Ibarlucea.",
+      "isPartOf":{"@id":"https://www.sasharuiz.com.ar/#service"}
     },
     {
       "@type":"FAQPage",
@@ -61,21 +90,21 @@
         {
           "@type":"Question",
           "name":"¿Qué diferencia a un legajo BIM de un juego de planos tradicional?",
-          "acceptedAnswer":{"@type":"Answer","text":"El legajo BIM se genera a partir de un modelo 3D único y coordinado, donde arquitectura, estructura e instalaciones conviven en el mismo archivo. Cualquier cambio se propaga automáticamente a plantas, cortes, vistas 3D y planillas de cómputo, eliminando los errores de coordinación típicos del dibujo 2D independiente por disciplina."
+          "acceptedAnswer":{"@type":"Answer","text":"El legajo BIM se genera a partir de un modelo 3D único y coordinado, donde arquitectura, estructura e instalaciones conviven en el mismo archivo. Cualquier cambio se propaga automáticamente a plantas, cortes, vistas 3D y planillas de cómputo, eliminando los errores de coordinación típicos del dibujo 2D independiente por disciplina."}
         },
         {
           "@type":"Question",
           "name":"¿Qué es la detección de interferencias (clash detection) y por qué ahorra dinero en obra?",
-          "acceptedAnswer":{"@type":"Answer","text":"Es el proceso de superponer los modelos de arquitectura, estructura e instalaciones para detectar cruces físicos (una viga que atraviesa un conducto, una cañería que choca con una columna) antes de construir. Resolver esos conflictos en la pantalla cuesta minutos; resolverlos en obra implica demoliciones, retrabajos y demoras que impactan directamente el presupuesto."
+          "acceptedAnswer":{"@type":"Answer","text":"Es el proceso de superponer los modelos de arquitectura, estructura e instalaciones para detectar cruces físicos (una viga que atraviesa un conducto, una cañería que choca con una columna) antes de construir. Resolver esos conflictos en la pantalla cuesta minutos; resolverlos en obra implica demoliciones, retrabajos y demoras que impactan directamente el presupuesto."}
         },
         {
           "@type":"Question",
           "name":"¿Qué nivel de detalle (LOD) necesito para presupuestar mi obra con precisión?",
-          "acceptedAnswer":{"@type":"Answer","text":"Para un cómputo métrico confiable y una licitación de obra sin ambigüedades se recomienda un modelo LOD 300, con dimensiones, cantidades y ubicación exacta de cada elemento. Un LOD 400 agrega información de fabricación e instalación, útil para detalles constructivos específicos como carpinterías a medida o sistemas premium."
+          "acceptedAnswer":{"@type":"Answer","text":"Para un cómputo métrico confiable y una licitación de obra sin ambigüedades se recomienda un modelo LOD 300, con dimensiones, cantidades y ubicación exacta de cada elemento. Un LOD 400 agrega información de fabricación e instalación, útil para detalles constructivos específicos como carpinterías a medida o sistemas premium."}
         },
         {
           "@type":"Question","name":"¿El servicio BIM es solo para arquitectos y constructoras, o también para el propietario particular?",
-          "acceptedAnswer":{"@type":"Answer","text":"Ambos. A colegas y constructoras les brindamos documentación técnica y coordinación de disciplinas para sus proyectos. Al propietario particular que construye en un barrio cerrado, el modelo BIM le da certeza de costos, renders fotorrealistas para validar decisiones antes de construir y transparencia total sobre lo que se está pagando."
+          "acceptedAnswer":{"@type":"Answer","text":"Ambos. A colegas y constructoras les brindamos documentación técnica y coordinación de disciplinas para sus proyectos. Al propietario particular que construye en un barrio cerrado, el modelo BIM le da certeza de costos, renders fotorrealistas para validar decisiones antes de construir y transparencia total sobre lo que se está pagando."}
         }
       ]
     }
