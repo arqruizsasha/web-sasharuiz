@@ -199,12 +199,14 @@ h1.hero-title .word{display:inline-block;opacity:0;transform:translateY(-26px)}
 h1.hero-title.in .word{animation:wordFall .55s cubic-bezier(.34,1.56,.64,1) both}
 h1.hero-title .word:nth-child(1){animation-delay:.05s}
 h1.hero-title .word:nth-child(2){animation-delay:.14s}
+h1.hero-title .hero-title-sub{display:block;font-family:'Montserrat',sans-serif;font-weight:600;font-size:clamp(1.05rem,2.4vw,1.4rem);letter-spacing:-.005em;line-height:1.3;color:rgba(247,245,242,.82);margin-top:16px;opacity:0;transform:translateY(8px);transition:opacity .6s ease .5s,transform .6s ease .5s}
+h1.hero-title.in .hero-title-sub{opacity:1;transform:translateY(0)}
 @keyframes wordFall{
   0%{opacity:0;transform:translateY(-26px)}
   65%{opacity:1;transform:translateY(4px)}
   100%{opacity:1;transform:translateY(0)}
 }
-@media(prefers-reduced-motion:reduce){h1.hero-title .word{animation:none !important;opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){h1.hero-title .word{animation:none !important;opacity:1;transform:none}h1.hero-title .hero-title-sub{transition:none !important;opacity:1;transform:none}}
 .hero-bio{font-size:1.03rem;font-weight:400;max-width:54ch;color:rgba(247,245,242,.82);margin-bottom:16px;line-height:1.7;margin-top:24px}
 .hero-bio strong{font-weight:700;color:var(--nude)}
 .hero-acts{display:flex;gap:14px;flex-wrap:wrap;margin:30px 0 46px}
@@ -394,7 +396,7 @@ h1.hero-title .word:nth-child(2){animation-delay:.14s}
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <div class="eyebrow tech rv">Arquitecta · BIM Manager · Rosario, AR</div>
-      <h1 class="hero-title" id="heroTitle"><span class="word">Sasha</span> <span class="word">Ruiz</span></h1>
+      <h1 class="hero-title" id="heroTitle"><span class="word">Sasha</span> <span class="word">Ruiz</span> <span class="hero-title-sub">Casas Sustentables Premium en Barrios Cerrados · Rosario y Funes</span></h1>
       <p class="geo-fallback">Sasha Ruiz es arquitecta y BIM Manager, fundadora de Mengibar Studio x Sasha Ruiz (diseño y construcción integral llave en mano) y Mengibar Academy x Sasha Ruiz (formación BIM). El estudio desarrolla casas sustentables premium en barrios cerrados de Rosario, Funes, Roldán e Ibarlucea, con metodología BIM que garantiza costo cerrado y cero sorpresas presupuestarias en obra. Incluye un cotizador interactivo de honorarios según Ley 10653 / CAUPSF Santa Fe.</p>
       <p class="hero-bio rv rv-2">
         Fundadora de <strong>Mengibar Studio y Academy</strong>.<br>
