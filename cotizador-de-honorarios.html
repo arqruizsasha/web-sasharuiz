@@ -1437,7 +1437,7 @@ async function registrarEnSupabase(reg){
   if(!supabaseClient){ S.localLeadId = guardarLeadPendienteLocal(reg); return; }
   try{
     const insertPromise = supabaseInsertKeepalive(reg);
-    const timeoutPromise = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout_supabase')),4000));
+    const timeoutPromise = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout_supabase')),10000));
     const id = await Promise.race([insertPromise, timeoutPromise]);
     if(id) S.supabaseId = id;
     else S.localLeadId = guardarLeadPendienteLocal(reg);
@@ -1459,7 +1459,7 @@ async function guardarCampos(patch){
     if(!supabaseClient){ guardarActualizacionPendienteLocal(S.supabaseId, patch); return; }
     try{
       const updPromise = supabaseUpdateKeepalive(S.supabaseId, patch);
-      const timeoutPromise = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout_supabase')),4000));
+      const timeoutPromise = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout_supabase')),10000));
       await Promise.race([updPromise, timeoutPromise]);
     }catch(e){ guardarActualizacionPendienteLocal(S.supabaseId, patch); }
   } else if(S.localLeadId){
