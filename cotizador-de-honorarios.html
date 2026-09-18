@@ -653,6 +653,18 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;background:var(--nude
 .res-line--tenue .rl b{font-weight:400}
 .res-line--tenue .rmonto{font-weight:400;font-size:.92rem}
 .res-total{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:20px 22px;background:var(--nude);color:var(--navy)}
+/* Teaser: el resultado completo (ficha, esquema, desglose) se muestra de
+   entrada; solo los montos quedan tapados hasta dejar nombre y email. */
+#s6.teaser-oculto #resTotalBig,#s6.teaser-oculto #resTotal,#s6.teaser-oculto #resObra,#s6.teaser-oculto .rmonto{
+  filter:blur(7px);user-select:none;pointer-events:none}
+#s6.teaser-oculto .res-hero,#s6.teaser-oculto .res-total,#s6.teaser-oculto .obra-box{cursor:pointer}
+.teaser-cta{display:none;width:100%;margin:16px 0 6px;background:var(--nude);color:var(--navy);border:1px solid var(--navy);
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:.88rem;letter-spacing:.03em;padding:16px 28px;
+  border-radius:999px;box-shadow:0 4px 14px rgba(20,33,41,.14);align-items:center;justify-content:center;gap:10px;cursor:pointer}
+#s6.teaser-oculto .teaser-cta{display:flex}
+.etapa-bloqueada{display:flex;gap:10px;align-items:flex-start;background:rgba(110,133,149,.12);border:1px solid var(--azul);
+  border-radius:12px;padding:14px 16px;font-size:.85rem;line-height:1.5;color:var(--navy)}
+.etapa-bloqueada svg{flex:none;width:20px;height:20px;color:var(--azul)}
 .res-total .tl{font-family:'Poppins',sans-serif;font-weight:700;font-size:1rem}
 .res-total .tv{font-family:'Poppins',sans-serif;font-weight:900;font-size:1.7rem;font-variant-numeric:tabular-nums}
 .obra-box{padding:16px 22px;background:var(--c-surf2);border-bottom:1px solid var(--c-ln);display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;opacity:.72}
@@ -768,7 +780,6 @@ button,.btn{border-radius:var(--r-pill)}
 @keyframes tickerMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media(prefers-reduced-motion: reduce){.ticker-track{animation:none}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
@@ -1126,10 +1137,12 @@ Cotizador de Honorarios de Arquitectura es una herramienta de estimación online
       <h2 id="s8title">Tu estimación de honorarios</h2>
       <p class="lead" id="s8lead"></p>
 
-      <div class="res-hero">
+      <div class="res-hero" onclick="if(document.getElementById('s6').classList.contains('teaser-oculto'))abrirModalLead()">
         <div><span class="rl">Total honorarios profesionales</span><span class="rt" id="resTotalBig"></span></div>
         <span class="rd" id="resFecha"></span>
       </div>
+      <button type="button" class="teaser-cta" onclick="abrirModalLead()">
+        <svg class="ico"><use href="#i-sobre"/></svg> Dejá tu nombre y email para ver el monto</button>
       <div class="ficha" id="resFicha"></div>
 
       <div class="bloque hidden" id="esquemaBloque">
@@ -1148,7 +1161,7 @@ Cotizador de Honorarios de Arquitectura es una herramienta de estimación online
 
       <div class="bloque" id="obraBloque">
         <div class="bloque-h"><svg class="ico ico--sm"><use href="#i-casco"/></svg><span>Costo de construcción estimado</span></div>
-        <div class="obra-box">
+        <div class="obra-box" onclick="if(document.getElementById('s6').classList.contains('teaser-oculto'))abrirModalLead()">
           <div class="ob"><svg class="ico ico--sm"><use href="#i-cinta"/></svg><span id="resObraDet"></span></div>
           <span class="ov" id="resObra"></span>
         </div>
@@ -1162,7 +1175,7 @@ Cotizador de Honorarios de Arquitectura es una herramienta de estimación online
       <div class="bloque">
         <div class="bloque-h"><svg class="ico ico--sm"><use href="#i-lapiz"/></svg><span>Desglose de honorarios</span></div>
         <div class="bloque-b" id="resBody"></div>
-        <div class="res-total"><span class="tl">Total honorarios</span><span class="tv" id="resTotal"></span></div>
+        <div class="res-total" onclick="if(document.getElementById('s6').classList.contains('teaser-oculto'))abrirModalLead()"><span class="tl">Total honorarios</span><span class="tv" id="resTotal"></span></div>
       </div>
 
       <div class="fb">
@@ -1218,88 +1231,45 @@ Cotizador de Honorarios de Arquitectura es una herramienta de estimación online
 const CONFIG = { whatsapp:'543413632019' };
 
 /* ============================================================
-   SUPABASE — captura de leads y consulta desde /admin
+   SUPABASE — captura de leads vía Edge Function propia
+   ============================================================
+   CORREGIDO 18/09: antes se insertaba directo contra
+   /rest/v1/cotizaciones con la apikey anon. Ese camino se rompía en
+   sendBeacon() (401 confirmado en logs de producción — un beacon no
+   puede mandar el header Authorization, solo la apikey por query, y el
+   gateway lo rechaza) y dependía además de que el CDN de supabase-js
+   cargara bien en el celular del visitante (si ese script no cargaba,
+   ni siquiera se reintentaba el guardado en la próxima visita).
+
+   Ahora todo el guardado pasa por una Edge Function propia
+   ("registrar-lead", desplegada con verify_jwt=false): corre del lado
+   del servidor con la Service Role Key — nunca expuesta acá — y NO
+   exige ningún header de autenticación al cliente. Eso permite que
+   tanto sendBeacon() como fetch() le peguen directo, sin apikey ni
+   Authorization, eliminando el 401 de raíz. La función solo acepta dos
+   acciones acotadas (insert / update de columnas fijas), nunca un
+   UPDATE arbitrario — ver el código de la función en Supabase.
    ============================================================ */
 const SUPABASE_URL = 'https://kvqxffvaalxphmqrmjxw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2cXhmZnZhYWx4cGhtcXJtanh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MzM2NjYsImV4cCI6MjEwMjEwOTY2Nn0.xwfujk1JsO6GM89lIKyPOu0ixFX-dX1vgC9IqWmgvvQ';
-let supabaseClient = null;
-try{
-  if(window.supabase && typeof window.supabase.createClient==='function' &&
-     SUPABASE_ANON_KEY && SUPABASE_ANON_KEY.indexOf('PEGAR_AQUI')===-1){
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-}catch(e){ supabaseClient = null; }
+const LEAD_FN_URL = SUPABASE_URL + '/functions/v1/registrar-lead';
 
-/* ============================================================
-   ENVÍO "A PRUEBA DE BACKGROUNDING" — sendBeacon + fetch keepalive
-   ============================================================
-   El problema real en mobile: apenas el visitante toca "Enviar por
-   WhatsApp" o "Enviar por email", el navegador manda la pestaña a
-   segundo plano (se abre WhatsApp / la app de mail), o simplemente
-   cierra/recarga la pestaña sin tocar ningún botón. Si en ese momento
-   el guardado en Supabase seguía viajando, el sistema puede cortar la
-   conexión a mitad de camino y el dato se pierde, sin aviso — y sin
-   que quede ni siquiera en el respaldo local (porque ese respaldo se
-   escribe recién en el catch, que puede no llegar a ejecutarse si el
-   navegador mata la pestaña primero).
-
-   Por eso el guardado inicial se dispara por DOS caminos redundantes
-   en paralelo, con un id propio generado en el cliente para que
-   ambos apunten a la misma fila y nunca se duplique:
-
-   1) navigator.sendBeacon(): API del navegador diseñada específicamente
-      para este caso — el pedido queda en manos del navegador mismo,
-      que garantiza el envío incluso si la pestaña se oculta, navega a
-      otra app o se cierra un instante después. No permite mandar
-      headers propios (Authorization/apikey), así que la apikey de
-      Supabase viaja como query param en la URL (Supabase/Kong lo
-      acepta) y el body va como Blob con content-type application/json.
-      No hay forma de leer la respuesta (fire-and-forget), así que no
-      se puede confirmar éxito desde acá — es una red de contención,
-      no la vía principal.
-   2) fetch(..., {keepalive:true}): la vía principal, la que sí permite
-      mandar los headers de autenticación completos y leer la respuesta
-      para confirmar el id creado. keepalive:true logra una garantía
-      similar a sendBeacon para pedidos que ya estaban en viaje cuando
-      la pestaña se oculta.
-
-   Si el fetch (vía 2) confirma un id, se usa ese. Si sendBeacon (vía 1)
-   ya había disparado con un id propio y el fetch no llega a confirmar
-   a tiempo, se usa igual ese id propio: es muy probable que sendBeacon
-   sí haya llegado, y si el fetch además insertó la misma fila, Supabase
-   devuelve 409 (conflicto de clave primaria) — se trata como éxito, no
-   como error, porque significa que la fila ya está guardada.
-   ============================================================ */
-const SUPABASE_REST_URL = SUPABASE_URL + '/rest/v1/cotizaciones';
-function supabaseHeaders(prefer){
-  return {
-    'Content-Type': 'application/json',
-    'apikey': SUPABASE_ANON_KEY,
-    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-    'Prefer': prefer
-  };
-}
-/* Inserta una fila vía fetch keepalive. Si Supabase devuelve 409 (la fila ya
-   existe, porque sendBeacon la insertó primero), se toma como éxito: se
-   devuelve el id que ya traía el registro. Si no hay id propio disponible en
-   ese punto (no debería pasar, pero por las dudas) devuelve null. */
+/* Inserta un lead vía fetch keepalive contra la Edge Function. */
 async function supabaseInsertKeepalive(reg){
-  const resp = await fetch(SUPABASE_REST_URL, {
+  const resp = await fetch(LEAD_FN_URL, {
     method:'POST', keepalive:true,
-    headers: supabaseHeaders('return=representation'),
-    body: JSON.stringify(reg)
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(Object.assign({action:'insert'}, reg))
   });
-  if(resp.status===409) return reg.id || null;
   if(!resp.ok) throw new Error('insert_failed_'+resp.status);
   const data = await resp.json();
-  return (data && data[0] && data[0].id) ? data[0].id : (reg.id || null);
+  return (data && data.id) ? data.id : (reg.id || null);
 }
-/* Actualiza una fila por id, misma garantía de keepalive. */
+/* Actualiza un lead ya insertado vía fetch keepalive contra la misma función. */
 async function supabaseUpdateKeepalive(id, patch){
-  const resp = await fetch(SUPABASE_REST_URL+'?id=eq.'+encodeURIComponent(id), {
-    method:'PATCH', keepalive:true,
-    headers: supabaseHeaders('return=minimal'),
-    body: JSON.stringify(patch)
+  const resp = await fetch(LEAD_FN_URL, {
+    method:'POST', keepalive:true,
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({action:'update', id, patch})
   });
   if(!resp.ok) throw new Error('update_failed_'+resp.status);
 }
@@ -1389,7 +1359,6 @@ function borrarActualizacionPendienteLocal(localId){
    Se llama sola al cargar la página, al abrir el panel admin y a pedido manual.
    No bloquea nada si falla de nuevo. */
 async function sincronizarLeadsPendientes(){
-  if(!supabaseClient) return {intentados:0, exitosos:0};
   let intentados=0, exitosos=0;
   const pendientes = leerLeadsPendientesLocal();
   intentados += pendientes.length;
@@ -1398,16 +1367,16 @@ async function sincronizarLeadsPendientes(){
       const reg = Object.assign({}, lead);
       const localId = reg._localId;
       delete reg._localId; delete reg._guardadoLocal;
-      const {error} = await supabaseClient.from('cotizaciones').insert([reg]);
-      if(!error){ borrarLeadPendienteLocal(localId); exitosos++; }
+      const id = await supabaseInsertKeepalive(reg);
+      if(id){ borrarLeadPendienteLocal(localId); exitosos++; }
     }catch(e){ /* sigue pendiente, se reintenta la próxima vez que se cargue la página */ }
   }
   const actualizaciones = leerActualizacionesPendientesLocal();
   intentados += actualizaciones.length;
   for(const upd of actualizaciones){
     try{
-      const {error} = await supabaseClient.from('cotizaciones').update(upd.patch).eq('id', upd.supabaseId);
-      if(!error){ borrarActualizacionPendienteLocal(upd._localId); exitosos++; }
+      await supabaseUpdateKeepalive(upd.supabaseId, upd.patch);
+      borrarActualizacionPendienteLocal(upd._localId); exitosos++;
     }catch(e){ /* sigue pendiente */ }
   }
   return {intentados, exitosos};
@@ -1416,39 +1385,67 @@ window.addEventListener('load', ()=>{ sincronizarLeadsPendientes(); });
 
 /* Inserta el lead en la tabla `cotizaciones` de Supabase sin bloquear el
    RENDER de la pantalla de resultado (se ve al instante igual).
-   Dispara sendBeacon primero (red de contención inmediata, sobrevive
-   backgrounding y cierre de pestaña) y en paralelo lanza el fetch keepalive
-   (vía principal, la que confirma el id real). Si nada de eso llega a
-   confirmarse a tiempo, se guarda como respaldo local (ver arriba) para no
-   perder el dato del cliente.
+
+   CORREGIDO 17/09: la versión anterior daba por guardado el sendBeacon
+   apenas se disparaba (S.supabaseId = idPropio de inmediato), sin esperar
+   ninguna confirmación real. sendBeacon es fire-and-forget: no se puede
+   leer su respuesta. En producción, ese beacon está devolviendo 401 (no
+   puede mandar el header Authorization, solo la apikey por query, y el
+   gateway de Supabase lo rechaza) — confirmado en los logs reales del
+   proyecto. Como el código igual marcaba S.supabaseId como si existiera,
+   cualquier guardado posterior (el cálculo final, el voto de feedback, el
+   teléfono) intentaba un UPDATE sobre una fila que nunca se creó, en vez
+   de cargarse: si ese UPDATE también fallaba, el respaldo local guardaba
+   solo el campo suelto (el patch), no la cotización completa. Resultado:
+   la cotización se perdía por completo, sin dato recuperable en ningún
+   lado — exactamente lo que pasó en la prueba de Sasha.
+
+   Ahora el respaldo local se escribe PRIMERO, de forma síncrona, antes de
+   cualquier intento de red: pase lo que pase después (pestaña cerrada,
+   app en segundo plano, 401, timeout, sin señal), siempre queda al menos
+   la copia local en el dispositivo del visitante. sendBeacon se sigue
+   disparando en paralelo como intento extra de buena fe, pero YA NO se
+   toma como confirmación de nada. Solo una respuesta real y exitosa del
+   fetch (o un 409 = "ya existe", que confirma que alguna vía sí insertó)
+   asciende el registro de "solo local" a S.supabaseId.
+
    Devuelve la promesa del intento (no solo dispara y olvida): así, acciones
    que sacan al usuario de la pestaña —como "Enviar por WhatsApp", que en
    celular manda la app a segundo plano casi al instante— pueden ESPERAR a
-   que el intento termine (éxito o respaldo local) antes de disparar esa
-   salida. Guarda el id devuelto en S.supabaseId (o el id local en
-   S.localLeadId si no hubo forma de llegar a Supabase) para que cualquier
-   clic posterior —voto de feedback, pedido de email, teléfono, pdf
-   generado— sepa dónde escribir. */
+   que el intento termine antes de disparar esa salida. */
 async function registrarEnSupabase(reg){
   if(S.supabaseId || S.localLeadId) return; /* ya existe un registro para esta cotización: no duplicar */
   const idPropio = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : null;
   const payload = idPropio ? Object.assign({id:idPropio}, reg) : reg;
+
+  /* 1) Respaldo local INMEDIATO y síncrono — pase lo que pase después, el
+        dato ya no depende de que termine ningún viaje de red. */
+  S.localLeadId = guardarLeadPendienteLocal(payload);
+
+  /* 2) sendBeacon: intento extra de buena fe (sobrevive cierre de pestaña),
+        pero fire-and-forget — nunca se confirma ni se marca como guardado
+        a partir de esto. Ahora le pega directo a la Edge Function propia,
+        SIN apikey ni Authorization (verify_jwt=false del lado del server):
+        ya no hay ningún header que un beacon no pueda mandar. */
   if(idPropio && navigator.sendBeacon){
     try{
-      const beaconUrl = SUPABASE_REST_URL + '?apikey=' + encodeURIComponent(SUPABASE_ANON_KEY);
-      const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
-      navigator.sendBeacon(beaconUrl, blob);
-    }catch(e){ /* si sendBeacon falla por algún motivo, el fetch keepalive de abajo sigue como respaldo */ }
-    S.supabaseId = idPropio; /* se toma como guardado: si el fetch no confirma a tiempo, este id ya viaja igual */
+      const blob = new Blob([JSON.stringify(Object.assign({action:'insert'}, payload))], {type:'application/json'});
+      navigator.sendBeacon(LEAD_FN_URL, blob);
+    }catch(e){ /* no hay nada más que hacer del lado del beacon */ }
   }
-  if(!supabaseClient){ if(!S.supabaseId) S.localLeadId = guardarLeadPendienteLocal(reg); return; }
+
+  /* 3) fetch keepalive: única vía que realmente confirma el guardado. */
   try{
     const insertPromise = supabaseInsertKeepalive(payload);
     const timeoutPromise = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout_supabase')),10000));
     const id = await Promise.race([insertPromise, timeoutPromise]);
-    if(id) S.supabaseId = id;
-    else if(!S.supabaseId) S.localLeadId = guardarLeadPendienteLocal(reg);
-  }catch(e){ if(!S.supabaseId) S.localLeadId = guardarLeadPendienteLocal(reg); else guardarLeadPendienteLocal(payload); }
+    if(id){
+      S.supabaseId = id;
+      borrarLeadPendienteLocal(S.localLeadId); /* ya confirmado en Supabase: el respaldo local queda redundante */
+      S.localLeadId = null;
+    }
+    /* si no devuelve id, se queda con el respaldo local ya escrito en el paso 1 */
+  }catch(e){ /* falló el fetch (401, timeout, sin red): se queda con el respaldo local ya escrito en el paso 1 */ }
 }
 /* Punto único para guardar CUALQUIER dato que se genere después del insert
    inicial: voto de feedback, pedido de "enviar por email", teléfono, pdf
@@ -1463,7 +1460,6 @@ async function registrarEnSupabase(reg){
 async function guardarCampos(patch){
   try{ if(S.guardadoPromise) await S.guardadoPromise; }catch(e){}
   if(S.supabaseId){
-    if(!supabaseClient){ guardarActualizacionPendienteLocal(S.supabaseId, patch); return; }
     try{
       const updPromise = supabaseUpdateKeepalive(S.supabaseId, patch);
       const timeoutPromise = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout_supabase')),10000));
@@ -1942,12 +1938,16 @@ function next(){
   if(id==='s4'){
     if(esBim()){
       if(!S.bimLod){alerta('Elegí el nivel de detalle (LOD).');return}
-      abrirModalLead(); return
+      mostrarEstimacionTeaser(); return
     }
     if(!S.tareaProyecto && !S.tareaDireccion){alerta('Elegí qué querés contratar.');return}
+    if(S.alcance==='proyecto_do' && (!S.tareaProyecto || !S.tareaDireccion)){
+      alerta(direccionRequiereProyectoCompleto()?'Para combinar Proyecto y Dirección de obra, elegí primero Proyecto Completo (Legajo).':'Elegí la modalidad de Dirección de obra para continuar.');
+      return
+    }
     construirPaso6(); irA(paso+1); return
   }
-  if(id==='s5'){ abrirModalLead(); return }
+  if(id==='s5'){ mostrarEstimacionTeaser(); return }
 }
 function prev(){ if(paso>0) irA(paso-1) }
 function alerta(m){ window.alert(m) }
@@ -2370,6 +2370,14 @@ function toggleBimDisciplina(el,k){
   const i=S.bimDisciplinas.indexOf(k);
   if(i>-1) S.bimDisciplinas.splice(i,1); else S.bimDisciplinas.push(k);
 }
+/* Auto-avance: después de resolver una decisión, lleva la vista suave hacia
+   la PRÓXIMA decisión pendiente (o al botón Continuar si ya no queda
+   ninguna) en vez de dejar al visitante buscando qué sigue. */
+function irAlProximoPendiente(...candidatos){
+  const el = candidatos.find(e=>e && e.offsetParent!==null);
+  if(!el) return;
+  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'center'}), 140);
+}
 function elegirAlcance(v){
   if(!v)return;
   S.alcance=v;
@@ -2387,8 +2395,18 @@ function elegirAlcance(v){
     cardDireccion&&cardDireccion.classList.add('sel');
   }
   renderSubEtapas();
+  irAlProximoPendiente(document.getElementById('s4subProyecto'), document.getElementById('s4subDireccion'), document.querySelector('#s4 .navrow'));
 }
 function esAltaGama(){ return S.calidad==='distinguida'||S.calidad==='autor'; }
+/* Regla comercial: si Proyecto y Dirección se contratan JUNTOS (alcance
+   'proyecto_do'), la Dirección de obra solo puede contratarse sobre un
+   Proyecto Completo (Legajo) — no hay legajo ejecutivo para dirigir si la
+   etapa de proyecto elegida es apenas Anteproyecto (con o sin presupuesto
+   global). Si Dirección se contrata SOLA (sin proyecto acá, porque el
+   legajo ya existe por otra vía), esta restricción no aplica. */
+function direccionRequiereProyectoCompleto(){
+  return S.alcance==='proyecto_do' && S.tareaProyecto!=='proyecto';
+}
 function renderSubEtapas(){
   const boxP=document.getElementById('s4subProyecto');
   const boxD=document.getElementById('s4subDireccion');
@@ -2417,7 +2435,8 @@ function renderSubEtapas(){
             <span class="opt-mark">0${i+1}</span><span class="oi">${ico(t.ico,'ico--lg')}</span>
             <span class="ot">${t.n}</span><span class="od">${t.d}</span>
             <span class="op">${Math.round(t.p*100)}% del Honorario Base</span></button>`;
-        }).join('')}</div>`;
+        }).join('')}</div>
+        ${S.alcance==='proyecto_do'?`<p class="lead" style="margin-top:10px;font-size:.8rem;opacity:.75">${ico('alerta','ico--sm')} Si además contratás Dirección de obra, se habilita solo con <b>Proyecto Completo (Legajo)</b>: no se puede dirigir una obra sin la documentación ejecutiva.</p>`:''}`;
     }
   } else {
     S.tareaProyecto=null;
@@ -2434,6 +2453,14 @@ function renderSubEtapas(){
           <span class="od">Por el nivel de terminaciones elegido, la dirección se contrata en su modalidad completa (no representante técnico).</span>
           <span class="op">${Math.round(TAREAS.do_sola.p*100)}% del Honorario Base</span>
         </div></div>`;
+    } else if(direccionRequiereProyectoCompleto()){
+      S.tareaDireccion=null;
+      boxD.innerHTML=`<div class="step-num tech" style="margin-top:6px">Modalidad de dirección</div>
+        <div class="etapa-bloqueada">
+          <svg class="ico"><use href="#i-alerta"/></svg>
+          <div><b>Elegí primero Proyecto Completo (Legajo)</b> en la etapa de Proyecto.
+          No se puede contratar Dirección de obra sobre un Anteproyecto: falta la documentación ejecutiva para dirigir la obra.</div>
+        </div>`;
     } else {
       if(!['do_sola','rep_tecnico'].includes(S.tareaDireccion)) S.tareaDireccion=null;
       const ops=['do_sola','rep_tecnico'];
@@ -2464,15 +2491,25 @@ function renderSubEtapas(){
 }
 function elegirTareaProyecto(k){
   S.tareaProyecto=k;
-  document.querySelectorAll('#s4subProyecto .opt').forEach(b=>b.classList.remove('sel'));
-  const btn=[...document.querySelectorAll('#s4subProyecto .opt')].find(b=>b.getAttribute('onclick')===`elegirTareaProyecto('${k}')`);
-  if(btn) btn.classList.add('sel');
+  /* Si al elegir esta etapa de proyecto la Dirección ya no queda habilitada
+     (por ejemplo, se retrocede de "Proyecto Completo" a "Anteproyecto" con
+     Dirección ya elegida), renderSubEtapas() la vuelve a bloquear y limpia
+     S.tareaDireccion sola — no hace falta duplicar esa lógica acá. */
+  renderSubEtapas();
+  irAlProximoPendiente(
+    (S.alcance==='proyecto_do' && !S.tareaDireccion) ? document.getElementById('s4subDireccion') : null,
+    document.querySelector('#s4 .navrow')
+  );
 }
 function elegirTareaDireccion(k){
   S.tareaDireccion=k;
   document.querySelectorAll('#s4subDireccion .opt').forEach(b=>b.classList.remove('sel'));
   const btn=[...document.querySelectorAll('#s4subDireccion .opt')].find(b=>b.getAttribute('onclick')===`elegirTareaDireccion('${k}')`);
   if(btn) btn.classList.add('sel');
+  irAlProximoPendiente(
+    (S.alcance==='proyecto_do' && !S.tareaProyecto) ? document.getElementById('s4subProyecto') : null,
+    document.querySelector('#s4 .navrow')
+  );
 }
 function tareaCombinada(){
   const items=[];
@@ -2893,12 +2930,38 @@ function usarEstimacion(){
 
 /* ============================================================
    DATOS + CALCULO
-   ============================================================ */
+   ============================================================
+   FLUJO TEASER (corregido 17/09): la pantalla de Estimación se muestra
+   completa de entrada —ficha, desglose, esquema— con el número final
+   tapado (blur). El modal de datos recién aparece 5 segundos después de
+   ese reveal parcial (o antes, si el visitante toca el monto tapado). Solo
+   al confirmar nombre y email se destapa el número Y se dispara el guardado
+   en Supabase: antes de eso no hay nada que persistir, porque el número que
+   ve el visitante sin dejar datos está intencionalmente oculto. */
+let temporizadorTeaser=null;
+function mostrarEstimacionTeaser(){
+  calcular();
+  irA(stepSequence().length-1);
+  renderResultado();
+  activarBlurEstimacion();
+  clearTimeout(temporizadorTeaser);
+  temporizadorTeaser=setTimeout(()=>{ if(!S.nombre) abrirModalLead(); }, 5000);
+}
+function activarBlurEstimacion(){
+  const cont=document.getElementById('s6');
+  if(cont) cont.classList.add('teaser-oculto');
+}
+function desactivarBlurEstimacion(){
+  const cont=document.getElementById('s6');
+  if(cont) cont.classList.remove('teaser-oculto');
+}
 function abrirModalLead(){
+  clearTimeout(temporizadorTeaser);
   document.getElementById('leadErr').innerHTML='';
-  /* Reabrir el modal (típicamente tras "← Modificar datos" y volver a avanzar)
-     es una intención legítima de recalcular: hay que soltar el freno anti
-     doble-tap de la vez anterior, si no, el botón queda muerto para siempre. */
+  /* Reabrir el modal (típicamente tras tocar el monto tapado, o tras
+     "← Modificar datos" y volver a avanzar) es una intención legítima de
+     recalcular: hay que soltar el freno anti doble-tap de la vez anterior,
+     si no, el botón queda muerto para siempre. */
   envioLeadEnCurso = false;
   const btnConfirmar=document.getElementById('btnConfirmarLead');
   if(btnConfirmar) btnConfirmar.disabled = false;
@@ -2918,7 +2981,9 @@ function confirmarLead(){
   if(btnConfirmar) btnConfirmar.disabled = true;
   err.innerHTML=''; S.nombre=sanitizarTexto(n); S.email=sanitizarTexto(m);
   cerrarModal('modalLead');
-  calcularYRender();
+  clearTimeout(temporizadorTeaser);
+  desactivarBlurEstimacion();
+  calcularYRender(); /* recalcula (ya calculado), pinta con el nombre real y AHORA sí persiste en Supabase */
   irA(stepSequence().length-1);
 }
 
@@ -3108,9 +3173,18 @@ function fichaItem(icn,k,v,x){
 }
 
 
+/* Saludo del resultado: antes de que el visitante deje nombre/email (teaser)
+   todavía no hay S.nombre — usamos un encabezado genérico y recién lo
+   personalizamos al confirmar el modal. */
+function saludoResultado(){
+  return S.nombre ? ('Listo, '+S.nombre+'. Esta es tu estimación') : 'Así queda tu estimación';
+}
 function calcularYRender(){
   calcular();
+  renderResultado();
   guardarCotizacionAdmin();
+}
+function renderResultado(){
   const envioCard=document.getElementById('envioCard');
   const obraBloque=document.getElementById('obraBloque');
   document.getElementById('envioSub').textContent='Elegí cómo preferís recibirlo: WhatsApp o email.';
@@ -3126,7 +3200,7 @@ function calcularYRender(){
   }
 
   if(R.esBimCalc){
-    document.getElementById('s8title').textContent='Listo, '+S.nombre+'. Esta es tu estimación';
+    document.getElementById('s8title').textContent=saludoResultado();
     document.getElementById('s8lead').textContent=(S.bimNombreProyecto?S.bimNombreProyecto+' · ':'')+'Documentación BIM sobre '+R.supComp.toLocaleString('es-AR',{maximumFractionDigits:1})+' m² · Mercado '+R.mercado.n+'. Valores de referencia de mercado, expresados en dólares (USD).';
     document.getElementById('resTotalBig').textContent=usd(R.total);
     document.getElementById('resTotal').textContent=usd(R.total);
@@ -3151,7 +3225,7 @@ function calcularYRender(){
   }
   if(obraBloque) obraBloque.classList.remove('hidden');
 
-  document.getElementById('s8title').textContent='Listo, '+S.nombre+'. Esta es tu estimación';
+  document.getElementById('s8title').textContent=saludoResultado();
   document.getElementById('s8lead').textContent = S.tipo==='obra_nueva'
     ? 'Obra nueva en '+R.zona.n+'. Cálculo según arancel CAUPSF (Ley 10653). Valores expresados en dólares (USD).'
     : 'Remodelación de '+(AMBIENTE_REMOD[S.ambienteRemod]?AMBIENTE_REMOD[S.ambienteRemod].n.toLowerCase():'espacio existente')+'. Cálculo según arancel CAUPSF (Ley 10653). Valores expresados en dólares (USD).';
@@ -3328,6 +3402,8 @@ function reiniciar(){
   envioLeadEnCurso = false;
   envioWaEnCurso = false;
   envioMailEnCurso = false;
+  clearTimeout(temporizadorTeaser);
+  desactivarBlurEstimacion();
   const btnConfirmar=document.getElementById('btnConfirmarLead');
   if(btnConfirmar) btnConfirmar.disabled = false;
   const btnMail=document.getElementById('btnEnviarMail'); if(btnMail) btnMail.disabled=false;
